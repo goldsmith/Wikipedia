@@ -1,11 +1,17 @@
 import requests
 from bs4 import BeautifulSoup
 
+from .exceptions import *
+
 __all__ = ["search", "page", "suggest", "WikipediaPage"]
 
-def search(query, results=10):
+def search(query, results=10, suggestion=False):
 	"""
-	Do a Wikipedia search and return a list of at most `result` results.
+	Do a Wikipedia search for `query`.
+
+	Keyword arguments:
+	results - the maxmimum number of results returned
+	suggestion - if True, return results and suggestion (if any) in a tuple
 	"""
 
 	search_params = {
@@ -13,11 +19,19 @@ def search(query, results=10):
 		"list": "search",
 		"srprop": "",
 	}
+	if suggestion:
+		search_params["srinfo"] = "suggestion"
 	search_params["srsearch"] = query
 	search_params["limit"] = results
 
 	raw_results 	= _wiki_request(**search_params)
 	search_results 	= (d['title'] for d in raw_results['query']['search'])
+
+	if suggestion:
+		if raw_results['query'].get('searchinfo'):
+			return list(search_results), raw_results['query']['searchinfo']['suggestion']
+		else:
+			return list(search_results), None
 
 	return list(search_results)
 
@@ -51,8 +65,14 @@ def page(title, auto_suggest=True):
 	"""
 
 	if auto_suggest:
-		title = suggest(title) or title
+		results, suggestion = search(title, results=1, suggestion=True)
+		try:
+			title = suggestion or results[0]
+		except IndexError:
+			# if there is no suggestion or search results, let the user know
+			raise PageError(title)
 	
+	# WikipediaPage may raise a DisambiguationError
 	return WikipediaPage(title)
 
 class WikipediaPage(object):
@@ -75,7 +95,15 @@ class WikipediaPage(object):
 		search_params['page'] = self.title
 	
 		self._raw = _wiki_request(**search_params)
-		self.html = self._raw["parse"]["text"]["*"]
+
+		if self._raw['parse']['properties'][0]['name'] == "disambiguation":
+
+			# this is a disambiguation page!
+			html = self._raw['parse']['text']['*']
+			may_refer_to = [li.a.get_text() for li in BeautifulSoup(html).find_all("li")]
+			raise DisambiguationError(self.title, may_refer_to)
+
+		self.html = self._raw['parse']['text']['*']
 
 	@property
 	def content(self):
