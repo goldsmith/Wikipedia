@@ -82,14 +82,17 @@ class WikipediaPage(object):
 		"""
 		Get the plain text content of the page, excluding images, tables, and other data.
 		"""
-		html = BeautifulSoup(self.html)
-		paragraphs = html.find_all("p")
+		if not getattr(self, "_content", None):	
+			soup = BeautifulSoup(self.html)
+			paragraphs = soup.find_all("p")
+	
+			for p in paragraphs:
+				for sup in p.find_all("sup"):
+					sup.extract()
+			
+			self._content = '\n\n'.join(p.get_text() for p in paragraphs)
 
-		for p in paragraphs:
-			for sup in p.find_all("sup"):
-				sup.extract()
-		
-		return '\n\n'.join(p.get_text() for p in paragraphs)	
+		return self._content
 
 def _wiki_request(**params):
 	"""
