@@ -56,12 +56,13 @@ def suggest(query):
 
 	return None
 
-def page(title, auto_suggest=True):
+def page(title, auto_suggest=True, redirect=True):
 	"""
 	Get a WikipediaPage object for the page with title `title`.
 
 	Keyword arguments:
-	auto_suggest - if True, replace title with a Wikipedia suggested alternative
+	auto_suggest - replace title with a Wikipedia suggested alternative
+	redirect - allow redirection without raising RedirectError
 	"""
 
 	if auto_suggest:
@@ -73,7 +74,7 @@ def page(title, auto_suggest=True):
 			raise PageError(title)
 	
 	# WikipediaPage may raise a DisambiguationError
-	return WikipediaPage(title)
+	return WikipediaPage(title, redirect=redirect)
 
 class WikipediaPage(object):
 	"""
@@ -81,22 +82,24 @@ class WikipediaPage(object):
 	Uses property methods to filter data from the raw HTML.
 	"""
 
-	def __init__(self, title):
+	def __init__(self, title, redirect=True):
 		self.title = title
 
-		self.load()
+		self.load(redirect=redirect)
 
-	def load(self):
+	def load(self, redirect=True):
 		"""Make a request to Wikipedia and load the page HTML into memory."""
 
 		search_params = {
 			"action": "parse",
 		}
 		search_params['page'] = self.title
+		if redirect:
+			search_params['redirects'] = ""
 	
 		self._raw = _wiki_request(**search_params)
 
-		if self._raw['parse']['properties'][0]['name'] == "disambiguation":
+		if self._raw['parse']['properties'] and self._raw['parse']['properties'][0]['name'] == "disambiguation":
 
 			# this is a disambiguation page!
 			html = self._raw['parse']['text']['*']
@@ -104,6 +107,9 @@ class WikipediaPage(object):
 			raise DisambiguationError(self.title, may_refer_to)
 
 		self.html = self._raw['parse']['text']['*']
+
+		if "REDIRECT" in BeautifulSoup(self.html).get_text() and not redirect:
+			raise RedirectError(self.title)
 
 	@property
 	def content(self):

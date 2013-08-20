@@ -9,7 +9,7 @@ class PageError(Exception):
 		self.title = page_title
 
 	def __str__(self):
-		return "%s does not match any pages. Try another query!" % self.title
+		return "\"%s\" does not match any pages. Try another query!" % self.title
 
 class DisambiguationError(Exception):
 	"""
@@ -24,5 +24,14 @@ class DisambiguationError(Exception):
 		self.options = may_refer_to
 
 	def __str__(self):
-		return "'%s' may refer to: \n%s" % (self.title, '\n'.join(self.options))
+		return "\"%s\" may refer to: \n%s" % (self.title, '\n'.join(self.options))
+
+class RedirectError(Exception):
+	"""Exception raised when a page title unexpectedly resolves to a redirect."""
+
+	def __init__(self, page_title):
+		self.title = page_title
+
+	def __str__(self):
+		return ("\"%s\" resulted in a redirect. Did you mean to enable the keyword argument `redirect`?" % self.title)
 
