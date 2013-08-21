@@ -3,8 +3,6 @@ from bs4 import BeautifulSoup
 
 from .exceptions import *
 
-__all__ = ["search", "page", "suggest", "WikipediaPage"]
-
 def search(query, results=10, suggestion=False):
 	"""
 	Do a Wikipedia search for `query`.
@@ -54,6 +52,30 @@ def suggest(query):
 		return raw_result['query']['searchinfo']['suggestion']
 
 	return None
+
+def random(pages=1):
+	"""
+	Get a list of random Wikipedia article titles.
+	Note: 	only includes articles from namespace 0, meaning
+			no Category, User talk, or other meta-Wikipedia pages.
+
+	Keyword arguments:
+	pages - the number of random pages returned (max of 10)
+	"""
+	#http://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=5000&format=jsonfm
+	query_params = {
+		'list': "random",
+		'rnnamespace': 0,
+		'rnlimit': pages,
+	}
+
+	request = _wiki_request(**query_params)
+	titles = [page['title'] for page in request['query']['random']]
+
+	if len(titles) == 1:
+		return titles[0]
+
+	return titles
 
 def page(title, auto_suggest=True, redirect=True):
 	"""
