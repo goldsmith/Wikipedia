@@ -189,6 +189,28 @@ class WikipediaPage(object):
 
 		return summary
 
+	def images(self):
+		"""
+		List of URLs of images on the page.
+		"""
+		
+		if not getattr(self, "_images", False):
+			query_params = {
+				'generator': "images",
+				'gimlimit': "max",
+				'prop': "imageinfo",
+				'iiprop': "url",
+				'titles': self.title,
+			}
+	
+			request = _wiki_request(**query_params)
+	
+			image_keys = request['query']['pages'].keys()
+			images = [request['query']['pages'][key] for key in image_keys]
+			self._images = [image['imageinfo'][0]['url'] for image in images if image.get('imageinfo')]
+
+		return self._images
+
 def _wiki_request(**params):
 	"""
 	Make a request to the Wikipedia API using the given search parameters. 
