@@ -192,8 +192,8 @@ class WikipediaPage(object):
 	def images(self):
 		"""
 		List of URLs of images on the page.
-		"""
-		
+		"""	
+
 		if not getattr(self, "_images", False):
 			query_params = {
 				'generator': "images",
@@ -206,10 +206,35 @@ class WikipediaPage(object):
 			request = _wiki_request(**query_params)
 	
 			image_keys = request['query']['pages'].keys()
-			images = [request['query']['pages'][key] for key in image_keys]
+			images = (request['query']['pages'][key] for key in image_keys)
 			self._images = [image['imageinfo'][0]['url'] for image in images if image.get('imageinfo')]
 
 		return self._images
+
+	def references(self):
+		"""
+		List of URLs of external links on a page.
+		May include external links within page that aren't technically cited anywhere.
+		"""
+
+		if not getattr(self, "_references", False):
+			query_params = {
+				'prop': "extlinks",
+				'ellimit': "max",
+				'titles': self.title,
+			}
+
+			request = _wiki_request(**query_params)
+
+			links = request['query']['pages'][self.pageid]['extlinks']
+			relative_urls = (link['*'] for link in links)
+
+			def add_protocol(url):
+				return url if url.startswith('http') else 'http:' + url
+
+			self._references = [add_protocol(url) for url in relative_urls]
+
+		return self._references
 
 def _wiki_request(**params):
 	"""
