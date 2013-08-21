@@ -108,6 +108,9 @@ class WikipediaPage(object):
 
 		self.load(redirect=redirect)
 
+	def __repr__(self):
+		return u'<WikipediaPage \'%s\'>' % self.title
+
 	def load(self, redirect=True):
 		"""
 		Load basic information from Wikipedia. 
