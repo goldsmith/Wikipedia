@@ -33,5 +33,5 @@ class RedirectError(Exception):
 		self.title = page_title
 
 	def __str__(self):
-		return ("\"%s\" resulted in a redirect. Did you mean to enable the keyword argument `redirect`?" % self.title)
+		return ("\"%s\" resulted in a redirect. Set the redirect property to True to allow automatic redirects." % self.title)
 
