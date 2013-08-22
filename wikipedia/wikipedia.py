@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from .exceptions import *
-from .util import cache, debug
+from .util import cache
 
 @cache
 def search(query, results=10, suggestion=False):
@@ -208,6 +208,26 @@ class WikipediaPage(object):
 			self.pageid = pageid
 			self.url = data['fullurl']
 
+	def html(self):
+		"""
+		Get full page HTML.
+		Warning: this can get pretty slow on long pages.
+		"""
+
+		if not getattr(self, "_html", False):
+			query_params = {
+				'prop': "revisions",
+				'rvprop': "content",
+				'rvlimit': 1,
+				'rvparse': "",
+				'titles': self.title
+			}
+	
+			request = _wiki_request(**query_params)
+			self._html = request['query']['pages'][self.pageid]['revisions'][0]['*']
+
+		return self._html
+
 	@property
 	def content(self):
 		"""
@@ -330,7 +350,6 @@ class WikipediaPage(object):
 
 		return self._links
 
-@debug
 def _wiki_request(**params):
 	"""
 	Make a request to the Wikipedia API using the given search parameters. 
@@ -339,6 +358,5 @@ def _wiki_request(**params):
 	api_url = "http://en.wikipedia.org/w/api.php"
 	params['format'] = "json"
 	params['action'] = "query"
-
 	r = requests.get(api_url, params=params)
 	return r.json()

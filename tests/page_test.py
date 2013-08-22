@@ -87,3 +87,7 @@ class TestPage(unittest.TestCase):
 	def test_links(self):
 		"""Test the list of titles of links to Wikipedia pages."""
 		self.assertEqual(self.celtuce.links, mock_data['data']["celtuce.links"])
+
+	def test_html(self):
+		"""Test the full HTML method."""
+		self.assertEqual(self.celtuce.html(), mock_data['data']["celtuce.html"])
