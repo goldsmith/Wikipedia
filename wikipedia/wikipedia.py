@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from .exceptions import *
-from .util import cache
+from .util import cache, debug
 
 @cache
 def search(query, results=10, suggestion=False):
@@ -124,7 +124,7 @@ def page(title, auto_suggest=True, redirect=True, preload=False):
 	Keyword arguments:
 	auto_suggest - let Wikipedia find a valid page title for the query
 	redirect - allow redirection without raising RedirectError
-	preload - load content, summary, images, and references in advance
+	preload - load content, summary, images, references, and links during initialization
 	"""
 
 	if auto_suggest:
@@ -150,7 +150,7 @@ class WikipediaPage(object):
 		self.load(redirect=redirect, preload=preload)
 
 		if preload:
-			for prop in ["content", "summary", "images", "references"]:
+			for prop in ["content", "summary", "images", "references", "links"]:
 				getattr(self, prop)
 
 	def __repr__(self):
@@ -299,6 +299,38 @@ class WikipediaPage(object):
 
 		return self._references
 
+	@property
+	def links(self):
+		"""
+		List of titles of Wikipedia page links on a page.
+		Note:	Only includes articles from namespace 0, meaning
+				no Category, User talk, or other meta-Wikipedia pages.
+		"""
+
+		if not getattr(self, "_links", False):
+			links = []
+
+			query_params = {
+				'prop': "links",
+				'plnamespace': 0,
+				'pllimit': "max",
+				'titles': self.title,
+			}
+
+			while True:
+				request = _wiki_request(**query_params)
+				links.extend([link['title'] for link in request['query']['pages'][self.pageid]['links']])
+
+				if not request.get('query-continue'):
+					break
+
+				query_params['plcontinue'] = request['query-continue']['links']['plcontinue']
+
+			self._links = links
+
+		return self._links
+
+@debug
 def _wiki_request(**params):
 	"""
 	Make a request to the Wikipedia API using the given search parameters. 

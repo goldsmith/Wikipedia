@@ -83,3 +83,7 @@ class TestPage(unittest.TestCase):
 	def test_references(self):
 		"""Test the list of reference URLs."""
 		self.assertEqual(self.celtuce.references, mock_data['data']["celtuce.references"])
+
+	def test_links(self):
+		"""Test the list of titles of links to Wikipedia pages."""
+		self.assertEqual(self.celtuce.links, mock_data['data']["celtuce.links"])

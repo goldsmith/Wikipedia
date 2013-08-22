@@ -47,6 +47,9 @@ mock_data = {
 
 		"{'titles': u'Celtuce', 'prop': 'extlinks', 'ellimit': 'max'}":
 		{u'query': {u'pages': {u'1868108': {u'extlinks': [{u'*': u'http://ndb.nal.usda.gov/ndb/search/list'}, {u'*': u'http://ndb.nal.usda.gov/ndb/search/list?qlookup=11145&format=Full'}], u'ns': 0, u'pageid': 1868108, u'title': u'Celtuce'}}}, u'limits': {u'extlinks': 500}},
+
+		"{'plnamespace': 0, 'titles': u'Celtuce', 'pllimit': 'max', 'prop': 'links'}":
+		{u'query': {u'pages': {u'1868108': {u'ns': 0, u'pageid': 1868108, u'links': [{u'ns': 0, u'title': u'Calcium'}, {u'ns': 0, u'title': u'Carbohydrate'}, {u'ns': 0, u'title': u'Chinese language'}, {u'ns': 0, u'title': u'Dietary Reference Intake'}, {u'ns': 0, u'title': u'Dietary fiber'}, {u'ns': 0, u'title': u'Fat'}, {u'ns': 0, u'title': u'Folate'}, {u'ns': 0, u'title': u'Food energy'}, {u'ns': 0, u'title': u'Iron'}, {u'ns': 0, u'title': u'Lettuce'}, {u'ns': 0, u'title': u'Lhasa'}, {u'ns': 0, u'title': u'Magnesium in biology'}, {u'ns': 0, u'title': u'Manganese'}, {u'ns': 0, u'title': u'Niacin'}, {u'ns': 0, u'title': u'Pantothenic acid'}, {u'ns': 0, u'title': u'Phosphorus'}, {u'ns': 0, u'title': u'Pinyin'}, {u'ns': 0, u'title': u'Plant stem'}, {u'ns': 0, u'title': u'Potassium'}, {u'ns': 0, u'title': u'Protein (nutrient)'}, {u'ns': 0, u'title': u'Riboflavin'}, {u'ns': 0, u'title': u'Sodium'}, {u'ns': 0, u'title': u'Stir frying'}, {u'ns': 0, u'title': u'Thiamine'}, {u'ns': 0, u'title': u'Vegetable'}, {u'ns': 0, u'title': u'Vitamin A'}, {u'ns': 0, u'title': u'Vitamin B6'}, {u'ns': 0, u'title': u'Vitamin C'}, {u'ns': 0, u'title': u'Zinc'}], u'title': u'Celtuce'}}}, u'limits': {u'links': 500}},
 	},
 
 	"data": {
@@ -57,5 +60,7 @@ mock_data = {
 		"celtuce.images": [u'http://upload.wikimedia.org/wikipedia/en/9/99/Question_book-new.svg', u'http://upload.wikimedia.org/wikipedia/commons/8/87/Celtuce.jpg', u'http://upload.wikimedia.org/wikipedia/commons/7/79/VegCorn.jpg', u'http://upload.wikimedia.org/wikipedia/commons/d/dc/The_farmer%27s_market_near_the_Potala_in_Lhasa.jpg'],
 
 		"celtuce.references": [u'http://ndb.nal.usda.gov/ndb/search/list', u'http://ndb.nal.usda.gov/ndb/search/list?qlookup=11145&format=Full'],
+
+		"celtuce.links": [u'Calcium', u'Carbohydrate', u'Chinese language', u'Dietary Reference Intake', u'Dietary fiber', u'Fat', u'Folate', u'Food energy', u'Iron', u'Lettuce', u'Lhasa', u'Magnesium in biology', u'Manganese', u'Niacin', u'Pantothenic acid', u'Phosphorus', u'Pinyin', u'Plant stem', u'Potassium', u'Protein (nutrient)', u'Riboflavin', u'Sodium', u'Stir frying', u'Thiamine', u'Vegetable', u'Vitamin A', u'Vitamin B6', u'Vitamin C', u'Zinc'],
 	}
 }
