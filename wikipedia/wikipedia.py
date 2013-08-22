@@ -365,5 +365,6 @@ def _wiki_request(**params):
 	api_url = "http://en.wikipedia.org/w/api.php"
 	params['format'] = "json"
 	params['action'] = "query"
+
 	r = requests.get(api_url, params=params)
 	return r.json()
