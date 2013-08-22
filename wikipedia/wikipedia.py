@@ -10,8 +10,9 @@ def search(query, results=10, suggestion=False):
 	Do a Wikipedia search for `query`.
 
 	Keyword arguments:
-	results - the maxmimum number of results returned
-	suggestion - if True, return results and suggestion (if any) in a tuple
+
+	* results - the maxmimum number of results returned
+	* suggestion - if True, return results and suggestion (if any) in a tuple
 	"""
 
 	search_params = {
@@ -59,11 +60,12 @@ def suggest(query):
 def random(pages=1):
 	"""
 	Get a list of random Wikipedia article titles.
-	Note: 	only includes articles from namespace 0, meaning
-			no Category, User talk, or other meta-Wikipedia pages.
+
+	.. note::	Random only gets articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
 
 	Keyword arguments:
-	pages - the number of random pages returned (max of 10)
+
+	* pages - the number of random pages returned (max of 10)
 	"""
 	#http://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=5000&format=jsonfm
 	query_params = {
@@ -84,13 +86,15 @@ def random(pages=1):
 def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
 	"""
 	Plain text summary of the page.
-	This is a convenience wrapper - auto_suggest and redirect are enabled by default
+
+	.. note:: This is a convenience wrapper - auto_suggest and redirect are enabled by default
 
 	Keyword arguments:
-	sentences - if set, return the first `sentences` sentences
-	chars - if set, return only the first `chars` characters.
-	auto_suggest - let Wikipedia find a valid page title for the query
-	redirect - allow redirection without raising RedirectError
+
+	* sentences - if set, return the first `sentences` sentences
+	* chars - if set, return only the first `chars` characters.
+	* auto_suggest - let Wikipedia find a valid page title for the query
+	* redirect - allow redirection without raising RedirectError
 	"""
 
 	# use auto_suggest and redirect to get the correct article
@@ -122,9 +126,10 @@ def page(title, auto_suggest=True, redirect=True, preload=False):
 	Get a WikipediaPage object for the page with title `title`.
 
 	Keyword arguments:
-	auto_suggest - let Wikipedia find a valid page title for the query
-	redirect - allow redirection without raising RedirectError
-	preload - load content, summary, images, references, and links during initialization
+
+	* auto_suggest - let Wikipedia find a valid page title for the query
+	* redirect - allow redirection without raising RedirectError
+	* preload - load content, summary, images, references, and links during initialization
 	"""
 
 	if auto_suggest:
@@ -211,7 +216,8 @@ class WikipediaPage(object):
 	def html(self):
 		"""
 		Get full page HTML.
-		Warning: this can get pretty slow on long pages.
+
+		.. warning:: this can get pretty slow on long pages.
 		"""
 
 		if not getattr(self, "_html", False):
@@ -252,8 +258,9 @@ class WikipediaPage(object):
 		Plain text summary of the page.
 
 		Keyword arguments:
-		sentences - if set, return the first `sentences` sentences
-		chars - if set, return only the first `chars` characters.
+
+		* sentences - if set, return the first `sentences` sentences
+		* chars - if set, return only the first `chars` characters.
 		"""
 
 		# cache the most common form of invoking summary
@@ -323,8 +330,8 @@ class WikipediaPage(object):
 	def links(self):
 		"""
 		List of titles of Wikipedia page links on a page.
-		Note:	Only includes articles from namespace 0, meaning
-				no Category, User talk, or other meta-Wikipedia pages.
+		
+		.. note:: Only includes articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
 		"""
 
 		if not getattr(self, "_links", False):
