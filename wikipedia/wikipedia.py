@@ -2,7 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 
 from .exceptions import *
+from .util import cache
 
+@cache
 def search(query, results=10, suggestion=False):
 	"""
 	Do a Wikipedia search for `query`.
@@ -33,6 +35,7 @@ def search(query, results=10, suggestion=False):
 
 	return list(search_results)
 
+@cache
 def suggest(query):
 	"""
 	Get a Wikipedia search suggestion for `query`.
@@ -77,6 +80,7 @@ def random(pages=1):
 
 	return titles
 
+@cache
 def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
 	"""
 	Plain text summary of the page.
