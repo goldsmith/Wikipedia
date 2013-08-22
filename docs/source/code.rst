@@ -9,7 +9,7 @@ Contents:
 
 .. toctree::
 
-   index.rst
+   code
 
 .. automodule:: wikipedia
 	:members:
