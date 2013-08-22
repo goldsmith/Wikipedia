@@ -350,6 +350,13 @@ class WikipediaPage(object):
 
 		return self._links
 
+def donate():
+	"""
+	Open up the Wikimedia donate page in your favorite browser.
+	"""
+	import webbrowser
+	webbrowser.open("https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage", new=2)
+
 def _wiki_request(**params):
 	"""
 	Make a request to the Wikipedia API using the given search parameters. 
