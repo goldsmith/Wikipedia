@@ -113,13 +113,14 @@ def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
 
 	return summary	
 
-def page(title, auto_suggest=True, redirect=True):
+def page(title, auto_suggest=True, redirect=True, preload=False):
 	"""
 	Get a WikipediaPage object for the page with title `title`.
 
 	Keyword arguments:
 	auto_suggest - let Wikipedia find a valid page title for the query
 	redirect - allow redirection without raising RedirectError
+	preload - load content, summary, images, and references in advance
 	"""
 
 	if auto_suggest:
@@ -130,7 +131,7 @@ def page(title, auto_suggest=True, redirect=True):
 			# if there is no suggestion or search results, the page doesn't exist
 			raise PageError(title)
 	
-	return WikipediaPage(title, redirect=redirect)
+	return WikipediaPage(title, redirect=redirect, preload=preload)
 
 class WikipediaPage(object):
 	"""
@@ -138,16 +139,20 @@ class WikipediaPage(object):
 	Uses property methods to filter data from the raw HTML.
 	"""
 
-	def __init__(self, title, redirect=True, original_title=""):
+	def __init__(self, title, redirect=True, preload=False, original_title=""):
 		self.title = title
 		self.original_title = original_title or title
 
-		self.load(redirect=redirect)
+		self.load(redirect=redirect, preload=preload)
+
+		if preload:
+			for prop in ["content", "summary", "images", "references"]:
+				getattr(self, prop)
 
 	def __repr__(self):
 		return u'<WikipediaPage \'%s\'>' % self.title
 
-	def load(self, redirect=True):
+	def load(self, redirect=True, preload=False):
 		"""
 		Load basic information from Wikipedia. 
 		Confirm that page exists and is not a disambiguation/redirect.
@@ -181,7 +186,7 @@ class WikipediaPage(object):
 				request = _wiki_request(**query_params)
 				title = ' '.join(request['query']['pages'][pageid]['extract'].split()[1:])
 
-				self.__init__(title, redirect=redirect)
+				self.__init__(title, redirect=redirect, preload=preload)
 
 			else:
 				raise RedirectError(self.title)
@@ -199,6 +204,7 @@ class WikipediaPage(object):
 			self.pageid = pageid
 			self.url = data['fullurl']
 
+	@property
 	def content(self):
 		"""
 		Plain text content of the page, excluding images, tables, and other data.
@@ -216,7 +222,8 @@ class WikipediaPage(object):
 
 		return self._content
 
-	def summary(self, sentences=0, chars=0):
+	@property
+	def summary(self):
 		"""
 		Plain text summary of the page.
 
@@ -226,30 +233,20 @@ class WikipediaPage(object):
 		"""
 
 		# cache the most common form of invoking summary
-		if not sentences and not chars and getattr(self, "_summary", False):
-			return self._summary
+		if not getattr(self, "_summary", False):	
+			query_params = {
+				'prop': "extracts",
+				'explaintext': "",
+				'exintro': "",
+				'titles': self.title
+			}
+	
+			request = _wiki_request(**query_params)
+			self._summary = request['query']['pages'][self.pageid]['extract']
+	
+		return self._summary
 
-		query_params = {
-			'prop': "extracts",
-			'explaintext': "",
-			'titles': self.title
-		}
-
-		if sentences:
-			query_params['exsentences'] = sentences
-		elif chars:
-			query_params['exchars'] = chars
-		else:
-			query_params['exintro'] = ""
-
-		request = _wiki_request(**query_params)
-		summary = request['query']['pages'][self.pageid]['extract']
-
-		if not sentences and not chars:
-			self._summary = summary
-
-		return summary
-
+	@property
 	def images(self):
 		"""
 		List of URLs of images on the page.
@@ -272,6 +269,7 @@ class WikipediaPage(object):
 
 		return self._images
 
+	@property
 	def references(self):
 		"""
 		List of URLs of external links on a page.

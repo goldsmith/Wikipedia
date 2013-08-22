@@ -70,20 +70,16 @@ class TestPage(unittest.TestCase):
 
 	def test_content(self):
 		"""Test the plain text content."""
-		self.assertEqual(self.celtuce.content(), mock_data['data']["celtuce.content"])
+		self.assertEqual(self.celtuce.content, mock_data['data']["celtuce.content"])
 
 	def test_summary(self):
 		"""Test the summary."""
-		self.assertEqual(self.celtuce.summary(), mock_data['data']["celtuce.summary"])
-
-	def test_sentence(self):
-		"""Test the first sentence summary."""
-		self.assertEqual(self.celtuce.summary(sentences=1), mock_data['data']["celtuce.sentence"])
+		self.assertEqual(self.celtuce.summary, mock_data['data']["celtuce.summary"])
 
 	def test_images(self):
 		"""Test the list of image URLs."""
-		self.assertEqual(self.celtuce.images(), mock_data['data']["celtuce.images"])
+		self.assertEqual(self.celtuce.images, mock_data['data']["celtuce.images"])
 
 	def test_references(self):
 		"""Test the list of reference URLs."""
-		self.assertEqual(self.celtuce.references(), mock_data['data']["celtuce.references"])
+		self.assertEqual(self.celtuce.references, mock_data['data']["celtuce.references"])
