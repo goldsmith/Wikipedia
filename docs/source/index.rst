@@ -1,36 +1,21 @@
-.. wikipedia documentation master file, created by
-   sphinx-quickstart on Thu Aug 22 11:23:34 2013.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+.. _index:
 
-Wikipedia Documentation
-***********************
+Wikipedia
+=========
 
-Contents:
+Wikipedia
+*********
 
-.. toctree::
+Welcome to the wikipedia for Python library!
 
-   index.rst
+::
 
-.. automodule:: wikipedia
-	:members:
+	import wikipedia
 
-Functions and Classes
-===============================
+	print wikipedia.summary("Wikipedia")
+	# Wikipedia (/ˌwɪkɨˈpiːdiə/ or /ˌwɪkiˈpiːdiə/ WIK-i-PEE-dee-ə) is a collaboratively edited, multilingual, free Internet encyclopedia supported by the non-profit Wikimedia Foundation...
 
-.. automodule:: wikipedia
-	:members: search, suggest, random, summary, page
-
-.. autoclass:: wikipedia.WikipediaPage
-	:members:
-
-.. autofunction:: wikipedia.donate
-
-Exceptions
-==========
-
-.. automodule:: wikipedia.exceptions
-	:members:
+Go to the :ref:`quickstart` to start using ``wikipedia`` now, or see the :ref:`api`.
 
 Indices and tables
 ==================
