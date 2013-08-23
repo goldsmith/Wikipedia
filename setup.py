@@ -10,7 +10,7 @@ dependencies = open(os.path.join(os.path.dirname(__file__), "requirements.txt"))
 
 setup(
     name = "wikipedia",
-    version = "0.9.5dev",
+    version = "0.9.8",
     author = "Jonathan Goldsmith",
     author_email = "jhghank@gmail.com",
     description = "Wikipedia API for Python",
