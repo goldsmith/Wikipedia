@@ -1,6 +1,13 @@
 Wikipedia
 =========
 
+.. image:: https://travis-ci.org/goldsmith/Wikipedia.png?branch=master  
+    :target: https://travis-ci.org/goldsmith/Wikipedia 
+.. image:: https://pypip.in/d/wikipedia/badge.png   
+    :target: https://crate.io/packages/wikipedia 
+.. image:: https://pypip.in/v/wikipedia/badge.png   
+    :target: https://crate.io/packages/wikipedia
+
 **Wikipedia** is a Python library that makes it easy to access and parse
 data from Wikipedia.
 
