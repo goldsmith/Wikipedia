@@ -1,4 +1,4 @@
-beautifulsoup4
+beautifulsoup==4.3.1
 nose==1.3.0
 requests==1.2.3
 wsgiref==0.1.2
