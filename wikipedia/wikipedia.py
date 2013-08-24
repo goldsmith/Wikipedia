@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from .exceptions import *
-from .util import cache, debug
+from .util import cache
 
 @cache
 def search(query, results=10, suggestion=False):
@@ -368,7 +368,6 @@ def donate():
 	import webbrowser
 	webbrowser.open("https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage", new=2)
 
-@debug
 def _wiki_request(**params):
 	"""
 	Make a request to the Wikipedia API using the given search parameters. 
