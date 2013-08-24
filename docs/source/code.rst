@@ -18,10 +18,19 @@ Functions and Classes
 ===============================
 
 .. automodule:: wikipedia
-	:members: search, suggest, random, summary, page
+
+	.. autofunction:: search(query, results=10, suggestion=False)
+
+	.. autofunction:: suggest(query)
+
+	.. autofunction:: summary(query, sentences=0, chars=0, auto_suggest=True, redirect=True)
+
+	.. autofunction:: page
 
 .. autoclass:: wikipedia.WikipediaPage
 	:members:
+
+.. autofunction:: wikipedia.random
 
 .. autofunction:: wikipedia.donate
 
