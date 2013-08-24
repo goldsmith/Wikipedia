@@ -330,7 +330,7 @@ class WikipediaPage(object):
 	def links(self):
 		"""
 		List of titles of Wikipedia page links on a page.
-		
+
 		.. note:: Only includes articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
 		"""
 
@@ -373,5 +373,9 @@ def _wiki_request(**params):
 	params['format'] = "json"
 	params['action'] = "query"
 
-	r = requests.get(api_url, params=params)
+	headers = {
+		'User-Agent': "wikipedia/0.9 (https://github.com/goldsmith/Wikipedia/)"
+	}
+
+	r = requests.get(api_url, params=params, headers=headers)
 	return r.json()
