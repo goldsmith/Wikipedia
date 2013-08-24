@@ -41,7 +41,7 @@ class TestPageSetUp(unittest.TestCase):
 			options = e.options
 
 		self.assertTrue(error_raised)
-		self.assertEqual(options, [u'Dodge Ramcharger', u'Dodge Ram Van', u'Dodge Mini Ram', u'Dodge Caravan C/V', u'Dodge Caravan C/V', u'Ram C/V', u'Dodge Ram 50'])
+		self.assertEqual(options, [u'Dodge Ramcharger', u'Dodge Ram Van', u'Dodge Mini Ram', u'Dodge Caravan C/V', u'Dodge Caravan C/V', u'Ram C/V', u'Dodge Ram 50', u'Dodge D-Series', u'Dodge Rampage', u'Ram (brand)'])
 
 	def test_auto_suggest(self):
 		"""Test that auto_suggest properly corrects a typo."""

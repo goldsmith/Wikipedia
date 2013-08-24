@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from .exceptions import *
-from .util import cache
+from .util import cache, debug
 
 @cache
 def search(query, results=10, suggestion=False):
@@ -168,9 +168,9 @@ class WikipediaPage(object):
 		"""
 
 		query_params = {
-			'prop': "info|categories",
+			'prop': "info|pageprops",
 			'inprop': "url",
-			'clcategories': "Category:All disambiguation pages",
+			'ppprop': "disambiguation",
 			'titles': self.title
 		}
 	
@@ -200,13 +200,17 @@ class WikipediaPage(object):
 			else:
 				raise RedirectError(self.title)
 
-		# since we limited categories, if a category is returned 
+		# since we only asked for disambiguation in ppprop,
+		# if a pageprop is returned,
 		# then the page must be a disambiguation page
-		elif data.get('categories'):
+		elif data.get('pageprops'):
 			request = _wiki_request(titles=self.title, prop="revisions", rvprop="content", rvparse="", rvlimit=1)
 			html = request['query']['pages'][pageid]['revisions'][0]['*']
 
-			may_refer_to = [li.a.get_text() for li in BeautifulSoup(html).ul.find_all('li')]
+			lis = BeautifulSoup(html).find_all('li')
+			filtered_lis = [li for li in lis if not "tocsection" in ''.join(li.get('class', []))]
+			may_refer_to = [li.a.get_text() for li in filtered_lis]
+
 			raise DisambiguationError(self.title, may_refer_to)
 
 		else:
@@ -364,6 +368,7 @@ def donate():
 	import webbrowser
 	webbrowser.open("https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage", new=2)
 
+@debug
 def _wiki_request(**params):
 	"""
 	Make a request to the Wikipedia API using the given search parameters. 
@@ -378,4 +383,5 @@ def _wiki_request(**params):
 	}
 
 	r = requests.get(api_url, params=params, headers=headers)
+
 	return r.json()

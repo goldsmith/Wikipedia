@@ -23,8 +23,11 @@ class DisambiguationError(Exception):
 		self.title = title
 		self.options = may_refer_to
 
+	def __unicode__(self):
+		return u"\"%s\" may refer to: \n%s" % (self.title, '\n'.join(self.options))
+
 	def __str__(self):
-		return "\"%s\" may refer to: \n%s" % (self.title, '\n'.join(self.options))
+		return unicode(self).encode('ascii', 'ignore')
 
 class RedirectError(Exception):
 	"""Exception raised when a page title unexpectedly resolves to a redirect."""
