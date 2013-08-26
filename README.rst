@@ -35,6 +35,8 @@ Wikipedia data, not getting it.
     >>> ny.links[0]
     # u'1790 United States Census'
 
+Note: this library was designed for ease of use and simplicity, not for advanced use. If you plan on doing serious scraping or automated requests please use `Pywikipediabot <http://www.mediawiki.org/wiki/Manual:Pywikipediabot>`__, the official MediaWiki scraper that has a larger API and includes rate limiting so we can be considerate of the MediaWiki infrastructure. 
+
 Installation
 ------------
 
