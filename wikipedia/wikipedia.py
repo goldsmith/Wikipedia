@@ -4,383 +4,391 @@ from bs4 import BeautifulSoup
 from .exceptions import *
 from .util import cache
 
+
 @cache
 def search(query, results=10, suggestion=False):
-	"""
-	Do a Wikipedia search for `query`.
+    '''
+    Do a Wikipedia search for `query`.
 
-	Keyword arguments:
+    Keyword arguments:
 
-	* results - the maxmimum number of results returned
-	* suggestion - if True, return results and suggestion (if any) in a tuple
-	"""
+    * results - the maxmimum number of results returned
+    * suggestion - if True, return results and suggestion (if any) in a tuple
+    '''
 
-	search_params = {
-		"list": "search",
-		"srprop": "",
-		"srlimit": results
-	}
-	if suggestion:
-		search_params["srinfo"] = "suggestion"
-	search_params["srsearch"] = query
-	search_params["limit"] = results
+    search_params = {
+        'list': 'search',
+        'srprop': '',
+        'srlimit': results
+    }
+    if suggestion:
+        search_params['srinfo'] = 'suggestion'
+    search_params['srsearch'] = query
+    search_params['limit'] = results
 
-	raw_results 	= _wiki_request(**search_params)
-	search_results 	= (d['title'] for d in raw_results['query']['search'])
+    raw_results = _wiki_request(**search_params)
+    search_results = (d['title'] for d in raw_results['query']['search'])
 
-	if suggestion:
-		if raw_results['query'].get('searchinfo'):
-			return list(search_results), raw_results['query']['searchinfo']['suggestion']
-		else:
-			return list(search_results), None
+    if suggestion:
+        if raw_results['query'].get('searchinfo'):
+            return list(search_results), raw_results['query']['searchinfo']['suggestion']
+        else:
+            return list(search_results), None
 
-	return list(search_results)
+    return list(search_results)
+
 
 @cache
 def suggest(query):
-	"""
-	Get a Wikipedia search suggestion for `query`.
-	Returns a string or None if no suggestion was found.
-	"""
+    '''
+    Get a Wikipedia search suggestion for `query`.
+    Returns a string or None if no suggestion was found.
+    '''
 
-	search_params = {
-		"list": "search",
-		"srinfo": "suggestion",
-		"srprop": "",
-	}
-	search_params['srsearch'] = query
+    search_params = {
+        'list': 'search',
+        'srinfo': 'suggestion',
+        'srprop': '',
+    }
+    search_params['srsearch'] = query
 
-	raw_result = _wiki_request(**search_params)
+    raw_result = _wiki_request(**search_params)
 
-	if raw_result['query'].get('searchinfo'):
-		return raw_result['query']['searchinfo']['suggestion']
+    if raw_result['query'].get('searchinfo'):
+        return raw_result['query']['searchinfo']['suggestion']
 
-	return None
+    return None
+
 
 def random(pages=1):
-	"""
-	Get a list of random Wikipedia article titles.
+    '''
+    Get a list of random Wikipedia article titles.
 
-	.. note::	Random only gets articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
+    .. note:: Random only gets articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
 
-	Keyword arguments:
+    Keyword arguments:
 
-	* pages - the number of random pages returned (max of 10)
-	"""
-	#http://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=5000&format=jsonfm
-	query_params = {
-		'list': "random",
-		'rnnamespace': 0,
-		'rnlimit': pages,
-	}
+    * pages - the number of random pages returned (max of 10)
+    '''
+    #http://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=5000&format=jsonfm
+    query_params = {
+        'list': 'random',
+        'rnnamespace': 0,
+        'rnlimit': pages,
+    }
 
-	request = _wiki_request(**query_params)
-	titles = [page['title'] for page in request['query']['random']]
+    request = _wiki_request(**query_params)
+    titles = [page['title'] for page in request['query']['random']]
 
-	if len(titles) == 1:
-		return titles[0]
+    if len(titles) == 1:
+        return titles[0]
 
-	return titles
+    return titles
+
 
 @cache
 def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
-	"""
-	Plain text summary of the page.
+    '''
+    Plain text summary of the page.
 
-	.. note:: This is a convenience wrapper - auto_suggest and redirect are enabled by default
+    .. note:: This is a convenience wrapper - auto_suggest and redirect are enabled by default
 
-	Keyword arguments:
+    Keyword arguments:
 
-	* sentences - if set, return the first `sentences` sentences
-	* chars - if set, return only the first `chars` characters.
-	* auto_suggest - let Wikipedia find a valid page title for the query
-	* redirect - allow redirection without raising RedirectError
-	"""
+    * sentences - if set, return the first `sentences` sentences
+    * chars - if set, return only the first `chars` characters.
+    * auto_suggest - let Wikipedia find a valid page title for the query
+    * redirect - allow redirection without raising RedirectError
+    '''
 
-	# use auto_suggest and redirect to get the correct article
-	# also, use page's error checking to raise DisambiguationError if necessary
-	page_info = page(title, auto_suggest=True, redirect=True)
-	title = page_info.title
-	pageid = page_info.pageid
+    # use auto_suggest and redirect to get the correct article
+    # also, use page's error checking to raise DisambiguationError if necessary
+    page_info = page(title, auto_suggest=True, redirect=True)
+    title = page_info.title
+    pageid = page_info.pageid
 
-	query_params = {
-		'prop': "extracts",
-		'explaintext': "",
-		'titles': title
-	}
+    query_params = {
+        'prop': 'extracts',
+        'explaintext': '',
+        'titles': title
+    }
 
-	if sentences:
-		query_params['exsentences'] = sentences
-	elif chars:
-		query_params['exchars'] = chars
-	else:
-		query_params['exintro'] = ""
+    if sentences:
+        query_params['exsentences'] = sentences
+    elif chars:
+        query_params['exchars'] = chars
+    else:
+        query_params['exintro'] = ''
 
-	request = _wiki_request(**query_params)
-	summary = request['query']['pages'][pageid]['extract']
+    request = _wiki_request(**query_params)
+    summary = request['query']['pages'][pageid]['extract']
 
-	return summary	
+    return summary
+
 
 def page(title, auto_suggest=True, redirect=True, preload=False):
-	"""
-	Get a WikipediaPage object for the page with title `title`.
+    '''
+    Get a WikipediaPage object for the page with title `title`.
 
-	Keyword arguments:
+    Keyword arguments:
 
-	* auto_suggest - let Wikipedia find a valid page title for the query
-	* redirect - allow redirection without raising RedirectError
-	* preload - load content, summary, images, references, and links during initialization
-	"""
+    * auto_suggest - let Wikipedia find a valid page title for the query
+    * redirect - allow redirection without raising RedirectError
+    * preload - load content, summary, images, references, and links during initialization
+    '''
 
-	if auto_suggest:
-		results, suggestion = search(title, results=1, suggestion=True)
-		try:
-			title = suggestion or results[0]
-		except IndexError:
-			# if there is no suggestion or search results, the page doesn't exist
-			raise PageError(title)
-	
-	return WikipediaPage(title, redirect=redirect, preload=preload)
+    if auto_suggest:
+        results, suggestion = search(title, results=1, suggestion=True)
+        try:
+            title = suggestion or results[0]
+        except IndexError:
+            # if there is no suggestion or search results, the page doesn't exist
+            raise PageError(title)
+
+    return WikipediaPage(title, redirect=redirect, preload=preload)
+
 
 class WikipediaPage(object):
-	"""
-	Contains data from a Wikipedia page.
-	Uses property methods to filter data from the raw HTML.
-	"""
+    '''
+    Contains data from a Wikipedia page.
+    Uses property methods to filter data from the raw HTML.
+    '''
 
-	def __init__(self, title, redirect=True, preload=False, original_title=""):
-		self.title = title
-		self.original_title = original_title or title
+    def __init__(self, title, redirect=True, preload=False, original_title=''):
+        self.title = title
+        self.original_title = original_title or title
 
-		self.load(redirect=redirect, preload=preload)
+        self.load(redirect=redirect, preload=preload)
 
-		if preload:
-			for prop in ["content", "summary", "images", "references", "links"]:
-				getattr(self, prop)
+        if preload:
+            for prop in ['content', 'summary', 'images', 'references', 'links']:
+                getattr(self, prop)
 
-	def __repr__(self):
-		return u'<WikipediaPage \'%s\'>' % self.title
+    def __repr__(self):
+        return u'<WikipediaPage \'%s\'>' % self.title
 
-	def load(self, redirect=True, preload=False):
-		"""
-		Load basic information from Wikipedia. 
-		Confirm that page exists and is not a disambiguation/redirect.
-		"""
+    def load(self, redirect=True, preload=False):
+        '''
+        Load basic information from Wikipedia.
+        Confirm that page exists and is not a disambiguation/redirect.
+        '''
 
-		query_params = {
-			'prop': "info|pageprops",
-			'inprop': "url",
-			'ppprop': "disambiguation",
-			'titles': self.title
-		}
-	
-		request = _wiki_request(**query_params)
-		pageid = request['query']['pages'].keys()[0]
-		data = request['query']['pages'][pageid]
+        query_params = {
+            'prop': 'info|pageprops',
+            'inprop': 'url',
+            'ppprop': 'disambiguation',
+            'titles': self.title
+        }
 
-		# missing is equal to empty string if it is True
-		if data.get('missing') == "":
-			raise PageError(self.title)
+        request = _wiki_request(**query_params)
+        pageid = request['query']['pages'].keys()[0]
+        data = request['query']['pages'][pageid]
 
-		# same thing for redirect
-		elif data.get('redirect') == "":
-			if redirect:
-				# change the title and reload the whole object
-				query_params = {
-					'prop': "extracts",
-					'explaintext': "",
-					'titles': self.title
-				}
+        # missing is equal to empty string if it is True
+        if data.get('missing') == '':
+            raise PageError(self.title)
 
-				request = _wiki_request(**query_params)
-				title = ' '.join(request['query']['pages'][pageid]['extract'].split()[1:])
+        # same thing for redirect
+        elif data.get('redirect') == '':
+            if redirect:
+                # change the title and reload the whole object
+                query_params = {
+                    'prop': 'extracts',
+                    'explaintext': '',
+                    'titles': self.title
+                }
 
-				self.__init__(title, redirect=redirect, preload=preload)
+                request = _wiki_request(**query_params)
+                title = ' '.join(request['query']['pages'][pageid]['extract'].split()[1:])
 
-			else:
-				raise RedirectError(self.title)
+                self.__init__(title, redirect=redirect, preload=preload)
 
-		# since we only asked for disambiguation in ppprop,
-		# if a pageprop is returned,
-		# then the page must be a disambiguation page
-		elif data.get('pageprops'):
-			request = _wiki_request(titles=self.title, prop="revisions", rvprop="content", rvparse="", rvlimit=1)
-			html = request['query']['pages'][pageid]['revisions'][0]['*']
+            else:
+                raise RedirectError(self.title)
 
-			lis = BeautifulSoup(html).find_all('li')
-			filtered_lis = [li for li in lis if not "tocsection" in ''.join(li.get('class', []))]
-			may_refer_to = [li.a.get_text() for li in filtered_lis]
+        # since we only asked for disambiguation in ppprop,
+        # if a pageprop is returned,
+        # then the page must be a disambiguation page
+        elif data.get('pageprops'):
+            request = _wiki_request(titles=self.title, prop='revisions', rvprop='content', rvparse='', rvlimit=1)
+            html = request['query']['pages'][pageid]['revisions'][0]['*']
 
-			raise DisambiguationError(self.title, may_refer_to)
+            lis = BeautifulSoup(html).find_all('li')
+            filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
+            may_refer_to = [li.a.get_text() for li in filtered_lis]
 
-		else:
-			self.pageid = pageid
-			self.url = data['fullurl']
+            raise DisambiguationError(self.title, may_refer_to)
 
-	def html(self):
-		"""
-		Get full page HTML.
+        else:
+            self.pageid = pageid
+            self.url = data['fullurl']
 
-		.. warning:: this can get pretty slow on long pages.
-		"""
+    def html(self):
+        '''
+        Get full page HTML.
 
-		if not getattr(self, "_html", False):
-			query_params = {
-				'prop': "revisions",
-				'rvprop': "content",
-				'rvlimit': 1,
-				'rvparse': "",
-				'titles': self.title
-			}
-	
-			request = _wiki_request(**query_params)
-			self._html = request['query']['pages'][self.pageid]['revisions'][0]['*']
+        .. warning:: this can get pretty slow on long pages.
+        '''
 
-		return self._html
+        if not getattr(self, '_html', False):
+            query_params = {
+                'prop': 'revisions',
+                'rvprop': 'content',
+                'rvlimit': 1,
+                'rvparse': '',
+                'titles': self.title
+            }
 
-	@property
-	def content(self):
-		"""
-		Plain text content of the page, excluding images, tables, and other data.
-		"""
+            request = _wiki_request(**query_params)
+            self._html = request['query']['pages'][self.pageid]['revisions'][0]['*']
 
-		if not getattr(self, "_content", False):
-			query_params = {
-				'prop': "extracts",
-				'explaintext': "",
-				'titles': self.title
-			}
+        return self._html
 
-			request = _wiki_request(**query_params)
-			self._content = content = request['query']['pages'][self.pageid]['extract']
+    @property
+    def content(self):
+        '''
+        Plain text content of the page, excluding images, tables, and other data.
+        '''
 
-		return self._content
+        if not getattr(self, '_content', False):
+            query_params = {
+                'prop': 'extracts',
+                'explaintext': '',
+                'titles': self.title
+            }
 
-	@property
-	def summary(self):
-		"""
-		Plain text summary of the page.
+            request = _wiki_request(**query_params)
+            self._content = request['query']['pages'][self.pageid]['extract']
 
-		Keyword arguments:
+        return self._content
 
-		* sentences - if set, return the first `sentences` sentences
-		* chars - if set, return only the first `chars` characters.
-		"""
+    @property
+    def summary(self):
+        '''
+        Plain text summary of the page.
 
-		# cache the most common form of invoking summary
-		if not getattr(self, "_summary", False):	
-			query_params = {
-				'prop': "extracts",
-				'explaintext': "",
-				'exintro': "",
-				'titles': self.title
-			}
-	
-			request = _wiki_request(**query_params)
-			self._summary = request['query']['pages'][self.pageid]['extract']
-	
-		return self._summary
+        Keyword arguments:
 
-	@property
-	def images(self):
-		"""
-		List of URLs of images on the page.
-		"""	
+        * sentences - if set, return the first `sentences` sentences
+        * chars - if set, return only the first `chars` characters.
+        '''
 
-		if not getattr(self, "_images", False):
-			query_params = {
-				'generator': "images",
-				'gimlimit': "max",
-				'prop': "imageinfo",
-				'iiprop': "url",
-				'titles': self.title,
-			}
-	
-			request = _wiki_request(**query_params)
-	
-			image_keys = request['query']['pages'].keys()
-			images = (request['query']['pages'][key] for key in image_keys)
-			self._images = [image['imageinfo'][0]['url'] for image in images if image.get('imageinfo')]
+        # cache the most common form of invoking summary
+        if not getattr(self, '_summary', False):
+            query_params = {
+                'prop': 'extracts',
+                'explaintext': '',
+                'exintro': '',
+                'titles': self.title
+            }
 
-		return self._images
+            request = _wiki_request(**query_params)
+            self._summary = request['query']['pages'][self.pageid]['extract']
 
-	@property
-	def references(self):
-		"""
-		List of URLs of external links on a page.
-		May include external links within page that aren't technically cited anywhere.
-		"""
+        return self._summary
 
-		if not getattr(self, "_references", False):
-			query_params = {
-				'prop': "extlinks",
-				'ellimit': "max",
-				'titles': self.title,
-			}
+    @property
+    def images(self):
+        '''
+        List of URLs of images on the page.
+        '''
 
-			request = _wiki_request(**query_params)
+        if not getattr(self, '_images', False):
+            query_params = {
+                'generator': 'images',
+                'gimlimit': 'max',
+                'prop': 'imageinfo',
+                'iiprop': 'url',
+                'titles': self.title,
+            }
 
-			links = request['query']['pages'][self.pageid]['extlinks']
-			relative_urls = (link['*'] for link in links)
+            request = _wiki_request(**query_params)
 
-			def add_protocol(url):
-				return url if url.startswith('http') else 'http:' + url
+            image_keys = request['query']['pages'].keys()
+            images = (request['query']['pages'][key] for key in image_keys)
+            self._images = [image['imageinfo'][0]['url'] for image in images if image.get('imageinfo')]
 
-			self._references = [add_protocol(url) for url in relative_urls]
+        return self._images
 
-		return self._references
+    @property
+    def references(self):
+        '''
+        List of URLs of external links on a page.
+        May include external links within page that aren't technically cited anywhere.
+        '''
 
-	@property
-	def links(self):
-		"""
-		List of titles of Wikipedia page links on a page.
+        if not getattr(self, '_references', False):
+            query_params = {
+                'prop': 'extlinks',
+                'ellimit': 'max',
+                'titles': self.title,
+            }
 
-		.. note:: Only includes articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
-		"""
+            request = _wiki_request(**query_params)
 
-		if not getattr(self, "_links", False):
-			links = []
+            links = request['query']['pages'][self.pageid]['extlinks']
+            relative_urls = (link['*'] for link in links)
 
-			query_params = {
-				'prop': "links",
-				'plnamespace': 0,
-				'pllimit': "max",
-				'titles': self.title,
-			}
+            def add_protocol(url):
+                return url if url.startswith('http') else 'http:' + url
 
-			while True:
-				request = _wiki_request(**query_params)
-				links.extend([link['title'] for link in request['query']['pages'][self.pageid]['links']])
+            self._references = [add_protocol(url) for url in relative_urls]
 
-				if not request.get('query-continue'):
-					break
+        return self._references
 
-				query_params['plcontinue'] = request['query-continue']['links']['plcontinue']
+    @property
+    def links(self):
+        '''
+        List of titles of Wikipedia page links on a page.
 
-			self._links = links
+        .. note:: Only includes articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
+        '''
 
-		return self._links
+        if not getattr(self, '_links', False):
+            links = []
+
+            query_params = {
+                'prop': 'links',
+                'plnamespace': 0,
+                'pllimit': 'max',
+                'titles': self.title,
+            }
+
+            while True:
+                request = _wiki_request(**query_params)
+                links.extend([link['title'] for link in request['query']['pages'][self.pageid]['links']])
+
+                if not request.get('query-continue'):
+                    break
+
+                query_params['plcontinue'] = request['query-continue']['links']['plcontinue']
+
+            self._links = links
+
+        return self._links
+
 
 def donate():
-	"""
-	Open up the Wikimedia donate page in your favorite browser.
-	"""
-	import webbrowser
-	webbrowser.open("https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage", new=2)
+    '''
+    Open up the Wikimedia donate page in your favorite browser.
+    '''
+    import webbrowser
+    webbrowser.open('https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage', new=2)
+
 
 def _wiki_request(**params):
-	"""
-	Make a request to the Wikipedia API using the given search parameters. 
-	Returns a parsed dict of the JSON response.
-	"""
-	api_url = "http://en.wikipedia.org/w/api.php"
-	params['format'] = "json"
-	params['action'] = "query"
+    '''
+    Make a request to the Wikipedia API using the given search parameters.
+    Returns a parsed dict of the JSON response.
+    '''
+    api_url = 'http://en.wikipedia.org/w/api.php'
+    params['format'] = 'json'
+    params['action'] = 'query'
 
-	headers = {
-		'User-Agent': "wikipedia/0.9 (https://github.com/goldsmith/Wikipedia/)"
-	}
+    headers = {
+        'User-Agent': 'wikipedia/0.9 (https://github.com/goldsmith/Wikipedia/)'
+    }
 
-	r = requests.get(api_url, params=params, headers=headers)
+    r = requests.get(api_url, params=params, headers=headers)
 
-	return r.json()
+    return r.json()
