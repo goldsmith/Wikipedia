@@ -357,16 +357,16 @@ class WikipediaPage(object):
 
             # based on https://www.mediawiki.org/wiki/API:Query#Continuing_queries
             while True:
-            	params = request.copy()
-            	params.update(lastContinue)
-            	
+                params = request.copy()
+                params.update(lastContinue)
+
                 request = _wiki_request(**params)
                 self._links.extend([link['title'] for link in request['query']['pages'][self.pageid]['links']])
 
                 if 'continue' not in request:
                     break
 
-               	lastContinue = request['continue']
+                lastContinue = request['continue']
 
         return self._links
 
