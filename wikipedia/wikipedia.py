@@ -345,25 +345,28 @@ class WikipediaPage(object):
         '''
 
         if not getattr(self, '_links', False):
-            links = []
+            self._links = []
 
-            query_params = {
+            request = {
                 'prop': 'links',
                 'plnamespace': 0,
                 'pllimit': 'max',
                 'titles': self.title,
             }
+            lastContinue = {}
 
+            # based on https://www.mediawiki.org/wiki/API:Query#Continuing_queries
             while True:
-                request = _wiki_request(**query_params)
-                links.extend([link['title'] for link in request['query']['pages'][self.pageid]['links']])
+                params = request.copy()
+                params.update(lastContinue)
+                
+                request = _wiki_request(**params)
+                self._links.extend([link['title'] for link in request['query']['pages'][self.pageid]['links']])
 
-                if not request.get('query-continue'):
+                if 'continue' not in request:
                     break
 
-                query_params['plcontinue'] = request['query-continue']['links']['plcontinue']
-
-            self._links = links
+                lastContinue = request['continue']
 
         return self._links
 
@@ -386,7 +389,7 @@ def _wiki_request(**params):
     params['action'] = 'query'
 
     headers = {
-        'User-Agent': 'wikipedia/0.9 (https://github.com/goldsmith/Wikipedia/)'
+        'User-Agent': 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
     }
 
     r = requests.get(api_url, params=params, headers=headers)
