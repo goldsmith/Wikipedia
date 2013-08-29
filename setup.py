@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os 
+import os
 
 from setuptools import setup
 from io import open
