@@ -70,6 +70,13 @@ But watch out - ``wikipedia.summary`` will raise a ``DisambiguationError`` if th
 	>>> ny.links[0]
 	# u'1790 United States Census'
 
+To change the language of the Wikipedia you are accessing, use ``wikipedia.set_lang``. Remember to search for page titles in the language that you have set, not English!::
+
+	>>> wikipedia.set_lang("fr")
+
+	>>> print wikipedia.summary("Francois Hollande")
+	# François Hollande, né le 12 août 1954 à Rouen, en Seine-Maritime, est un homme d'État français. Il est président de la République française depuis le 15 mai 2012...
+
 Finally, the last method you're going to want to know in the wikipedia module is ``wikipedia.donate``::
 
 	>>> wikipedia.donate()

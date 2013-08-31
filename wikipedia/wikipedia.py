@@ -4,6 +4,23 @@ from bs4 import BeautifulSoup
 from .exceptions import *
 from .util import cache
 
+api_url = 'http://en.wikipedia.org/w/api.php'
+
+def set_lang(prefix):
+    '''
+    Change the language of the API being requested. 
+    Set `prefix` to one of the two letter prefixes found on the `list of all Wikipedias <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_.
+
+    After setting the language, the cache for ``search``, ``suggest``, and ``summary`` will be cleared.
+
+    .. note:: Make sure you search for page titles in the language that you have set.
+    '''
+    global api_url
+    api_url = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
+
+    for cached_func in (search, suggest, summary):
+        cached_func.clear_cache()
+
 
 @cache
 def search(query, results=10, suggestion=False):
@@ -103,7 +120,7 @@ def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
 
     # use auto_suggest and redirect to get the correct article
     # also, use page's error checking to raise DisambiguationError if necessary
-    page_info = page(title, auto_suggest=True, redirect=True)
+    page_info = page(title, auto_suggest=auto_suggest, redirect=redirect)
     title = page_info.title
     pageid = page_info.pageid
 
@@ -384,7 +401,6 @@ def _wiki_request(**params):
     Make a request to the Wikipedia API using the given search parameters.
     Returns a parsed dict of the JSON response.
     '''
-    api_url = 'http://en.wikipedia.org/w/api.php'
     params['format'] = 'json'
     params['action'] = 'query'
 
@@ -393,5 +409,6 @@ def _wiki_request(**params):
     }
 
     r = requests.get(api_url, params=params, headers=headers)
+    print "made request to", r.url
 
     return r.json()

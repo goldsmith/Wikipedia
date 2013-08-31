@@ -30,6 +30,8 @@ Functions and Classes
 .. autoclass:: wikipedia.WikipediaPage
 	:members:
 
+.. autofunction:: wikipedia.set_lang
+
 .. autofunction:: wikipedia.random
 
 .. autofunction:: wikipedia.donate
