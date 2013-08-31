@@ -8,6 +8,7 @@ def debug(fn):
         return res
     return wrapper
 
+
 class cache(object):
 
     def __init__(self, fn):
