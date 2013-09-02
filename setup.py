@@ -9,7 +9,6 @@ long_description = open(os.path.join(os.path.dirname(__file__), "README.rst"), e
 dependencies = [
     "beautifulsoup4",
     "requests==1.2.3"
-    "wsgiref==0.1.2"
 ]
 
 setup(
