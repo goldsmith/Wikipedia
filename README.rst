@@ -63,6 +63,7 @@ To run tests, clone the `respository on GitHub <https://github.com/goldsmith/Wik
 ::
     
     $ pip install -r requirements.txt
+    $ pip install nose
     $ nosetests
 
 in the root project directory.
@@ -71,6 +72,7 @@ To build the documentation yourself, after installing requirements.txt, run:
 
 ::
 
+    $ pip install sphinx
     $ cd docs/
     $ make html
 
