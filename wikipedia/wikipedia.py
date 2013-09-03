@@ -409,6 +409,5 @@ def _wiki_request(**params):
     }
 
     r = requests.get(api_url, params=params, headers=headers)
-    print "made request to", r.url
 
     return r.json()

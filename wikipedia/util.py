@@ -2,9 +2,7 @@ import functools
 
 def debug(fn):
     def wrapper(*args, **kwargs):
-        print fn.__name__, "called with args:\n", str(args) + str(kwargs), "\n"
         res = fn(*args, **kwargs)
-        print "\nreturning:", res, "\n\n"
         return res
     return wrapper
 
