@@ -63,8 +63,7 @@ To run tests, clone the `respository on GitHub <https://github.com/goldsmith/Wik
 ::
     
     $ pip install -r requirements.txt
-    $ pip install nose
-    $ nosetests
+    $ python -m unittest discover tests/ '*test.py'
 
 in the root project directory.
 
