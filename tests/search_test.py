@@ -26,12 +26,10 @@ class TestSearch(unittest.TestCase):
     def test_search(self):
         """Test parsing a Wikipedia request result."""
         self.assertEqual(wikipedia.search("Barack Obama"), mock_data['data']["barack.search"])
-        self.assertEqual(_wiki_request.calls["{'list': 'search', 'srprop': '', 'srlimit': 10, 'limit': 10, 'srsearch': 'Barack Obama'}"], 1)
 
     def test_limit(self):
         """Test limiting a request results."""
         self.assertEqual(wikipedia.search("Porsche", results=3), mock_data['data']["porsche.search"])
-        self.assertEqual(_wiki_request.calls["{'list': 'search', 'srprop': '', 'srlimit': 3, 'limit': 3, 'srsearch': 'Porsche'}"], 1)
 
     def test_suggestion(self):
         """Test getting a suggestion as well as search results."""
