@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from .exceptions import *
-from .util import cache
+from .util import cache, stdout_encode
 
 api_url = 'http://en.wikipedia.org/w/api.php'
 
@@ -182,7 +182,7 @@ class WikipediaPage(object):
                 getattr(self, prop)
 
     def __repr__(self):
-        return u'<WikipediaPage \'%s\'>' % self.title
+        return stdout_encode(u'<WikipediaPage \'{}\'>'.format(self.title))
 
     def load(self, redirect=True, preload=False):
         '''
@@ -216,7 +216,7 @@ class WikipediaPage(object):
                 }
 
                 request = _wiki_request(**query_params)
-                title = ' '.join(request['query']['pages'][pageid]['extract'].split()[1:])
+                title = request['query']['pages'][pageid]['extract'].split('\n')[0][8:].strip()
 
                 self.__init__(title, redirect=redirect, preload=preload)
 
