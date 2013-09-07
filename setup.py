@@ -13,7 +13,7 @@ dependencies = [
 
 setup(
     name = "wikipedia",
-    version = "0.9.8",
+    version = "1.0.0dev",
     author = "Jonathan Goldsmith",
     author_email = "jhghank@gmail.com",
     description = "Wikipedia API for Python",
@@ -24,7 +24,7 @@ setup(
     packages = ['wikipedia'],
     long_description = long_description,
     classifiers = (
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Topic :: Software Development :: Libraries',
         'License :: OSI Approved :: MIT License',
     ),
