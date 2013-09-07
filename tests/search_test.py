@@ -15,7 +15,7 @@ class _wiki_request(object):
     @classmethod
     def __call__(cls, **params):
         cls.calls[params.__str__()] += 1
-        return mock_data["_wiki_request calls"][params.__str__()]
+        return mock_data["_wiki_request calls"][tuple(sorted(params.items()))]
 
 wikipedia._wiki_request = _wiki_request()
 

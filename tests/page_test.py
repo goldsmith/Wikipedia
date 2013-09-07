@@ -7,7 +7,7 @@ from request_mock_data import mock_data
 
 # mock out _wiki_request
 def _wiki_request(**params):
-    return mock_data["_wiki_request calls"][params.__str__()]
+    return mock_data["_wiki_request calls"][tuple(sorted(params.items()))]
 wikipedia._wiki_request = _wiki_request
 
 
@@ -79,7 +79,7 @@ class TestPage(unittest.TestCase):
 
     def test_images(self):
         """Test the list of image URLs."""
-        self.assertEqual(self.celtuce.images, mock_data['data']["celtuce.images"])
+        self.assertEqual(sorted(self.celtuce.images), mock_data['data']["celtuce.images"])
 
     def test_references(self):
         """Test the list of reference URLs."""
