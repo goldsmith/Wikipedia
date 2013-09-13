@@ -283,14 +283,8 @@ class WikipediaPage(object):
     def summary(self):
         '''
         Plain text summary of the page.
-
-        Keyword arguments:
-
-        * sentences - if set, return the first `sentences` sentences
-        * chars - if set, return only the first `chars` characters.
         '''
 
-        # cache the most common form of invoking summary
         if not getattr(self, '_summary', False):
             query_params = {
                 'prop': 'extracts',
