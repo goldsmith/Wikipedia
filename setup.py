@@ -4,7 +4,7 @@ import os
 from setuptools import setup
 from io import open
 
-long_description = open(os.path.join(os.path.dirname(__file__), "README.rst"), encoding='utf-8').read().encode('ascii', 'ignore')
+long_description = open(os.path.join(os.path.dirname(__file__), "README.rst"), encoding='utf-8').read()
 
 dependencies = [
     "beautifulsoup4",
