@@ -13,7 +13,7 @@ dependencies = [
 
 setup(
     name = "wikipedia",
-    version = "1.0.0dev",
+    version = "1.0.1dev",
     author = "Jonathan Goldsmith",
     author_email = "jhghank@gmail.com",
     description = "Wikipedia API for Python",
