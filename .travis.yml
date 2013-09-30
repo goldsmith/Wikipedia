@@ -4,4 +4,5 @@ python:
   - 3.3
 install:
   - pip install -r requirements.txt
+  - pip install -e .
 script: python -m unittest discover tests/ '*test.py'
