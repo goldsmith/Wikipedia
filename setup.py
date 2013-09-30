@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
+import codecs
 
 from setuptools import setup
-from io import open
 
-long_description = open(os.path.join(os.path.dirname(__file__), "README.rst"), encoding='utf-8').read()
+long_description = codecs.open(os.path.join(os.path.dirname(__file__), 'README.rst'), 'r', 'utf-8').read()
 
 dependencies = [
     "beautifulsoup4",
