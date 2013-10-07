@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 from .exceptions import *
 from .util import cache, stdout_encode
 
-api_url = 'http://en.wikipedia.org/w/api.php'
+API_URL = 'http://en.wikipedia.org/w/api.php'
 
 def set_lang(prefix):
     '''
@@ -15,8 +15,8 @@ def set_lang(prefix):
 
     .. note:: Make sure you search for page titles in the language that you have set.
     '''
-    global api_url
-    api_url = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
+    global API_URL
+    API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
 
     for cached_func in (search, suggest, summary):
         cached_func.clear_cache()
@@ -402,6 +402,6 @@ def _wiki_request(**params):
         'User-Agent': 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
     }
 
-    r = requests.get(api_url, params=params, headers=headers)
+    r = requests.get(API_URL, params=params, headers=headers)
 
     return r.json()
