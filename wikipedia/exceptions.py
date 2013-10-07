@@ -2,8 +2,13 @@
 Global wikipedia excpetion and warning classes.
 """
 
+class WikipediaException(Exception):
+    """Base Wikipedia exception class."""
 
-class PageError(Exception):
+    pass
+
+
+class PageError(WikipediaException):
     """Exception raised when no Wikipedia matched a query."""
 
     def __init__(self, page_title):
@@ -13,7 +18,7 @@ class PageError(Exception):
         return "\"%s\" does not match any pages. Try another query!" % self.title
 
 
-class DisambiguationError(Exception):
+class DisambiguationError(WikipediaException):
     """
     Exception raised when a page resolves to a Disambiguation page.
 
@@ -32,7 +37,7 @@ class DisambiguationError(Exception):
         return unicode(self).encode('ascii', 'ignore')
 
 
-class RedirectError(Exception):
+class RedirectError(WikipediaException):
     """Exception raised when a page title unexpectedly resolves to a redirect."""
 
     def __init__(self, page_title):
