@@ -232,7 +232,10 @@ class WikipediaPage(object):
 
             lis = BeautifulSoup(html).find_all('li')
             filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
-            may_refer_to = [li.a.get_text() for li in filtered_lis]
+            #account for lis that dont have an anchor element
+            #More careful processing with BeautifulSoup could be done to handle these cases
+            #elegantly, this was a quick hack to get it working.
+            may_refer_to = [str(li.get_text().split(',')[0].lstrip()) for li in filtered_lis]
 
             raise DisambiguationError(self.title, may_refer_to)
 
