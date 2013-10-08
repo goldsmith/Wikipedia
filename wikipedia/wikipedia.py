@@ -235,7 +235,7 @@ class WikipediaPage(object):
             #account for lis that dont have an anchor element
             #More careful processing with BeautifulSoup could be done to handle these cases
             #elegantly, this was a quick hack to get it working.
-            may_refer_to = [str(li.get_text().split(',')[0].lstrip()) for li in filtered_lis]
+            may_refer_to = [li.get_text().split(',')[0].lstrip() for li in filtered_lis]
 
             raise DisambiguationError(self.title, may_refer_to)
 
