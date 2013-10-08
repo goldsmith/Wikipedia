@@ -32,6 +32,8 @@ class DisambiguationError(WikipediaException):
 
     The `options` property contains a list of titles
     of Wikipedia pages that the query may refer to.
+
+    .. note:: `options` does not include titles that do not link to a valid Wikipedia page.
     """
 
     def __init__(self, title, may_refer_to):
