@@ -6,6 +6,7 @@ from .util import cache, stdout_encode
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
 
+
 def set_lang(prefix):
     '''
     Change the language of the API being requested. 
@@ -370,7 +371,7 @@ class WikipediaPage(object):
             while True:
                 params = request.copy()
                 params.update(lastContinue)
-                
+
                 request = _wiki_request(**params)
                 self._links.extend([link['title'] for link in request['query']['pages'][self.pageid]['links']])
 
@@ -381,12 +382,48 @@ class WikipediaPage(object):
 
         return self._links
 
+    @property
+    def sections(self):
+        """
+        Returns article's sections list
+        """
+        if not getattr(self, '_sections', False):
+            query_params = {
+                'action': 'parse',
+                'prop': 'sections',
+                'page': self.title
+            }
+
+            request = _wiki_request(**query_params)
+            self._sections = [{'index': section['index'], 'title': section['line']}
+                              for section in request['parse']['sections']]
+
+        return self._sections
+
+    def section(self, section_id):
+        """
+        Extract single section information by its ID.
+        @type section_id: int
+        """
+        query_params = {
+            'prop': 'revisions',
+            'rvlimit': 1,
+            'rvsection': section_id,
+            'rvprop': 'content',
+            'titles': self.title
+        }
+
+        request = _wiki_request(**query_params)
+
+        return request['query']['pages'][self.pageid]['revisions'][0]['*']
+
 
 def donate():
     '''
     Open up the Wikimedia donate page in your favorite browser.
     '''
     import webbrowser
+
     webbrowser.open('https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage', new=2)
 
 
@@ -396,7 +433,8 @@ def _wiki_request(**params):
     Returns a parsed dict of the JSON response.
     '''
     params['format'] = 'json'
-    params['action'] = 'query'
+    if not params.has_key('action'):
+        params['action'] = 'query'
 
     headers = {
         'User-Agent': 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
