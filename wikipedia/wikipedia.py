@@ -433,7 +433,7 @@ def _wiki_request(**params):
     Returns a parsed dict of the JSON response.
     '''
     params['format'] = 'json'
-    if not params.has_key('action'):
+    if not 'action' in params:
         params['action'] = 'query'
 
     headers = {
