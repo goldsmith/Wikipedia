@@ -189,6 +189,8 @@ class WikipediaPage(object):
         '''
         Load basic information from Wikipedia.
         Confirm that page exists and is not a disambiguation/redirect.
+
+        Does not need to be called manually, should be called automatically during __init__.
         '''
 
         query_params = {
@@ -245,7 +247,7 @@ class WikipediaPage(object):
         '''
         Get full page HTML.
 
-        .. warning:: this can get pretty slow on long pages.
+        .. warning:: This can get pretty slow on long pages.
         '''
 
         if not getattr(self, '_html', False):
