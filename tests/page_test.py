@@ -58,37 +58,54 @@ class TestPage(unittest.TestCase):
     """Test the functionality of the rest of wikipedia.page."""
 
     def setUp(self):
-        # one of the shortest wikipedia articles that includes images
+        # shortest wikipedia articles with images and sections
         self.celtuce = wikipedia.page("Celtuce")
+        self.cyclone = wikipedia.page("Tropical Depression Ten (2005)")
 
     def test_title(self):
         """Test the title."""
         self.assertEqual(self.celtuce.title, "Celtuce")
+        self.assertEqual(self.cyclone.title, "Tropical Depression Ten (2005)")
 
     def test_url(self):
         """Test the url."""
         self.assertEqual(self.celtuce.url, "http://en.wikipedia.org/wiki/Celtuce")
+        self.assertEqual(self.cyclone.url, "http://en.wikipedia.org/wiki/Tropical_Depression_Ten_(2005)")
 
     def test_content(self):
         """Test the plain text content."""
         self.assertEqual(self.celtuce.content, mock_data['data']["celtuce.content"])
+        self.assertEqual(self.cyclone.content, mock_data['data']["cyclone.content"])
 
     def test_summary(self):
         """Test the summary."""
         self.assertEqual(self.celtuce.summary, mock_data['data']["celtuce.summary"])
+        self.assertEqual(self.cyclone.summary, mock_data['data']["cyclone.summary"])
 
     def test_images(self):
         """Test the list of image URLs."""
         self.assertEqual(sorted(self.celtuce.images), mock_data['data']["celtuce.images"])
+        self.assertEqual(sorted(self.cyclone.images), mock_data['data']["cyclone.images"])
 
     def test_references(self):
         """Test the list of reference URLs."""
         self.assertEqual(self.celtuce.references, mock_data['data']["celtuce.references"])
+        self.assertEqual(self.cyclone.references, mock_data['data']["cyclone.references"])
 
     def test_links(self):
         """Test the list of titles of links to Wikipedia pages."""
         self.assertEqual(self.celtuce.links, mock_data['data']["celtuce.links"])
+        self.assertEqual(self.cyclone.links, mock_data['data']["cyclone.links"])
 
     def test_html(self):
         """Test the full HTML method."""
         self.assertEqual(self.celtuce.html(), mock_data['data']["celtuce.html"])
+
+    def test_sections(self):
+        """Test the list of section titles."""
+        self.assertEqual(sorted(self.cyclone.sections), mock_data['data']["cyclone.sections"])
+
+    def test_section(self):
+        """Test text content of a single section."""
+        self.assertEqual(self.cyclone.section("Impact"), mock_data['data']["cyclone.section.impact"])
+        self.assertEqual(self.cyclone.section("History"), None)
