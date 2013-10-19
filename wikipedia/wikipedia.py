@@ -384,9 +384,10 @@ class WikipediaPage(object):
 
     @property
     def sections(self):
-        """
-        Returns article's sections list
-        """
+        '''
+        List of section titles from the table of contents on the page.
+        '''
+
         if not getattr(self, '_sections', False):
             query_params = {
                 'action': 'parse',
@@ -395,27 +396,34 @@ class WikipediaPage(object):
             }
 
             request = _wiki_request(**query_params)
-            self._sections = [{'index': section['index'], 'title': section['line']}
-                              for section in request['parse']['sections']]
+            self._sections = [section['line'] for section in request['parse']['sections']]
 
         return self._sections
 
-    def section(self, section_id):
-        """
-        Extract single section information by its ID.
-        @type section_id: int
-        """
-        query_params = {
-            'prop': 'revisions',
-            'rvlimit': 1,
-            'rvsection': section_id,
-            'rvprop': 'content',
-            'titles': self.title
-        }
+    def section(self, section_title):
+        '''
+        Get the plain text content of a section from `self.sections`.
+        Returns None if `section_title` isn't found, otherwise returns a whitespace stripped string.
 
-        request = _wiki_request(**query_params)
+        This is a convenience method that wraps self.content.
 
-        return request['query']['pages'][self.pageid]['revisions'][0]['*']
+        .. warning:: Calling `section` on a section that has subheadings will NOT return
+                     the full text of all of the subsections. It only gets the text between
+                     `section_title` and the next subheading, which is often empty.
+        '''
+
+        section = "== {} ==".format(section_title)
+        try:
+            index = self.content.index(section) + len(section)
+        except ValueError:
+            return None
+
+        try:
+            next_index = self.content.index("==", index)
+        except ValueError:
+            next_index = len(self.content)
+
+        return self.content[index:next_index].lstrip("=").strip()
 
 
 def donate():
