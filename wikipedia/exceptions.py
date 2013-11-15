@@ -1,5 +1,5 @@
 """
-Global wikipedia excpetion and warning classes.
+Global wikipedia exception and warning classes.
 """
 
 import sys
