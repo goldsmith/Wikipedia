@@ -179,7 +179,7 @@ class WikipediaPage(object):
         self.load(redirect=redirect, preload=preload)
 
         if preload:
-            for prop in ['content', 'summary', 'images', 'references', 'links']:
+            for prop in ('content', 'summary', 'images', 'references', 'links', 'sections'):
                 getattr(self, prop)
 
     def __repr__(self):
