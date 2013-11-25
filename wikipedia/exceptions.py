@@ -1,11 +1,17 @@
 """
-Global wikipedia excpetion and warning classes.
+Global wikipedia exception and warning classes.
 """
 
 import sys
 
 class WikipediaException(Exception):
     """Base Wikipedia exception class."""
+
+    def __init__(self, error):
+        self.error = error
+
+    def __unicode__(self):
+        return "An unknown error occured: \"{0}\". Please report it on GitHub!".format(self.error)
 
     if sys.version_info > (3, 0):
         def __str__(self):
@@ -52,3 +58,13 @@ class RedirectError(WikipediaException):
 
     def __unicode__(self):
         return u"\"{0}\" resulted in a redirect. Set the redirect property to True to allow automatic redirects.".format(self.title)
+
+
+class HTTPTimeoutError(WikipediaException):
+    """Exception raised when a request to the Mediawiki servers times out."""
+
+    def __init__(self, query):
+        self.query = query
+
+    def __unicode__(self):
+        return u"Searching for \"{0}\" resulted in a timeout. Try again in a few seconds, and make sure you have rate limiting set to True.".format(self.query)

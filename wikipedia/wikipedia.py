@@ -45,6 +45,13 @@ def search(query, results=10, suggestion=False):
     search_params['limit'] = results
 
     raw_results = _wiki_request(**search_params)
+
+    if 'error' in raw_results:
+        if raw_results['error']['info'] == 'HTTP request timed out.':
+            raise HTTPTimeoutError(query)
+        else:
+            raise WikipediaException(raw_results['error']['info'])
+
     search_results = (d['title'] for d in raw_results['query']['search'])
 
     if suggestion:
