@@ -208,8 +208,10 @@ class WikipediaPage(object):
         }
 
         request = _wiki_request(**query_params)
-        pageid = list(request['query']['pages'].keys())[0]
-        data = request['query']['pages'][pageid]
+
+        pages = request['query']['pages']
+        pageid = pages.keys()[0]
+        data = pages[pageid]
 
         # missing is equal to empty string if it is True
         if data.get('missing') == '':
@@ -226,7 +228,12 @@ class WikipediaPage(object):
                 }
 
                 request = _wiki_request(**query_params)
-                title = request['query']['pages'][pageid]['extract'].split('\n')[0][8:].strip()
+
+                extract = request['query']['pages'][pageid]['extract']
+
+                # extract should be of the form "REDIRECT <new title>"
+                # ("REDIRECT" could be translated to current language)
+                title = ' '.join(extract.split('\n')[0].split()[1:]).strip()
 
                 self.__init__(title, redirect=redirect, preload=preload)
 
