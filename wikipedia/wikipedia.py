@@ -210,7 +210,7 @@ class WikipediaPage(object):
         request = _wiki_request(**query_params)
 
         pages = request['query']['pages']
-        pageid = pages.keys()[0]
+        pageid = list(pages.keys())[0]
         data = pages[pageid]
 
         # missing is equal to empty string if it is True
