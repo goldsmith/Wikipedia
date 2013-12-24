@@ -11,10 +11,10 @@ Begin by installing wikipedia::
 
 Now let's use search and suggestion.
 
-As you might guess, 
-``wikipedia.search`` does a Wikipedia search for a query, 
+As you might guess,
+``wikipedia.search`` does a Wikipedia search for a query,
 and ``wikipedia.suggest`` returns the suggested Wikipedia title for a query, or ``None``::
-	
+
 	>>> import wikipedia
 
 	>>> wikipedia.search("Barack")
@@ -41,7 +41,7 @@ But watch out - ``wikipedia.summary`` will raise a ``DisambiguationError`` if th
 	>>> wikipedia.summary("Mercury")
 	# Traceback (most recent call last):
 	# ...
-	# wikipedia.exceptions.DisambiguationError: "Mercury" may refer to: 
+	# wikipedia.exceptions.DisambiguationError: "Mercury" may refer to:
 	#	Mercury (mythology)
 	#	Mercury (planet)
 	#	Mercury (element)
