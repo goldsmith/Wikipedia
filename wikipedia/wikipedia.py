@@ -1,15 +1,16 @@
 import requests
 from bs4 import BeautifulSoup
 
-from .exceptions import *
-from .util import cache, stdout_encode
+from exceptions import PageError, DisambiguationError, RedirectError, HTTPTimeoutError
+from util import cache, stdout_encode
+
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
 
 
 def set_lang(prefix):
     '''
-    Change the language of the API being requested. 
+    Change the language of the API being requested.
     Set `prefix` to one of the two letter prefixes found on the `list of all Wikipedias <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_.
 
     After setting the language, the cache for ``search``, ``suggest``, and ``summary`` will be cleared.
