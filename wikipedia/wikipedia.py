@@ -3,8 +3,8 @@ import time
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
-from exceptions import PageError, DisambiguationError, RedirectError, HTTPTimeoutError, WikipediaException
-from util import cache, stdout_encode
+from .exceptions import PageError, DisambiguationError, RedirectError, HTTPTimeoutError, WikipediaException
+from .util import cache, stdout_encode
 
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
