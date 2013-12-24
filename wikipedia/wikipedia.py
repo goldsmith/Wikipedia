@@ -1,11 +1,16 @@
 import requests
+import time
 from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
 
-from exceptions import PageError, DisambiguationError, RedirectError, HTTPTimeoutError
+from exceptions import PageError, DisambiguationError, RedirectError, HTTPTimeoutError, WikipediaException
 from util import cache, stdout_encode
 
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
+RATE_LIMIT = False
+RATE_LIMIT_MIN_WAIT = None
+RATE_LIMIT_LAST_CALL = None
 
 
 def set_lang(prefix):
@@ -22,6 +27,38 @@ def set_lang(prefix):
 
     for cached_func in (search, suggest, summary):
         cached_func.clear_cache()
+
+
+def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
+    '''
+    Enable or disable rate limiting on requests to the Mediawiki servers.
+    If rate limiting is not enabled, under some circumstances (depending on
+    load on Wikipedia, the number of requests you and other `wikipedia` users
+    are making, and other factors), Wikipedia may return an HTTP timeout error.
+
+    Enabling rate limiting generally prevents that issue, but please note that
+    HTTPTimeoutError still might be raised.
+
+    Arguments:
+
+    * rate_limit - (Boolean) whether to enable rate limiting or not
+
+    Keyword arguments:
+
+    * min_wait - if rate limiting is enabled, `min_wait` is a timedelta describing the minimum time to wait before requests.
+                 Defaults to timedelta(milliseconds=50)
+    '''
+    global RATE_LIMIT
+    global RATE_LIMIT_MIN_WAIT
+    global RATE_LIMIT_LAST_CALL
+
+    RATE_LIMIT = rate_limit
+    if not rate_limit:
+        RATE_LIMIT_MIN_WAIT = None
+    else:
+        RATE_LIMIT_MIN_WAIT = min_wait
+
+    RATE_LIMIT_LAST_CALL = None
 
 
 @cache
@@ -457,6 +494,8 @@ def _wiki_request(**params):
     Make a request to the Wikipedia API using the given search parameters.
     Returns a parsed dict of the JSON response.
     '''
+    global RATE_LIMIT_LAST_CALL
+
     params['format'] = 'json'
     if not 'action' in params:
         params['action'] = 'query'
@@ -465,6 +504,18 @@ def _wiki_request(**params):
         'User-Agent': 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
     }
 
+    if RATE_LIMIT and RATE_LIMIT_LAST_CALL and \
+        RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT > datetime.now():
+
+        # it hasn't been long enough since the last API call
+        # so wait until we're in the clear to make the request
+
+        wait_time = datetime.now() - (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT)
+        time.sleep(int(wait_time.total_seconds()))
+
     r = requests.get(API_URL, params=params, headers=headers)
+
+    if RATE_LIMIT:
+        RATE_LIMIT_LAST_CALL = datetime.now()
 
     return r.json()

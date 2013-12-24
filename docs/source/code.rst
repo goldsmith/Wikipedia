@@ -32,6 +32,8 @@ Functions and Classes
 
 .. autofunction:: wikipedia.set_lang
 
+.. autofunction:: wikipedia.set_rate_limiting
+
 .. autofunction:: wikipedia.random
 
 .. autofunction:: wikipedia.donate
