@@ -94,3 +94,9 @@ Credits
    Foundation <http://wikimediafoundation.org/wiki/Home>`__ for giving
    the world free access to data
 
+
+
+.. image:: https://d2weczhvl823v0.cloudfront.net/goldsmith/wikipedia/trend.png
+   :alt: Bitdeli badge
+   :target: https://bitdeli.com/free
+
