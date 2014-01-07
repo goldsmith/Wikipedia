@@ -324,15 +324,40 @@ class WikipediaPage(object):
 
     if not getattr(self, '_content', False):
       query_params = {
-        'prop': 'extracts',
+        'prop': 'extracts|revisions',
         'explaintext': '',
-        'titles': self.title
+        'titles': self.title,
+        'rvprop': 'ids'
       }
 
       request = _wiki_request(**query_params)
-      self._content = request['query']['pages'][self.pageid]['extract']
-
+      self._content  = request['query']['pages'][self.pageid]['extract']
+      self._revid    = request['query']['pages'][self.pageid]['revisions'][0]['revid']
+      self._parentid = request['query']['pages'][self.pageid]['revisions'][0]['revid']
+      
     return self._content
+
+  @property
+  def revid(self):
+    '''
+    Revision ID of the page.
+    '''
+    if not getattr(self, '_revid', False):
+      # fetch the content (side effect is loading the revid)
+      self.content
+    
+    return self._revid
+      
+  @property
+  def parentid(self):
+    '''
+    Revision ID of the parent to the current revision of this page.
+    '''
+    if not getattr(self, '_revid', False):
+      # fetch the content (side effect is loading the revid)
+      self.content
+    
+    return self._parentid
 
   @property
   def summary(self):
