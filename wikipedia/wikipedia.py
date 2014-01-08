@@ -324,15 +324,49 @@ class WikipediaPage(object):
 
     if not getattr(self, '_content', False):
       query_params = {
-        'prop': 'extracts',
+        'prop': 'extracts|revisions',
         'explaintext': '',
-        'titles': self.title
+        'titles': self.title,
+        'rvprop': 'ids'
       }
 
       request = _wiki_request(**query_params)
-      self._content = request['query']['pages'][self.pageid]['extract']
-
+      self._content     = request['query']['pages'][self.pageid]['extract']
+      self._revision_id = request['query']['pages'][self.pageid]['revisions'][0]['revid']
+      self._parent_id   = request['query']['pages'][self.pageid]['revisions'][0]['parentid']
+      
     return self._content
+
+  @property
+  def revision_id(self):
+    '''
+    Revision ID of the page.
+
+    The revision ID is a number that uniquely identifies the current
+    version of the page. It can be used to create the permalink or for
+    other direct API calls. See `Help:Page history
+    <http://en.wikipedia.org/wiki/Wikipedia:Revision>`_ for more
+    information.
+    '''
+    
+    if not getattr(self, '_revid', False):
+      # fetch the content (side effect is loading the revid)
+      self.content
+    
+    return self._revision_id
+      
+  @property
+  def parent_id(self):
+    '''
+    Revision ID of the parent version of the current revision of this
+    page. See ``revision_id`` for more information.
+    '''
+    
+    if not getattr(self, '_parentid', False):
+      # fetch the content (side effect is loading the revid)
+      self.content
+    
+    return self._parent_id
 
   @property
   def summary(self):
