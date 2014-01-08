@@ -331,14 +331,14 @@ class WikipediaPage(object):
       }
 
       request = _wiki_request(**query_params)
-      self._content  = request['query']['pages'][self.pageid]['extract']
-      self._revid    = request['query']['pages'][self.pageid]['revisions'][0]['revid']
-      self._parentid = request['query']['pages'][self.pageid]['revisions'][0]['revid']
+      self._content     = request['query']['pages'][self.pageid]['extract']
+      self._revision_id = request['query']['pages'][self.pageid]['revisions'][0]['revid']
+      self._parent_id   = request['query']['pages'][self.pageid]['revisions'][0]['parentid']
       
     return self._content
 
   @property
-  def revid(self):
+  def revision_id(self):
     '''
     Revision ID of the page.
     '''
@@ -346,18 +346,18 @@ class WikipediaPage(object):
       # fetch the content (side effect is loading the revid)
       self.content
     
-    return self._revid
+    return self._revision_id
       
   @property
-  def parentid(self):
+  def parent_id(self):
     '''
     Revision ID of the parent to the current revision of this page.
     '''
-    if not getattr(self, '_revid', False):
+    if not getattr(self, '_parentid', False):
       # fetch the content (side effect is loading the revid)
       self.content
     
-    return self._parentid
+    return self._parent_id
 
   @property
   def summary(self):

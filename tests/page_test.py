@@ -77,6 +77,17 @@ class TestPage(unittest.TestCase):
     self.assertEqual(self.celtuce.content, mock_data['data']["celtuce.content"])
     self.assertEqual(self.cyclone.content, mock_data['data']["cyclone.content"])
 
+  def test_revision_id(self):
+    """Test the revision id."""
+    self.assertEqual(self.celtuce.revision_id, mock_data['data']["celtuce.revid"])
+    self.assertEqual(self.cyclone.revision_id, mock_data['data']["cyclone.revid"])
+    
+  def test_parent_id(self):
+    """Test the parent id."""
+    self.assertEqual(self.celtuce.parent_id, mock_data['data']["celtuce.parentid"])
+    self.assertEqual(self.cyclone.parent_id, mock_data['data']["cyclone.parentid"])
+    
+
   def test_summary(self):
     """Test the summary."""
     self.assertEqual(self.celtuce.summary, mock_data['data']["celtuce.summary"])
