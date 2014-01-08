@@ -1,5 +1,9 @@
 # Changelog
 
+## Current
+
+* Add revision_id and parent_id properties. PR [#23]() by [@fusiongyro]()
+
 ## Version 1.1
 
 * Add limited ability to access section titles on a page.  PR [#18]() by [@astavonin]()
