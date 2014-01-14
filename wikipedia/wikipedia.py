@@ -544,7 +544,7 @@ def _wiki_request(**params):
     # it hasn't been long enough since the last API call
     # so wait until we're in the clear to make the request
 
-    wait_time = datetime.now() - (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT)
+    wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
   r = requests.get(API_URL, params=params, headers=headers)
