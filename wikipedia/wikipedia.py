@@ -85,7 +85,7 @@ def search(query, results=10, suggestion=False):
   raw_results = _wiki_request(**search_params)
 
   if 'error' in raw_results:
-    if raw_results['error']['info'] == 'HTTP request timed out.':
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
       raise HTTPTimeoutError(query)
     else:
       raise WikipediaException(raw_results['error']['info'])
@@ -334,7 +334,7 @@ class WikipediaPage(object):
       self._content     = request['query']['pages'][self.pageid]['extract']
       self._revision_id = request['query']['pages'][self.pageid]['revisions'][0]['revid']
       self._parent_id   = request['query']['pages'][self.pageid]['revisions'][0]['parentid']
-      
+
     return self._content
 
   @property
@@ -348,24 +348,24 @@ class WikipediaPage(object):
     <http://en.wikipedia.org/wiki/Wikipedia:Revision>`_ for more
     information.
     '''
-    
+
     if not getattr(self, '_revid', False):
       # fetch the content (side effect is loading the revid)
       self.content
-    
+
     return self._revision_id
-      
+
   @property
   def parent_id(self):
     '''
     Revision ID of the parent version of the current revision of this
     page. See ``revision_id`` for more information.
     '''
-    
+
     if not getattr(self, '_parentid', False):
       # fetch the content (side effect is loading the revid)
       self.content
-    
+
     return self._parent_id
 
   @property
