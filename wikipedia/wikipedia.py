@@ -227,6 +227,14 @@ class WikipediaPage(object):
       for prop in ('content', 'summary', 'images', 'references', 'links', 'sections'):
         getattr(self, prop)
 
+  def from_page_id(self, pageid, preload=False):
+    '''
+    Alternative initiliaser using only a pageid rather than a title
+    :param pageid: integer page id
+    '''
+    self.pageid = pageid
+    self.load(redirect=False, preload=preload)
+
   def __repr__(self):
     return stdout_encode(u'<WikipediaPage \'{}\'>'.format(self.title))
 
@@ -237,13 +245,15 @@ class WikipediaPage(object):
 
     Does not need to be called manually, should be called automatically during __init__.
     '''
-
     query_params = {
       'prop': 'info|pageprops',
       'inprop': 'url',
       'ppprop': 'disambiguation',
-      'titles': self.title
     }
+    if getattr(self, 'pageid', None) is None:
+      query_params['titles'] = self.title
+    else:
+      query_params['pageids'] = str(self.pageid)
 
     request = _wiki_request(**query_params)
 
