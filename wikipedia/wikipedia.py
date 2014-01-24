@@ -189,26 +189,34 @@ def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
   return summary
 
 
-def page(title, auto_suggest=True, redirect=True, preload=False):
+def page(title=None, pageid=None, auto_suggest=True, redirect=True, preload=False):
   '''
-  Get a WikipediaPage object for the page with title `title`.
+  Get a WikipediaPage object for the page with title `title` or the pageid
+  `pageid` (mutually exclusive).
 
   Keyword arguments:
 
+  * title - the title of the page to load
+  * pageid - the numeric pageid of the page to load
   * auto_suggest - let Wikipedia find a valid page title for the query
   * redirect - allow redirection without raising RedirectError
   * preload - load content, summary, images, references, and links during initialization
   '''
 
-  if auto_suggest:
-    results, suggestion = search(title, results=1, suggestion=True)
-    try:
-      title = suggestion or results[0]
-    except IndexError:
-      # if there is no suggestion or search results, the page doesn't exist
-      raise PageError(title)
+  if title is not None:
+    if auto_suggest:
+      results, suggestion = search(title, results=1, suggestion=True)
+      try:
+        title = suggestion or results[0]
+      except IndexError:
+        # if there is no suggestion or search results, the page doesn't exist
+        raise PageError(title)
+    return WikipediaPage(title, redirect=redirect, preload=preload)
+  elif pageid is not None:
+    return WikipediaPage(pageid=pageid, preload=preload)
+  else:
+    raise ValueError("Either a title or a pageid must be specified")
 
-  return WikipediaPage(title, redirect=redirect, preload=preload)
 
 
 class WikipediaPage(object):
@@ -217,23 +225,20 @@ class WikipediaPage(object):
   Uses property methods to filter data from the raw HTML.
   '''
 
-  def __init__(self, title, redirect=True, preload=False, original_title=''):
-    self.title = title
-    self.original_title = original_title or title
+  def __init__(self, title=None, pageid=None, redirect=True, preload=False, original_title=''):
+    if title is not None:
+      self.title = title
+      self.original_title = original_title or title
+    elif pageid is not None:
+      self.pageid = pageid
+    else:
+      raise ValueError("Either a title or a pageid must be specified")
 
     self.load(redirect=redirect, preload=preload)
 
     if preload:
       for prop in ('content', 'summary', 'images', 'references', 'links', 'sections'):
         getattr(self, prop)
-
-  def from_page_id(self, pageid, preload=False):
-    '''
-    Alternative initiliaser using only a pageid rather than a title
-    :param pageid: integer page id
-    '''
-    self.pageid = pageid
-    self.load(redirect=False, preload=preload)
 
   def __repr__(self):
     return stdout_encode(u'<WikipediaPage \'{}\'>'.format(self.title))
@@ -336,10 +341,12 @@ class WikipediaPage(object):
       query_params = {
         'prop': 'extracts|revisions',
         'explaintext': '',
-        'titles': self.title,
         'rvprop': 'ids'
       }
-
+      if not getattr(self, 'title', None) is None:
+         query_params['titles'] = self.title
+      else:
+         query_params['pageids'] = self.pageid
       request = _wiki_request(**query_params)
       self._content     = request['query']['pages'][self.pageid]['extract']
       self._revision_id = request['query']['pages'][self.pageid]['revisions'][0]['revid']
@@ -389,8 +396,11 @@ class WikipediaPage(object):
         'prop': 'extracts',
         'explaintext': '',
         'exintro': '',
-        'titles': self.title
       }
+      if not getattr(self, 'title', None) is None:
+         query_params['titles'] = self.title
+      else:
+         query_params['pageids'] = self.pageid
 
       request = _wiki_request(**query_params)
       self._summary = request['query']['pages'][self.pageid]['extract']
@@ -409,8 +419,11 @@ class WikipediaPage(object):
         'gimlimit': 'max',
         'prop': 'imageinfo',
         'iiprop': 'url',
-        'titles': self.title,
       }
+      if not getattr(self, 'title', None) is None:
+         query_params['titles'] = self.title
+      else:
+         query_params['pageids'] = self.pageid
 
       request = _wiki_request(**query_params)
 
@@ -431,8 +444,11 @@ class WikipediaPage(object):
       query_params = {
         'prop': 'extlinks',
         'ellimit': 'max',
-        'titles': self.title,
       }
+      if not getattr(self, 'title', None) is None:
+         query_params['titles'] = self.title
+      else:
+         query_params['pageids'] = self.pageid
 
       request = _wiki_request(**query_params)
 
@@ -461,8 +477,11 @@ class WikipediaPage(object):
         'prop': 'links',
         'plnamespace': 0,
         'pllimit': 'max',
-        'titles': self.title,
       }
+      if not getattr(self, 'title', None) is None:
+         request['titles'] = self.title
+      else:
+         request['pageids'] = self.pageid
       lastContinue = {}
 
       # based on https://www.mediawiki.org/wiki/API:Query#Continuing_queries
@@ -490,8 +509,11 @@ class WikipediaPage(object):
       query_params = {
         'action': 'parse',
         'prop': 'sections',
-        'page': self.title
       }
+      if not getattr(self, 'title', None) is None:
+         query_params['page'] = self.title
+      else:
+         query_params['pageid'] = self.pageid
 
       request = _wiki_request(**query_params)
       self._sections = [section['line'] for section in request['parse']['sections']]

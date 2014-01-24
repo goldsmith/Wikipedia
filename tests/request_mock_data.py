@@ -96,6 +96,10 @@ mock_data = {
 
     (('limit', 10), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 10), ('srprop', ''), ('srsearch', 'qmxjsudek')):
     {'query': {'search': []}, 'warnings': {'main': {'*': u"Unrecognized parameter: 'limit'"}}},
+
+    (('inprop', 'url'), ('pageids', '12345'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops')):
+    {'query': {'pages': {'12345': {'extract': 'Sample page about 12345.', 'ns': 0, 'pageid': 12345, 'title': '12345', 'fullurl': 'http://en.wikipedia.org/wiki/12345'}}}},
+
   },
 
   "data": {

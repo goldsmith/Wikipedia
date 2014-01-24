@@ -62,6 +62,9 @@ class TestPage(unittest.TestCase):
     self.celtuce = wikipedia.page("Celtuce")
     self.cyclone = wikipedia.page("Tropical Depression Ten (2005)")
 
+  def test_from_pageid(self):
+    a_page = wikipedia.page(pageid=12345)
+
   def test_title(self):
     """Test the title."""
     self.assertEqual(self.celtuce.title, "Celtuce")
