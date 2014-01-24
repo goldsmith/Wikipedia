@@ -60,6 +60,35 @@ def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
 
   RATE_LIMIT_LAST_CALL = None
 
+@cache
+def search_loc(latitude, longitude, results=10, radius=1000):
+  '''
+  Do a wikipedia geo search for latitude and longitude
+
+  Keyword arguments:
+
+  * results - the meximum number of results returned
+  * radius - Search radius in meters. The value must be between 10 and 10000
+  '''
+
+  search_params = {
+    'list': 'geosearch',
+    'gsradius': radius,
+    'gscoord': '{0}|{1}'.format(latitude, longitude),
+    'gslimit': results
+  }
+
+  raw_results = _wiki_request(**search_params)
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError('{0}|{1}'.format(latitude, longitude))
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  search_results = (d['title'] for d in raw_results['query']['geosearch'])
+
+  return list(search_results)
 
 @cache
 def search(query, results=10, suggestion=False):
@@ -411,6 +440,28 @@ class WikipediaPage(object):
     return self._images
 
   @property
+  def coordinates(self):
+    '''
+    Geo coordinates of the place
+    '''
+    if not getattr(self, '_coordinates', False):
+      query_params = {
+        'prop': 'coordinates',
+        'ellimit': 'max',
+        'titles': self.title,
+      }
+
+      request = _wiki_request(**query_params)
+
+      print request['query']['pages'][self.pageid]
+
+      coordinates = request['query']['pages'][self.pageid]['coordinates']
+
+      self._coordinates = coordinates
+
+    return self._coordinates
+
+  @property
   def references(self):
     '''
     List of URLs of external links on a page.
@@ -547,6 +598,9 @@ def _wiki_request(**params):
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
+  print API_URL
+  print params
+  print headers
   r = requests.get(API_URL, params=params, headers=headers)
 
   if RATE_LIMIT:
