@@ -500,7 +500,7 @@ class WikipediaPage(object):
            `section_title` and the next subheading, which is often empty.
     '''
 
-    section = "== {} ==".format(section_title)
+    section = "== "+section_title+" =="
     try:
       index = self.content.index(section) + len(section)
     except ValueError:
