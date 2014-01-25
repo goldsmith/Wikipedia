@@ -98,8 +98,13 @@ mock_data = {
     {'query': {'search': []}, 'warnings': {'main': {'*': u"Unrecognized parameter: 'limit'"}}},
 
     (('inprop', 'url'), ('pageids', '12345'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops')):
-    {'query': {'pages': {'12345': {'extract': 'Sample page about 12345.', 'ns': 0, 'pageid': 12345, 'title': '12345', 'fullurl': 'http://en.wikipedia.org/wiki/12345'}}}},
+    {'query': {'pages': {'12345': {'extract': 'This is the extract for 12345', 'ns': 0, 'pageid': 12345, 'title': '12345', 'fullurl': 'http://en.wikipedia.org/wiki/12345'}}}},
 
+    (('explaintext', ''), ('pageids', u'12345'), ('prop', 'extracts|revisions'), ('rvprop', 'ids')):
+    {'query': {u'pages': {u'12345': {'extract': 'This is the extract for 12345', 'revisions': [{u'revid': 54321, u'parentid': 12344}]}}}},
+
+    (('exintro', ''), ('explaintext', ''), ('pageids', u'12345'), ('prop', 'extracts')):
+    {'query': {u'pages': {u'12345': {'extract': 'This is the extract for 12345', 'revisions': [{u'revid': 54321, u'parentid': 12344}]}}}}
   },
 
   "data": {
@@ -136,6 +141,14 @@ mock_data = {
     "cyclone.sections": ['External links', 'Impact', 'Meteorological history', 'References', 'See also'],
 
     "cyclone.section.impact": 'Because Tropical Depression Ten never approached land as a tropical cyclone, no tropical cyclone watches and warnings were issued for any land masses. No effects, damages, or fatalities were reported, and no ships reported tropical storm-force winds in association with the depression. The system did not attain tropical storm status; as such, it was not given a name by the National Hurricane Center. The storm partially contributed to the formation of Hurricane Katrina, which became a Category 5 hurricane on the Saffir-Simpson Hurricane Scale and made landfall in Louisiana, causing catastrophic damage. Katrina was the costliest hurricane, and one of the five deadliest, in the history of the United States.',
+
+     "12345.content": "This is the extract for 12345",
+
+     "12345.revid": 54321,
+
+     "12345.parentid": 12344,
+
+     "12345.summary": "This is the extract for 12345",
 
     "barack.search": ['Barack Obama', 'Barack Obama, Sr.', 'Presidency of Barack Obama', 'Barack Obama presidential campaign, 2008', 'List of federal judges appointed by Barack Obama', 'Barack Obama in comics', 'Political positions of Barack Obama', 'Barack Obama on social media', 'List of Batman: The Brave and the Bold characters', 'Family of Barack Obama'],
 
