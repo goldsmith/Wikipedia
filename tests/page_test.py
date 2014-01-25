@@ -50,7 +50,7 @@ class TestPageSetUp(unittest.TestCase):
     # yum, butter.
     butterfly = wikipedia.page("butteryfly")
 
-    self.assertEqual(butterfly.title, "butterfly")
+    self.assertEqual(butterfly.title, "Butterfly")
     self.assertEqual(butterfly.url, "http://en.wikipedia.org/wiki/Butterfly")
 
 
@@ -61,7 +61,10 @@ class TestPage(unittest.TestCase):
     # shortest wikipedia articles with images and sections
     self.celtuce = wikipedia.page("Celtuce")
     self.cyclone = wikipedia.page("Tropical Depression Ten (2005)")
-    self.onetwothreefourfive = wikipedia.page(pageid=12345)
+
+  def test_from_page_id(self):
+    """Test loading from a page id"""
+    self.assertEqual(self.celtuce, wikipedia.page(pageid=1868108))
 
   def test_title(self):
     """Test the title."""
@@ -77,26 +80,22 @@ class TestPage(unittest.TestCase):
     """Test the plain text content."""
     self.assertEqual(self.celtuce.content, mock_data['data']["celtuce.content"])
     self.assertEqual(self.cyclone.content, mock_data['data']["cyclone.content"])
-    self.assertEqual(self.onetwothreefourfive.content, mock_data['data']["12345.content"])
 
   def test_revision_id(self):
     """Test the revision id."""
     self.assertEqual(self.celtuce.revision_id, mock_data['data']["celtuce.revid"])
     self.assertEqual(self.cyclone.revision_id, mock_data['data']["cyclone.revid"])
-    self.assertEqual(self.onetwothreefourfive.revision_id, mock_data['data']["12345.revid"])
-    
+
   def test_parent_id(self):
     """Test the parent id."""
     self.assertEqual(self.celtuce.parent_id, mock_data['data']["celtuce.parentid"])
     self.assertEqual(self.cyclone.parent_id, mock_data['data']["cyclone.parentid"])
-    self.assertEqual(self.onetwothreefourfive.parent_id, mock_data['data']["12345.parentid"])
-    
+
 
   def test_summary(self):
     """Test the summary."""
     self.assertEqual(self.celtuce.summary, mock_data['data']["celtuce.summary"])
     self.assertEqual(self.cyclone.summary, mock_data['data']["cyclone.summary"])
-    self.assertEqual(self.onetwothreefourfive.summary, mock_data['data']["12345.summary"])
 
   def test_images(self):
     """Test the list of image URLs."""

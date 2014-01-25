@@ -243,6 +243,16 @@ class WikipediaPage(object):
   def __repr__(self):
     return stdout_encode(u'<WikipediaPage \'{}\'>'.format(self.title))
 
+  def __eq__(self, other):
+    try:
+      return (
+        self.pageid == other.pageid
+        and self.title == other.title
+        and self.url == other.url
+      )
+    except:
+      return False
+
   def load(self, redirect=True, preload=False):
     '''
     Load basic information from Wikipedia.
