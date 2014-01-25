@@ -255,10 +255,10 @@ class WikipediaPage(object):
       'inprop': 'url',
       'ppprop': 'disambiguation',
     }
-    if getattr(self, 'pageid', None) is None:
+    if not getattr(self, 'pageid', None):
       query_params['titles'] = self.title
     else:
-      query_params['pageids'] = str(self.pageid)
+      query_params['pageids'] = self.pageid
 
     request = _wiki_request(**query_params)
 
@@ -268,7 +268,10 @@ class WikipediaPage(object):
 
     # missing is equal to empty string if it is True
     if data.get('missing') == '':
-      raise PageError(self.title)
+      if hasattr(self, 'title'):
+        raise PageError(self.title)
+      else:
+        raise PageError(pageid=self.pageid)
 
     # same thing for redirect
     elif data.get('redirect') == '':
@@ -291,23 +294,34 @@ class WikipediaPage(object):
         self.__init__(title, redirect=redirect, preload=preload)
 
       else:
-        raise RedirectError(self.title)
+        raise RedirectError(getattr(self, 'title', data['title']))
 
     # since we only asked for disambiguation in ppprop,
     # if a pageprop is returned,
     # then the page must be a disambiguation page
     elif data.get('pageprops'):
-      request = _wiki_request(titles=self.title, prop='revisions', rvprop='content', rvparse='', rvlimit=1)
+      query_params = {
+        'prop': 'revisions',
+        'rvprop': 'content',
+        'rvparse': '',
+        'rvlimit': 1
+      }
+      if hasattr(self, 'pageid'):
+        query_params['pageids'] = self.pageid
+      else:
+        query_params['titles'] = self.title
+      request = _wiki_request(**query_params)
       html = request['query']['pages'][pageid]['revisions'][0]['*']
 
       lis = BeautifulSoup(html).find_all('li')
       filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
       may_refer_to = [li.a.get_text() for li in filtered_lis if li.a]
 
-      raise DisambiguationError(self.title, may_refer_to)
+      raise DisambiguationError(getattr(self, 'title', data['title']), may_refer_to)
 
     else:
       self.pageid = pageid
+      self.title = data['title']
       self.url = data['fullurl']
 
   def html(self):

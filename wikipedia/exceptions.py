@@ -26,11 +26,17 @@ class WikipediaException(Exception):
 class PageError(WikipediaException):
   """Exception raised when no Wikipedia matched a query."""
 
-  def __init__(self, page_title):
-    self.title = page_title
+  def __init__(self, pageid=None, *args):
+    if pageid:
+      self.pageid = pageid
+    else:
+      self.title = args[0]
 
   def __unicode__(self):
-    return u"\"{0}\" does not match any pages. Try another query!".format(self.title)
+    if hasattr(self, 'title'):
+      return u"\"{0}\" does not match any pages. Try another query!".format(self.title)
+    else:
+      return u"Page id \"{0}\" does not match any pages. Try another id!".format(self.pageid)
 
 
 class DisambiguationError(WikipediaException):
@@ -54,8 +60,8 @@ class DisambiguationError(WikipediaException):
 class RedirectError(WikipediaException):
   """Exception raised when a page title unexpectedly resolves to a redirect."""
 
-  def __init__(self, page_title):
-    self.title = page_title
+  def __init__(self, title):
+    self.title = title
 
   def __unicode__(self):
     return u"\"{0}\" resulted in a redirect. Set the redirect property to True to allow automatic redirects.".format(self.title)
