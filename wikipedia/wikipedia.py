@@ -11,6 +11,7 @@ API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
+USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
 
 
 def set_lang(prefix):
@@ -27,6 +28,18 @@ def set_lang(prefix):
 
   for cached_func in (search, suggest, summary):
     cached_func.clear_cache()
+
+
+def set_user_agent(user_agent_string):
+    '''
+    Set the User-Agent string to be used for all requests.
+
+    Arguments:
+
+    * user_agent_string - (string) a string specifying the User-Agent header
+    '''
+    global USER_AGENT
+    USER_AGENT = user_agent_string
 
 
 def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
@@ -585,13 +598,14 @@ def _wiki_request(**params):
   Returns a parsed dict of the JSON response.
   '''
   global RATE_LIMIT_LAST_CALL
+  global USER_AGENT
 
   params['format'] = 'json'
   if not 'action' in params:
     params['action'] = 'query'
 
   headers = {
-    'User-Agent': 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
+    'User-Agent': USER_AGENT
   }
 
   if RATE_LIMIT and RATE_LIMIT_LAST_CALL and \
