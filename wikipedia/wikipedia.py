@@ -61,7 +61,7 @@ def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
   RATE_LIMIT_LAST_CALL = None
 
 @cache
-def search_loc(latitude, longitude, results=10, radius=1000):
+def search_loc(latitude, longitude, article_name = None, results=10, radius=1000):
   '''
   Do a wikipedia geo search for latitude and longitude
 
@@ -87,6 +87,11 @@ def search_loc(latitude, longitude, results=10, radius=1000):
       raise WikipediaException(raw_results['error']['info'])
 
   search_results = (d['title'] for d in raw_results['query']['geosearch'])
+  if article_name:
+    search_results = (d['title'] for d in raw_results['query']['geosearch'] if d['title'].lower() == article_name.lower())
+  else:
+    search_results = (d['title'] for d in raw_results['query']['geosearch'])
+
 
   return list(search_results)
 
