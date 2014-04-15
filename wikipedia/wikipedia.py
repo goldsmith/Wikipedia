@@ -67,6 +67,7 @@ def search_loc(latitude, longitude, article_name = None, results=10, radius=1000
 
   Keyword arguments:
 
+  * article_name - The name of the article to find
   * results - the meximum number of results returned
   * radius - Search radius in meters. The value must be between 10 and 10000
   '''
@@ -77,6 +78,8 @@ def search_loc(latitude, longitude, article_name = None, results=10, radius=1000
     'gscoord': '{0}|{1}'.format(latitude, longitude),
     'gslimit': results
   }
+  if article_name:
+    search_params['titles'] = article_name
 
   raw_results = _wiki_request(**search_params)
 
@@ -86,12 +89,11 @@ def search_loc(latitude, longitude, article_name = None, results=10, radius=1000
     else:
       raise WikipediaException(raw_results['error']['info'])
 
-  search_results = (d['title'] for d in raw_results['query']['geosearch'])
-  if article_name:
-    search_results = (d['title'] for d in raw_results['query']['geosearch'] if d['title'].lower() == article_name.lower())
+  search_pages = raw_results['query'].get('pages', None)
+  if search_pages:
+    search_results = (v['title'] for k, v in search_pages.items() if k != '-1')
   else:
     search_results = (d['title'] for d in raw_results['query']['geosearch'])
-
 
   return list(search_results)
 
@@ -447,7 +449,7 @@ class WikipediaPage(object):
   @property
   def coordinates(self):
     '''
-    Geo coordinates of the place
+    Tuple of decimals in the form of (lat, lon)
     '''
     if not getattr(self, '_coordinates', False):
       query_params = {
@@ -458,11 +460,9 @@ class WikipediaPage(object):
 
       request = _wiki_request(**query_params)
 
-      print request['query']['pages'][self.pageid]
-
       coordinates = request['query']['pages'][self.pageid]['coordinates']
-
-      self._coordinates = coordinates
+      
+      self._coordinates = (coordinates[0]['lat'], coordinates[0]['lon'])
 
     return self._coordinates
 
@@ -603,9 +603,6 @@ def _wiki_request(**params):
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
-  print API_URL
-  print params
-  print headers
   r = requests.get(API_URL, params=params, headers=headers)
 
   if RATE_LIMIT:
