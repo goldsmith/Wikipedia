@@ -68,7 +68,7 @@ def search_loc(latitude, longitude, article_name = None, results=10, radius=1000
   Keyword arguments:
 
   * article_name - The name of the article to find
-  * results - the meximum number of results returned
+  * results - the maximum number of results returned
   * radius - Search radius in meters. The value must be between 10 and 10000
   '''
 
