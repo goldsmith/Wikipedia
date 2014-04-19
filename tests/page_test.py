@@ -61,6 +61,7 @@ class TestPage(unittest.TestCase):
     # shortest wikipedia articles with images and sections
     self.celtuce = wikipedia.page("Celtuce")
     self.cyclone = wikipedia.page("Tropical Depression Ten (2005)")
+    self.great_wall_of_china = wikipedia.page("Great Wall of China")
 
   def test_title(self):
     """Test the title."""
@@ -120,3 +121,9 @@ class TestPage(unittest.TestCase):
     """Test text content of a single section."""
     self.assertEqual(self.cyclone.section("Impact"), mock_data['data']["cyclone.section.impact"])
     self.assertEqual(self.cyclone.section("History"), None)
+
+  def test_coordinates(self):
+    """Test geo coordinates of a page"""
+    coordinates = self.great_wall_of_china.coordinates
+    coordinates = '%0.2f,%0.2f' % (coordinates[0], coordinates[1])
+    self.assertEqual(coordinates, mock_data['data']['great_wall_of_china.coordinates'])

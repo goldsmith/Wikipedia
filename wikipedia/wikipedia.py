@@ -2,6 +2,7 @@ import requests
 import time
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from .exceptions import PageError, DisambiguationError, RedirectError, HTTPTimeoutError, WikipediaException
 from .util import cache, stdout_encode
@@ -449,7 +450,7 @@ class WikipediaPage(object):
   @property
   def coordinates(self):
     '''
-    Tuple of decimals in the form of (lat, lon)
+    Tuple of Decimals in the form of (lat, lon)
     '''
     if not getattr(self, '_coordinates', False):
       query_params = {
@@ -462,7 +463,7 @@ class WikipediaPage(object):
 
       coordinates = request['query']['pages'][self.pageid]['coordinates']
       
-      self._coordinates = (coordinates[0]['lat'], coordinates[0]['lon'])
+      self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
 
     return self._coordinates
 

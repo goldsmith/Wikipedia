@@ -43,11 +43,17 @@ mock_data = {
     (('limit', 1), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 1), ('srprop', ''), ('srsearch', 'Tropical Depression Ten (2005)')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Tropical Depression Ten (2005)'}]}, 'warnings': {'main': {'*': u"Unrecognized parameter: 'limit'"}}},
 
+    (('limit', 1), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 1), ('srprop', ''), ('srsearch', 'Great Wall of China')):
+    {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Great Wall of China'}]}, 'warnings': {'main': {'*': u"Unrecognized parameter: 'limit'"}}},
+
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('titles', 'Celtuce')):
     {'query': {'pages': {'1868108': {'lastrevid': 562756085, 'pageid': 1868108, 'title': 'Celtuce', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Celtuce&action=edit', 'counter': '', 'length': 1662, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2013-08-17T03:30:23Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Celtuce'}}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('titles', 'Tropical Depression Ten (2005)')):
     {'query': {'pages': {'21196082': {'lastrevid': 572715399, 'pageid': 21196082, 'title': 'Tropical Depression Ten (2005)', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Tropical_Depression_Ten_(2005)&action=edit', 'counter': '', 'length': 8543, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2013-09-18T13:45:33Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Tropical_Depression_Ten_(2005)'}}}},
+
+    (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('titles', 'Great Wall of China')):
+    {'query': {'pages': {'5094570': {'lastrevid': 604138653, 'pageid': 5094570, 'title': 'Great Wall of China', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Great_Wall_of_China&action=edit', 'counter': '', 'length': 23895, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2013-08-17T03:30:23Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Great_Wall_of_China'}}}},
 
     (('explaintext', ''), ('prop', 'extracts'), ('titles', 'Celtuce')):
     {'query': {'pages': {'1868108': {'extract': 'Celtuce (Lactuca sativa var. asparagina, augustana, or angustata), also called stem lettuce, celery lettuce, asparagus lettuce, or Chinese lettuce, IPA (UK,US) /\u02c8s\u025blt.\u0259s/, is a cultivar of lettuce grown primarily for its thick stem, used as a vegetable. It is especially popular in China, and is called wosun (Chinese: \u83b4\u7b0b; pinyin: w\u014ds\u016dn) or woju (Chinese: \u83b4\u82e3; pinyin: w\u014dj\xf9) (although the latter name may also be used to mean lettuce in general).\n\nThe stem is usually harvested at a length of around 15\u201320 cm and a diameter of around 3\u20134 cm. It is crisp, moist, and mildly flavored, and typically prepared by slicing and then stir frying with more strongly flavored ingredients.', 'ns': 0, 'pageid': 1868108, 'title': 'Celtuce'}}}},
@@ -96,6 +102,21 @@ mock_data = {
 
     (('limit', 10), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 10), ('srprop', ''), ('srsearch', 'qmxjsudek')):
     {'query': {'search': []}, 'warnings': {'main': {'*': u"Unrecognized parameter: 'limit'"}}},
+
+    (('ellimit', 'max'), ('prop', 'coordinates'), ('titles', 'Great Wall of China')):
+    {'query': {'pages': {u'5094570': {u'ns': 0, u'pageid': 5094570, u'coordinates': [{u'lat': 40.6769, u'globe': u'earth', u'lon': 117.232, u'primary': u''}], u'title': u'Great Wall of China'}}}, 'limits': {'extlinks': 500}},
+
+    (('gscoord', '40.67693|117.23193'), ('gslimit', 10), ('gsradius', 1000), ('list', 'geosearch')): 
+    {u'query': {u'geosearch': [{u'pageid': 5094570, u'title': u'Great Wall of China', u'lon': 117.232, u'primary': u'', u'lat': 40.6769, u'dist': 6.8, u'ns': 0}]}},
+
+    (('gscoord', '40.67693|117.23193'), ('gslimit', 10), ('gsradius', 10000), ('list', 'geosearch')): 
+    {u'query': {u'geosearch': [{u'pageid': 5094570, u'title': u'Great Wall of China', u'lon': 117.232, u'primary': u'', u'lat': 40.6769, u'dist': 6.8, u'ns': 0}, {u'pageid': 10135375, u'title': u'Jinshanling', u'lon': 117.244, u'primary': u'', u'lat': 40.6764, u'dist': 1019.6, u'ns': 0}]}},
+
+    (('gscoord', '40.67693|117.23193'), ('gslimit', 10), ('gsradius', 1000), ('list', 'geosearch'), ('titles', 'Great Wall of China')): 
+    {u'query': {u'geosearch': [{u'pageid': 5094570, u'title': u'Great Wall of China', u'lon': 117.232, u'primary': u'', u'lat': 40.6769, u'dist': 6.8, u'ns': 0}]}},
+
+    (('gscoord', '40.67693|117.23193'), ('gslimit', 10), ('gsradius', 1000), ('list', 'geosearch'), ('titles', 'Test')): 
+    {u'query': {u'geosearch': []}},
   },
 
   "data": {
@@ -136,5 +157,15 @@ mock_data = {
     "barack.search": ['Barack Obama', 'Barack Obama, Sr.', 'Presidency of Barack Obama', 'Barack Obama presidential campaign, 2008', 'List of federal judges appointed by Barack Obama', 'Barack Obama in comics', 'Political positions of Barack Obama', 'Barack Obama on social media', 'List of Batman: The Brave and the Bold characters', 'Family of Barack Obama'],
 
     "porsche.search": ['Porsche', 'Porsche in motorsport', 'Porsche 911 GT3'],
+
+    "great_wall_of_china.coordinates": '40.68,117.23',
+
+    "great_wall_of_china.geo_seach": ['Great Wall of China'],
+
+    "great_wall_of_china.geo_seach_with_radius": ['Great Wall of China', 'Jinshanling'],
+
+    "great_wall_of_china.geo_seach_with_existing_article_name": ['Great Wall of China'],
+
+    "great_wall_of_china.geo_seach_with_non_existing_article_name": [],
   }
 }
