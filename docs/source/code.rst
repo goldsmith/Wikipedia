@@ -12,23 +12,25 @@ Contents:
    code
 
 .. automodule:: wikipedia
-	:members:
+  :members:
 
 Functions and Classes
 ===============================
 
 .. automodule:: wikipedia
 
-	.. autofunction:: search(query, results=10, suggestion=False)
+  .. autofunction:: search(query, results=10, suggestion=False)
 
-	.. autofunction:: suggest(query)
+  .. autofunction:: suggest(query)
 
-	.. autofunction:: summary(query, sentences=0, chars=0, auto_suggest=True, redirect=True)
+  .. autofunction:: summary(query, sentences=0, chars=0, auto_suggest=True, redirect=True)
 
-	.. autofunction:: page
+  .. autofunction:: page
+
+  .. autofunction:: geosearch(latitude, longitude, title=None, results=10, radius=1000)
 
 .. autoclass:: wikipedia.WikipediaPage
-	:members:
+  :members:
 
 .. autofunction:: wikipedia.set_lang
 
@@ -42,7 +44,7 @@ Exceptions
 ==========
 
 .. automodule:: wikipedia.exceptions
-	:members:
+  :members:
 
 Indices and tables
 ==================

@@ -63,9 +63,49 @@ def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
 
 
 @cache
+def search(query, results=10, suggestion=False):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'list': 'search',
+    'srprop': '',
+    'srlimit': results
+  }
+  if suggestion:
+    search_params['srinfo'] = 'suggestion'
+  search_params['srsearch'] = query
+  search_params['limit'] = results
+
+  raw_results = _wiki_request(**search_params)
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  search_results = (d['title'] for d in raw_results['query']['search'])
+
+  if suggestion:
+    if raw_results['query'].get('searchinfo'):
+      return list(search_results), raw_results['query']['searchinfo']['suggestion']
+    else:
+      return list(search_results), None
+
+  return list(search_results)
+
+
+@cache
 def geosearch(latitude, longitude, title=None, results=10, radius=1000):
   '''
-  Do a wikipedia geo search for latitude and longitude
+  Do a wikipedia geo search for `latitude` and `longitude`
   using HTTP API described in http://www.mediawiki.org/wiki/Extension:GeoData
 
   Arguments:
@@ -102,45 +142,6 @@ def geosearch(latitude, longitude, title=None, results=10, radius=1000):
     search_results = (v['title'] for k, v in search_pages.items() if k != '-1')
   else:
     search_results = (d['title'] for d in raw_results['query']['geosearch'])
-
-  return list(search_results)
-
-@cache
-def search(query, results=10, suggestion=False):
-  '''
-  Do a Wikipedia search for `query`.
-
-  Keyword arguments:
-
-  * results - the maxmimum number of results returned
-  * suggestion - if True, return results and suggestion (if any) in a tuple
-  '''
-
-  search_params = {
-    'list': 'search',
-    'srprop': '',
-    'srlimit': results
-  }
-  if suggestion:
-    search_params['srinfo'] = 'suggestion'
-  search_params['srsearch'] = query
-  search_params['limit'] = results
-
-  raw_results = _wiki_request(**search_params)
-
-  if 'error' in raw_results:
-    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
-      raise HTTPTimeoutError(query)
-    else:
-      raise WikipediaException(raw_results['error']['info'])
-
-  search_results = (d['title'] for d in raw_results['query']['search'])
-
-  if suggestion:
-    if raw_results['query'].get('searchinfo'):
-      return list(search_results), raw_results['query']['searchinfo']['suggestion']
-    else:
-      return list(search_results), None
 
   return list(search_results)
 

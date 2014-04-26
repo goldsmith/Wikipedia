@@ -3,6 +3,8 @@
 ## Current
 
 * Add revision_id and parent_id properties. PR [#23]() by [@fusiongyro]()
+* Add changeable User-Agent. PR [#33]() by [@crazybmanp]()
+* Add geosearch functionality. PR [#40]() by [@Kazuar]()
 
 ## Version 1.1
 
