@@ -61,15 +61,21 @@ def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
 
   RATE_LIMIT_LAST_CALL = None
 
+
 @cache
-def search_loc(latitude, longitude, article_name = None, results=10, radius=1000):
+def search_loc(latitude, longitude, title=None, results=10, radius=1000):
   '''
-  Do a wikipedia geo search for latitude and longitude 
+  Do a wikipedia geo search for latitude and longitude
   using HTTP API described in http://www.mediawiki.org/wiki/Extension:GeoData
+
+  Arguments:
+
+  * latitude (float or decimal.Decimal)
+  * longitude (float or decimal.Decimal)
 
   Keyword arguments:
 
-  * article_name - The name of the article to find
+  * title - The title of an article to search for
   * results - the maximum number of results returned
   * radius - Search radius in meters. The value must be between 10 and 10000
   '''
@@ -80,8 +86,8 @@ def search_loc(latitude, longitude, article_name = None, results=10, radius=1000
     'gscoord': '{0}|{1}'.format(latitude, longitude),
     'gslimit': results
   }
-  if article_name:
-    search_params['titles'] = article_name
+  if title:
+    search_params['titles'] = title
 
   raw_results = _wiki_request(**search_params)
 
@@ -510,7 +516,7 @@ class WikipediaPage(object):
       request = _wiki_request(**query_params)
 
       coordinates = request['query']['pages'][self.pageid]['coordinates']
-      
+
       self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
 
     return self._coordinates
