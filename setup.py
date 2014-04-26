@@ -3,13 +3,12 @@ import os
 import codecs
 
 from setuptools import setup
+from pip.req import parse_requirements
 
 long_description = codecs.open(os.path.join(os.path.dirname(__file__), 'README.rst'), 'r', 'utf-8').read()
 
-dependencies = [
-  "beautifulsoup4",
-  "requests==1.2.3"
-]
+install_reqs = parse_requirements(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
+dependencies = [str(ir.req) for ir in install_reqs]
 
 setup(
   name = "wikipedia",
