@@ -22,31 +22,31 @@ wikipedia._wiki_request = _wiki_request()
 
 
 class TestSearchLoc(unittest.TestCase):
-  """Test the functionality of wikipedia.search_loc."""
+  """Test the functionality of wikipedia.geosearch."""
 
-  def test_search_loc(self):
+  def test_geosearch(self):
     """Test parsing a Wikipedia location request result."""
     self.assertEqual(
-      wikipedia.search_loc(Decimal('40.67693'), Decimal('117.23193')),
+      wikipedia.geosearch(Decimal('40.67693'), Decimal('117.23193')),
       mock_data['data']["great_wall_of_china.geo_seach"]
     )
 
-  def test_search_loc_with_radius(self):
+  def test_geosearch_with_radius(self):
     """Test parsing a Wikipedia location request result."""
-    self.assertEqual(wikipedia.search_loc(
+    self.assertEqual(wikipedia.geosearch(
       Decimal('40.67693'), Decimal('117.23193'), radius=10000),
       mock_data['data']["great_wall_of_china.geo_seach_with_radius"]
     )
 
-  def test_search_loc_with_existing_article_name(self):
+  def test_geosearch_with_existing_title(self):
     """Test parsing a Wikipedia location request result."""
-    self.assertEqual(wikipedia.search_loc(
-      Decimal('40.67693'), Decimal('117.23193'), article_name='Great Wall of China'),
+    self.assertEqual(wikipedia.geosearch(
+      Decimal('40.67693'), Decimal('117.23193'), title='Great Wall of China'),
       mock_data['data']["great_wall_of_china.geo_seach_with_existing_article_name"]
     )
 
-  def test_search_loc_with_non_existing_article_name(self):
-    self.assertEqual(wikipedia.search_loc(
-      Decimal('40.67693'), Decimal('117.23193'), article_name='Test'),
+  def test_geosearch_with_non_existing_title(self):
+    self.assertEqual(wikipedia.geosearch(
+      Decimal('40.67693'), Decimal('117.23193'), title='Test'),
       mock_data['data']["great_wall_of_china.geo_seach_with_non_existing_article_name"]
     )

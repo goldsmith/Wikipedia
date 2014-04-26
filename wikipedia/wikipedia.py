@@ -63,7 +63,7 @@ def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
 
 
 @cache
-def search_loc(latitude, longitude, title=None, results=10, radius=1000):
+def geosearch(latitude, longitude, title=None, results=10, radius=1000):
   '''
   Do a wikipedia geo search for latitude and longitude
   using HTTP API described in http://www.mediawiki.org/wiki/Extension:GeoData
