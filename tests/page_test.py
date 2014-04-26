@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from decimal import Decimal
 import unittest
 
 from wikipedia import wikipedia
@@ -61,6 +62,7 @@ class TestPage(unittest.TestCase):
     # shortest wikipedia articles with images and sections
     self.celtuce = wikipedia.page("Celtuce")
     self.cyclone = wikipedia.page("Tropical Depression Ten (2005)")
+    self.great_wall_of_china = wikipedia.page("Great Wall of China")
 
   def test_from_page_id(self):
     """Test loading from a page id"""
@@ -124,3 +126,9 @@ class TestPage(unittest.TestCase):
     """Test text content of a single section."""
     self.assertEqual(self.cyclone.section("Impact"), mock_data['data']["cyclone.section.impact"])
     self.assertEqual(self.cyclone.section("History"), None)
+
+  def test_coordinates(self):
+    """Test geo coordinates of a page"""
+    lat, lon = self.great_wall_of_china.coordinates
+    self.assertEqual(str(lat.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lat'])
+    self.assertEqual(str(lon.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lon'])
