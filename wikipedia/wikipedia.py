@@ -390,7 +390,13 @@ class WikipediaPage(object):
     else:
       self.pageid = pageid
       self.title = data['title']
-      self.url = data['fullurl']
+
+      # Catch failures when the full url is missing
+      try:
+        self.url = data['fullurl']
+      except KeyError as e:
+          raise PageError(self.title)
+
 
   def html(self):
     '''
