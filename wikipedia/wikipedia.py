@@ -662,6 +662,7 @@ class WikipediaPage(object):
 
       request = {
           'prop': 'langlinks',
+          'lllimit': 'max',
       }
       if not getattr(self, 'title', None) is None:
         request['titles'] = self.title
