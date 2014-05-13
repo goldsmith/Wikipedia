@@ -647,6 +647,45 @@ class WikipediaPage(object):
 
     return self.content[index:next_index].lstrip("=").strip()
 
+  @property
+  def lang_links(self):
+    '''
+    List of links to versions of this page in different languages.
+
+    This is a list of (`prefix`, `title`) tuples, where `prefix` is a
+    language prefix found on the `list of all Wikipedias
+    <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_, and `title` is the
+    article title in the corresponding language.
+    '''
+    if not getattr(self, '_langlinks', False):
+      self._langlinks = []
+
+      request = {
+          'prop': 'langlinks',
+      }
+      if not getattr(self, 'title', None) is None:
+        request['titles'] = self.title
+      else:
+        request['pageids'] = self.pageid
+      last_continue = {}
+
+      while True:
+        query_params = request.copy()
+        query_params.update(last_continue)
+
+        response = _wiki_request(**query_params)
+
+        self._langlinks.extend(
+            (link['lang'], link['*'])
+            for link in response['query']['pages'][self.pageid]['langlinks'])
+
+        if 'query-continue' in response:
+          last_continue = response['query-continue']['langlinks']
+        else:
+          break
+
+    return self._langlinks
+
 
 def donate():
   '''
