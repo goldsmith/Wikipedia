@@ -89,14 +89,14 @@ def search(query, results=10, suggestion=False):
   search_params = {
     'list': 'search',
     'srprop': '',
-    'srlimit': results
+    'srlimit': results,
+    'limit': results,
+    'srsearch': query
   }
   if suggestion:
     search_params['srinfo'] = 'suggestion'
-  search_params['srsearch'] = query
-  search_params['limit'] = results
 
-  raw_results = _wiki_request(**search_params)
+  raw_results = _wiki_request(search_params)
 
   if 'error' in raw_results:
     if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
@@ -142,7 +142,7 @@ def geosearch(latitude, longitude, title=None, results=10, radius=1000):
   if title:
     search_params['titles'] = title
 
-  raw_results = _wiki_request(**search_params)
+  raw_results = _wiki_request(search_params)
 
   if 'error' in raw_results:
     if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
@@ -173,7 +173,7 @@ def suggest(query):
   }
   search_params['srsearch'] = query
 
-  raw_result = _wiki_request(**search_params)
+  raw_result = _wiki_request(search_params)
 
   if raw_result['query'].get('searchinfo'):
     return raw_result['query']['searchinfo']['suggestion']
@@ -198,7 +198,7 @@ def random(pages=1):
     'rnlimit': pages,
   }
 
-  request = _wiki_request(**query_params)
+  request = _wiki_request(query_params)
   titles = [page['title'] for page in request['query']['random']]
 
   if len(titles) == 1:
@@ -241,7 +241,7 @@ def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
   else:
     query_params['exintro'] = ''
 
-  request = _wiki_request(**query_params)
+  request = _wiki_request(query_params)
   summary = request['query']['pages'][pageid]['extract']
 
   return summary
@@ -328,7 +328,7 @@ class WikipediaPage(object):
     else:
       query_params['pageids'] = self.pageid
 
-    request = _wiki_request(**query_params)
+    request = _wiki_request(query_params)
 
     pages = request['query']['pages']
     pageid = list(pages.keys())[0]
@@ -351,7 +351,7 @@ class WikipediaPage(object):
           'titles': self.title
         }
 
-        request = _wiki_request(**query_params)
+        request = _wiki_request(query_params)
 
         extract = request['query']['pages'][pageid]['extract']
 
@@ -378,7 +378,7 @@ class WikipediaPage(object):
         query_params['pageids'] = self.pageid
       else:
         query_params['titles'] = self.title
-      request = _wiki_request(**query_params)
+      request = _wiki_request(query_params)
       html = request['query']['pages'][pageid]['revisions'][0]['*']
 
       lis = BeautifulSoup(html).find_all('li')
@@ -408,7 +408,7 @@ class WikipediaPage(object):
         'titles': self.title
       }
 
-      request = _wiki_request(**query_params)
+      request = _wiki_request(query_params)
       self._html = request['query']['pages'][self.pageid]['revisions'][0]['*']
 
     return self._html
@@ -429,7 +429,7 @@ class WikipediaPage(object):
          query_params['titles'] = self.title
       else:
          query_params['pageids'] = self.pageid
-      request = _wiki_request(**query_params)
+      request = _wiki_request(query_params)
       self._content     = request['query']['pages'][self.pageid]['extract']
       self._revision_id = request['query']['pages'][self.pageid]['revisions'][0]['revid']
       self._parent_id   = request['query']['pages'][self.pageid]['revisions'][0]['parentid']
@@ -484,7 +484,7 @@ class WikipediaPage(object):
       else:
          query_params['pageids'] = self.pageid
 
-      request = _wiki_request(**query_params)
+      request = _wiki_request(query_params)
       self._summary = request['query']['pages'][self.pageid]['extract']
 
     return self._summary
@@ -507,7 +507,7 @@ class WikipediaPage(object):
       else:
          query_params['pageids'] = self.pageid
 
-      request = _wiki_request(**query_params)
+      request = _wiki_request(query_params)
 
       image_keys = request['query']['pages'].keys()
       images = (request['query']['pages'][key] for key in image_keys)
@@ -527,7 +527,7 @@ class WikipediaPage(object):
         'titles': self.title,
       }
 
-      request = _wiki_request(**query_params)
+      request = _wiki_request(query_params)
 
       coordinates = request['query']['pages'][self.pageid]['coordinates']
 
@@ -552,7 +552,7 @@ class WikipediaPage(object):
       else:
          query_params['pageids'] = self.pageid
 
-      request = _wiki_request(**query_params)
+      request = _wiki_request(query_params)
 
       links = request['query']['pages'][self.pageid]['extlinks']
       relative_urls = (link['*'] for link in links)
@@ -591,7 +591,7 @@ class WikipediaPage(object):
         params = request.copy()
         params.update(lastContinue)
 
-        request = _wiki_request(**params)
+        request = _wiki_request(params)
         self._links.extend([link['title'] for link in request['query']['pages'][self.pageid]['links']])
 
         if 'continue' not in request:
@@ -617,7 +617,7 @@ class WikipediaPage(object):
       else:
          query_params['pageid'] = self.pageid
 
-      request = _wiki_request(**query_params)
+      request = _wiki_request(query_params)
       self._sections = [section['line'] for section in request['parse']['sections']]
 
     return self._sections
@@ -657,7 +657,7 @@ def donate():
   webbrowser.open('https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage', new=2)
 
 
-def _wiki_request(**params):
+def _wiki_request(params):
   '''
   Make a request to the Wikipedia API using the given search parameters.
   Returns a parsed dict of the JSON response.

@@ -7,7 +7,7 @@ from request_mock_data import mock_data
 
 
 # mock out _wiki_request
-def _wiki_request(**params):
+def _wiki_request(params):
   return mock_data["_wiki_request calls"][tuple(sorted(params.items()))]
 wikipedia._wiki_request = _wiki_request
 

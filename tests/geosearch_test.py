@@ -14,7 +14,7 @@ class _wiki_request(object):
   calls = defaultdict(int)
 
   @classmethod
-  def __call__(cls, **params):
+  def __call__(cls, params):
     cls.calls[params.__str__()] += 1
     return mock_data["_wiki_request calls"][tuple(sorted(params.items()))]
 
