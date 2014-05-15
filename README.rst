@@ -65,7 +65,8 @@ To run tests, clone the `respository on GitHub <https://github.com/goldsmith/Wik
 ::
 
   $ pip install -r requirements.txt
-  $ python -m unittest discover tests/ '*test.py'
+  $ bash runtests  # will run tests for python and python3
+  $ python -m unittest discover tests/ '*test.py'  # manual style
 
 in the root project directory.
 
