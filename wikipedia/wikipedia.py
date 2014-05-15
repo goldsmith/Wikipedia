@@ -32,15 +32,15 @@ def set_lang(prefix):
 
 
 def set_user_agent(user_agent_string):
-    '''
-    Set the User-Agent string to be used for all requests.
+  '''
+  Set the User-Agent string to be used for all requests.
 
-    Arguments:
+  Arguments:
 
-    * user_agent_string - (string) a string specifying the User-Agent header
-    '''
-    global USER_AGENT
-    USER_AGENT = user_agent_string
+  * user_agent_string - (string) a string specifying the User-Agent header
+  '''
+  global USER_AGENT
+  USER_AGENT = user_agent_string
 
 
 def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
