@@ -12,7 +12,7 @@ dependencies = [str(ir.req) for ir in install_reqs]
 
 setup(
   name = "wikipedia",
-  version = "1.1dev",
+  version = "1.2dev",
   author = "Jonathan Goldsmith",
   author_email = "jhghank@gmail.com",
   description = "Wikipedia API for Python",
