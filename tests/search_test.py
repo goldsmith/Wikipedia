@@ -37,7 +37,7 @@ class TestSearch(unittest.TestCase):
     self.assertEqual(search, [])
     self.assertEqual(suggestion, u'hallelujah')
 
-  def test_suggsetion_none(self):
+  def test_suggestion_none(self):
     """Test getting a suggestion when there is no suggestion."""
     search, suggestion = wikipedia.search("qmxjsudek", suggestion=True)
     self.assertEqual(search, [])
