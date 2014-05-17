@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from .exceptions import PageError, DisambiguationError, RedirectError, HTTPTimeoutError, WikipediaException
-from .util import cache, stdout_encode
+from .util import cache, stdout_encode, debug
 
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
@@ -294,7 +294,7 @@ class WikipediaPage(object):
     else:
       raise ValueError("Either a title or a pageid must be specified")
 
-    self.load(redirect=redirect, preload=preload)
+    self.__load(redirect=redirect, preload=preload)
 
     if preload:
       for prop in ('content', 'summary', 'images', 'references', 'links', 'sections'):
@@ -313,7 +313,7 @@ class WikipediaPage(object):
     except:
       return False
 
-  def load(self, redirect=True, preload=False):
+  def __load(self, redirect=True, preload=False):
     '''
     Load basic information from Wikipedia.
     Confirm that page exists and is not a disambiguation/redirect.
@@ -384,6 +384,44 @@ class WikipediaPage(object):
       self.pageid = pageid
       self.title = page['title']
       self.url = page['fullurl']
+
+  def __continued_query(self, query_params):
+    '''
+    Based on https://www.mediawiki.org/wiki/API:Query#Continuing_queries
+    '''
+    query_params.update(self.__title_query_param)
+
+    last_continue = {}
+    prop = query_params.get('prop', None)
+
+    while True:
+      params = query_params.copy()
+      params.update(last_continue)
+
+      request = _wiki_request(params)
+
+      if 'query' not in request:
+        break
+
+      pages = request['query']['pages']
+      if 'generator' in query_params:
+        for datum in pages.values():  # in python 3.3+: "yield from pages.values()"
+          yield datum
+      else:
+        for datum in pages[self.pageid][prop]:
+          yield datum
+
+      if 'continue' not in request:
+        break
+
+      last_continue = request['continue']
+
+  @property
+  def __title_query_param(self):
+    if getattr(self, 'title', None) is not None:
+      return {'titles': self.title}
+    else:
+      return {'pageids': self.pageid}
 
   def html(self):
     '''
@@ -489,42 +527,38 @@ class WikipediaPage(object):
     '''
 
     if not getattr(self, '_images', False):
-      query_params = {
-        'generator': 'images',
-        'gimlimit': 'max',
-        'prop': 'imageinfo',
-        'iiprop': 'url',
-      }
-      if not getattr(self, 'title', None) is None:
-         query_params['titles'] = self.title
-      else:
-         query_params['pageids'] = self.pageid
-
-      request = _wiki_request(query_params)
-
-      image_keys = request['query']['pages'].keys()
-      images = (request['query']['pages'][key] for key in image_keys)
-      self._images = [image['imageinfo'][0]['url'] for image in images if image.get('imageinfo')]
+      self._images = [
+        page['imageinfo'][0]['url']
+        for page in self.__continued_query({
+          'generator': 'images',
+          'gimlimit': 'max',
+          'prop': 'imageinfo',
+          'iiprop': 'url',
+        })
+        if 'imageinfo' in page
+      ]
 
     return self._images
 
   @property
   def coordinates(self):
     '''
-    Tuple of Decimals in the form of (lat, lon)
+    Tuple of Decimals in the form of (lat, lon) or None
     '''
     if not getattr(self, '_coordinates', False):
       query_params = {
         'prop': 'coordinates',
-        'ellimit': 'max',
+        'colimit': 'max',
         'titles': self.title,
       }
 
       request = _wiki_request(query_params)
 
-      coordinates = request['query']['pages'][self.pageid]['coordinates']
-
-      self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
+      if 'query' in request:
+        coordinates = request['query']['pages'][self.pageid]['coordinates']
+        self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
+      else:
+        self._coordinates = None
 
     return self._coordinates
 
@@ -536,24 +570,16 @@ class WikipediaPage(object):
     '''
 
     if not getattr(self, '_references', False):
-      query_params = {
-        'prop': 'extlinks',
-        'ellimit': 'max',
-      }
-      if not getattr(self, 'title', None) is None:
-         query_params['titles'] = self.title
-      else:
-         query_params['pageids'] = self.pageid
-
-      request = _wiki_request(query_params)
-
-      links = request['query']['pages'][self.pageid]['extlinks']
-      relative_urls = (link['*'] for link in links)
-
       def add_protocol(url):
         return url if url.startswith('http') else 'http:' + url
 
-      self._references = [add_protocol(url) for url in relative_urls]
+      self._references = [
+        add_protocol(link['*'])
+        for link in self.__continued_query({
+          'prop': 'extlinks',
+          'ellimit': 'max'
+        })
+      ]
 
     return self._references
 
@@ -566,31 +592,14 @@ class WikipediaPage(object):
     '''
 
     if not getattr(self, '_links', False):
-      self._links = []
-
-      request = {
-        'prop': 'links',
-        'plnamespace': 0,
-        'pllimit': 'max',
-      }
-      if not getattr(self, 'title', None) is None:
-         request['titles'] = self.title
-      else:
-         request['pageids'] = self.pageid
-      lastContinue = {}
-
-      # based on https://www.mediawiki.org/wiki/API:Query#Continuing_queries
-      while True:
-        params = request.copy()
-        params.update(lastContinue)
-
-        request = _wiki_request(params)
-        self._links.extend([link['title'] for link in request['query']['pages'][self.pageid]['links']])
-
-        if 'continue' not in request:
-          break
-
-        lastContinue = request['continue']
+      self._links = [
+        link['title']
+        for link in self.__continued_query({
+          'prop': 'links',
+          'plnamespace': 0,
+          'pllimit': 'max'
+        })
+      ]
 
     return self._links
 
@@ -605,10 +614,7 @@ class WikipediaPage(object):
         'action': 'parse',
         'prop': 'sections',
       }
-      if not getattr(self, 'title', None) is None:
-         query_params['page'] = self.title
-      else:
-         query_params['pageid'] = self.pageid
+      query_params.update(self.__title_query_param)
 
       request = _wiki_request(query_params)
       self._sections = [section['line'] for section in request['parse']['sections']]

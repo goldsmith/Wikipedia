@@ -2,8 +2,10 @@
 
 ## Current
 
-* Fix redirection errors by using official Mediawiki API 'redirects' key. Fixes [#28](https://github.com/goldsmith/Wikipedia/issues/28)
-  reported by [@shichao-an](https://github.com/shichao-an), [#32](https://github.com/goldsmith/Wikipedia/issues/32) reported by [@dmirylenka](https://github.com/dmirylenka), and [#38](https://github.com/goldsmith/Wikipedia/issues/38) reported by [@gwezerek](https://github.com/gwezerek)
+* Refactor query functions to standardize & fix functionality of WikipediaPage properties that return a list. Fixes [#38](https://github.com/goldsmith/Wikipedia/issues/38) reported by [@gwezerek](https://github.com/gwezerek)
+
+* Use official Mediawiki API 'redirects' key to avoid redirection parse errors. Fixes [#28](https://github.com/goldsmith/Wikipedia/issues/28)
+  reported by [@shichao-an](https://github.com/shichao-an) and [#32](https://github.com/goldsmith/Wikipedia/issues/32) reported by [@dmirylenka](https://github.com/dmirylenka)
 
 ## Version 1.2
 
