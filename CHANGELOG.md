@@ -2,6 +2,9 @@
 
 ## Current
 
+* Fix redirection errors by using official Mediawiki API 'redirects' key. Fixes [#28](https://github.com/goldsmith/Wikipedia/issues/28)
+  reported by [@shichao-an](https://github.com/shichao-an), [#32](https://github.com/goldsmith/Wikipedia/issues/32) reported by [@dmirylenka](https://github.com/dmirylenka), and [#38](https://github.com/goldsmith/Wikipedia/issues/38) reported by [@gwezerek](https://github.com/gwezerek)
+
 ## Version 1.2
 
 * Add revision_id and parent_id properties. PR [#23](https://github.com/goldsmith/Wikipedia/pull/23) by [@fusiongyro](https://github.com/fusiongyro)

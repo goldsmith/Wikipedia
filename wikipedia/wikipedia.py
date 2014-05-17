@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import requests
 import time
 from bs4 import BeautifulSoup
@@ -322,6 +324,7 @@ class WikipediaPage(object):
       'prop': 'info|pageprops',
       'inprop': 'url',
       'ppprop': 'disambiguation',
+      'redirects': '',
     }
     if not getattr(self, 'pageid', None):
       query_params['titles'] = self.title
@@ -330,44 +333,34 @@ class WikipediaPage(object):
 
     request = _wiki_request(query_params)
 
-    pages = request['query']['pages']
-    pageid = list(pages.keys())[0]
-    data = pages[pageid]
+    query = request['query']
+    pageid = list(query['pages'].keys())[0]
+    page = query['pages'][pageid]
 
-    # missing is equal to empty string if it is True
-    if data.get('missing') == '':
+    # missing is present if the page is missing
+    if 'missing' in page:
       if hasattr(self, 'title'):
         raise PageError(self.title)
       else:
         raise PageError(pageid=self.pageid)
 
-    # same thing for redirect
-    elif data.get('redirect') == '':
+    # same thing for redirect, except it shows up in query instead of page for
+    # whatever silly reason
+    elif 'redirects' in query:
       if redirect:
+        redirects = query['redirects'][0]
+        assert redirects['from'] == self.title
+
         # change the title and reload the whole object
-        query_params = {
-          'prop': 'extracts',
-          'explaintext': '',
-          'titles': self.title
-        }
-
-        request = _wiki_request(query_params)
-
-        extract = request['query']['pages'][pageid]['extract']
-
-        # extract should be of the form "REDIRECT <new title>"
-        # ("REDIRECT" could be translated to current language)
-        title = ' '.join(extract.split('\n')[0].split()[1:]).strip()
-
-        self.__init__(title, redirect=redirect, preload=preload)
+        self.__init__(redirects['to'], redirect=redirect, preload=preload)
 
       else:
-        raise RedirectError(getattr(self, 'title', data['title']))
+        raise RedirectError(getattr(self, 'title', page['title']))
 
     # since we only asked for disambiguation in ppprop,
     # if a pageprop is returned,
     # then the page must be a disambiguation page
-    elif data.get('pageprops'):
+    elif 'pageprops' in page:
       query_params = {
         'prop': 'revisions',
         'rvprop': 'content',
@@ -385,12 +378,12 @@ class WikipediaPage(object):
       filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
       may_refer_to = [li.a.get_text() for li in filtered_lis if li.a]
 
-      raise DisambiguationError(getattr(self, 'title', data['title']), may_refer_to)
+      raise DisambiguationError(getattr(self, 'title', page['title']), may_refer_to)
 
     else:
       self.pageid = pageid
-      self.title = data['title']
-      self.url = data['fullurl']
+      self.title = page['title']
+      self.url = page['fullurl']
 
   def html(self):
     '''
