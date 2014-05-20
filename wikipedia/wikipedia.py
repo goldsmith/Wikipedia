@@ -650,6 +650,30 @@ class WikipediaPage(object):
     return self.content[index:next_index].lstrip("=").strip()
 
 
+@cache
+def languages():
+  '''
+  List all the currently supported language prefixes (usually ISO language code).
+
+  Can be inputted to `set_lang` to change the Mediawiki that `wikipedia` requests
+  results from.
+
+  Returns: dict of <prefix>: <local_lang_name> pairs. To get just a list of prefixes,
+  use `wikipedia.languages().keys()`.
+  '''
+  response = _wiki_request({
+    'meta': 'siteinfo',
+    'siprop': 'languages'
+  })
+
+  languages = response['query']['languages']
+
+  return {
+    lang['code']: lang['*']
+    for lang in languages
+  }
+
+
 def donate():
   '''
   Open up the Wikimedia donate page in your favorite browser.

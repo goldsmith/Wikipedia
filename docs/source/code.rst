@@ -32,6 +32,8 @@ Functions and Classes
 .. autoclass:: wikipedia.WikipediaPage
   :members:
 
+.. autofunction:: wikipedia.languages
+
 .. autofunction:: wikipedia.set_lang
 
 .. autofunction:: wikipedia.set_rate_limiting

@@ -2,6 +2,8 @@
 
 ## Current
 
+* wikipedia.languages() for easy access to all language prefixes
+
 ### Version 1.2.1
 
 * Refactor query functions to standardize & fix functionality of WikipediaPage properties that return a list. Fixes [#38](https://github.com/goldsmith/Wikipedia/issues/38) reported by [@gwezerek](https://github.com/gwezerek)
