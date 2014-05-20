@@ -349,7 +349,10 @@ class WikipediaPage(object):
     elif 'redirects' in query:
       if redirect:
         redirects = query['redirects'][0]
-        assert redirects['from'] == self.title
+        normalized = query['normalized'][0]
+
+        assert redirects['from'] == normalized['to'], "this shouldn't happen. Please report on GitHub: github.com/goldsmith/Wikipedia"
+        assert normalized['from'] == self.title, "this shouldn't happen. Please report on GitHub: github.com/goldsmith/Wikipedia"
 
         # change the title and reload the whole object
         self.__init__(redirects['to'], redirect=redirect, preload=preload)
