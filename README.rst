@@ -7,6 +7,9 @@ Wikipedia
   :target: https://crate.io/packages/wikipedia
 .. image:: https://pypip.in/v/wikipedia/badge.png
   :target: https://crate.io/packages/wikipedia
+.. image:: https://pypip.in/license/wikipedia/badge.png
+    :target: https://pypi.python.org/pypi/wikipedia/
+    :alt: License
 
 **Wikipedia** is a Python library that makes it easy to access and parse
 data from Wikipedia.
