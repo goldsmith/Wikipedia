@@ -19,6 +19,15 @@ mock_data = {
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Menlo Park, New Jersey')):
     {'query': {'redirects': [{'to': 'Edison, New Jersey', 'from': 'Menlo Park, New Jersey'}], 'pages': {'125414': {'lastrevid': 607768264, 'pageid': 125414, 'title': 'Edison, New Jersey', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Edison,_New_Jersey&action=edit', 'counter': '', 'length': 85175, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-14T17:10:49Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Edison,_New_Jersey'}}}},
 
+    (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Communist Party')):
+    {'query': {'redirects': [{'to': 'Communist party', 'from': 'Communist Party'}], 'pages': {'37008': {'lastrevid': 608086859, 'pageid': 37008, 'title': 'Communist party', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Communist_party&action=edit', 'counter': '', 'length': 7868, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-26T01:19:01Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Communist_party'}}}},
+
+    (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'communist Party')):
+    {'query': {'redirects': [{'to': 'Communist party', 'from': 'Communist Party'}], 'normalized': [{'to': 'Communist Party', 'from': 'communist Party'}], 'pages': {'37008': {'lastrevid': 608086859, 'pageid': 37008, 'title': 'Communist party', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Communist_party&action=edit', 'counter': '', 'length': 7868, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-26T01:19:01Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Communist_party'}}}},
+
+    (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Communist party')):
+    {'query': {'pages': {'37008': {'lastrevid': 608086859, 'pageid': 37008, 'title': 'Communist party', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Communist_party&action=edit', 'counter': '', 'length': 7868, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-26T01:19:01Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Communist_party'}}}},
+
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Edison, New Jersey')):
     {'query': {'pages': {'125414': {'lastrevid': 607768264, 'pageid': 125414, 'title': 'Edison, New Jersey', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Edison,_New_Jersey&action=edit', 'counter': '', 'length': 85175, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-14T17:10:49Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Edison,_New_Jersey'}}}},
 

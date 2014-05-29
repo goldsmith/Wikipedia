@@ -3,6 +3,7 @@
 ## Current
 
 * wikipedia.languages() for easy access to all language prefixes
+* Conditional check for normalization in redirect queries. Fixes [#47](https://github.com/goldsmith/Wikipedia/issues/47)
 
 ### Version 1.2.1
 

@@ -34,6 +34,28 @@ class TestPageSetUp(unittest.TestCase):
     mp = lambda: wikipedia.page("Menlo Park, New Jersey", auto_suggest=False, redirect=False)
     self.assertRaises(wikipedia.RedirectError, mp)
 
+  def test_redirect_no_normalization(self):
+    """Test that a page with redirects but no normalization query loads correctly"""
+    the_party = wikipedia.page("Communist Party", auto_suggest=False)
+    self.assertIsInstance(the_party, wikipedia.WikipediaPage)
+    self.assertEqual(the_party.title, "Communist party")
+
+  def test_redirect_with_normalization(self):
+    """Test that a page redirect with a normalized query loads correctly"""
+    the_party = wikipedia.page("communist Party", auto_suggest=False)
+    self.assertIsInstance(the_party, wikipedia.WikipediaPage)
+    self.assertEqual(the_party.title, "Communist party")
+
+  def test_redirect_normalization(self):
+    """Test that a page redirect loads correctly with or without a query normalization"""
+    capital_party = wikipedia.page("Communist Party", auto_suggest=False)
+    lower_party = wikipedia.page("communist Party", auto_suggest=False)
+
+    self.assertIsInstance(capital_party, wikipedia.WikipediaPage)
+    self.assertIsInstance(lower_party, wikipedia.WikipediaPage)
+    self.assertEqual(capital_party.title, "Communist party")
+    self.assertEqual(capital_party, lower_party)
+
   def test_disambiguate(self):
     """Test that page raises an error when a disambiguation page is reached."""
     try:

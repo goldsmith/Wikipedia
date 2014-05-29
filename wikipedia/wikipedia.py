@@ -6,7 +6,9 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from decimal import Decimal
 
-from .exceptions import PageError, DisambiguationError, RedirectError, HTTPTimeoutError, WikipediaException
+from .exceptions import (
+  PageError, DisambiguationError, RedirectError, HTTPTimeoutError,
+  WikipediaException, ODD_ERROR_MESSAGE)
 from .util import cache, stdout_encode, debug
 
 
@@ -349,10 +351,17 @@ class WikipediaPage(object):
     elif 'redirects' in query:
       if redirect:
         redirects = query['redirects'][0]
-        normalized = query['normalized'][0]
 
-        assert redirects['from'] == normalized['to'], "this shouldn't happen. Please report on GitHub: github.com/goldsmith/Wikipedia"
-        assert normalized['from'] == self.title, "this shouldn't happen. Please report on GitHub: github.com/goldsmith/Wikipedia"
+        if 'normalized' in query:
+          normalized = query['normalized'][0]
+          assert normalized['from'] == self.title, ODD_ERROR_MESSAGE
+
+          from_title = normalized['to']
+
+        else:
+          from_title = self.title
+
+        assert redirects['from'] == from_title, ODD_ERROR_MESSAGE
 
         # change the title and reload the whole object
         self.__init__(redirects['to'], redirect=redirect, preload=preload)

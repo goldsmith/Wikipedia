@@ -5,6 +5,9 @@ Global wikipedia exception and warning classes.
 import sys
 
 
+ODD_ERROR_MESSAGE = "This shouldn't happen. Please report on GitHub: github.com/goldsmith/Wikipedia"
+
+
 class WikipediaException(Exception):
   """Base Wikipedia exception class."""
 
