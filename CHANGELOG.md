@@ -4,6 +4,7 @@
 
 * wikipedia.languages() for easy access to all language prefixes
 * Conditional check for normalization in redirect queries. Fixes [#47](https://github.com/goldsmith/Wikipedia/issues/47)
+* Remove pip requirement to fix pip installation error. Fixes [#46](https://github.com/goldsmith/Wikipedia/issues/46#issuecomment-44221725) reported by [@oquidav](https://github.com/oquidave)
 
 ### Version 1.2.1
 

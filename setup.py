@@ -3,12 +3,14 @@ import os
 import codecs
 
 from setuptools import setup
-from pip.req import parse_requirements
 
 long_description = codecs.open(os.path.join(os.path.dirname(__file__), 'README.rst'), 'r', 'utf-8').read()
 
-install_reqs = parse_requirements(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
-dependencies = [str(ir.req) for ir in install_reqs]
+install_reqs = [
+  line.strip()
+  for line in open(os.path.join(os.path.dirname(__file__), 'requirements.txt')).readlines()
+  if line.strip() != ''
+]
 
 setup(
   name = "wikipedia",
@@ -19,7 +21,7 @@ setup(
   license = "MIT",
   keywords = "python wikipedia API",
   url = "https://github.com/goldsmith/Wikipedia",
-  install_requires = dependencies,
+  install_requires = install_reqs,
   packages = ['wikipedia'],
   long_description = long_description,
   classifiers = [
