@@ -6,6 +6,8 @@
 
 * Determine package version without importing ``wikipedia`` in setup.py. Fixes [#50](https://github.com/goldsmith/Wikipedia/issues/50) reported by [@arcolife](https://github.com/arcolife)
 
+* Update ``requests`` dependency to v2.3.0
+
 ## Version 1.3
 
 * wikipedia.languages() for easy access to all language prefixes
