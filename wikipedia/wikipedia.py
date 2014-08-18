@@ -616,6 +616,24 @@ class WikipediaPage(object):
     return self._links
 
   @property
+  def categories(self):
+    '''
+    List of categories of a page.
+
+    '''
+
+    if not getattr(self, '_categories', False):
+      self._categories = [
+        link['title']
+        for link in self.__continued_query({
+          'prop': 'categories',
+          'cllimit': 'max'
+        })
+      ]
+
+    return self._categories
+
+  @property
   def sections(self):
     '''
     List of section titles from the table of contents on the page.
