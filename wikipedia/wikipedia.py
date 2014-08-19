@@ -10,7 +10,7 @@ from .exceptions import (
   PageError, DisambiguationError, RedirectError, HTTPTimeoutError,
   WikipediaException, ODD_ERROR_MESSAGE)
 from .util import cache, stdout_encode, debug
-
+import re
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
@@ -623,13 +623,13 @@ class WikipediaPage(object):
     '''
 
     if not getattr(self, '_categories', False):
-      self._categories = [
-        link['title']
+      self._categories = [re.sub("^Category:","",x) for x in 
+        [link['title']
         for link in self.__continued_query({
           'prop': 'categories',
           'cllimit': 'max'
         })
-      ]
+      ]]
 
     return self._categories
 
