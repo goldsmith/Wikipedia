@@ -59,6 +59,16 @@ class DisambiguationError(WikipediaException):
   def __unicode__(self):
     return u"\"{0}\" may refer to: \n{1}".format(self.title, '\n'.join(self.options))
 
+class LanguageError(WikipediaException):
+    """Exception raised when a language prefix is set which is not available"""
+    
+    def __init__(self, language):
+        self.language = language
+    
+    def __unicode__(self):
+        return u"\"{0}\" is not a language prefix available in Wikipedia. Run wikipedia.languages().keys() to get available prefixes.".format(self.language)
+
+
 
 class RedirectError(WikipediaException):
   """Exception raised when a page title unexpectedly resolves to a redirect."""

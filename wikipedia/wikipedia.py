@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 
 from .exceptions import (
-  PageError, DisambiguationError, RedirectError, HTTPTimeoutError,
-  WikipediaException, ODD_ERROR_MESSAGE)
+  PageError, DisambiguationError, LanguageError, RedirectError,
+  HTTPTimeoutError, WikipediaException, ODD_ERROR_MESSAGE)
 from .util import cache, stdout_encode, debug
 import re
 
@@ -28,12 +28,17 @@ def set_lang(prefix):
 
   .. note:: Make sure you search for page titles in the language that you have set.
   '''
+
   global API_URL
-  API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
-
-  for cached_func in (search, suggest, summary):
-    cached_func.clear_cache()
-
+  permitted_lang=languages().keys() #get the available language prefixes
+  prefix=prefix.lower()
+    
+  if prefix in permitted_lang:
+    API_URL = 'http://' + prefix + '.wikipedia.org/w/api.php'
+    for cached_func in (search, suggest, summary):
+      cached_func.clear_cache()
+  else:
+    raise LanguageError(prefix)
 
 def set_user_agent(user_agent_string):
   '''
