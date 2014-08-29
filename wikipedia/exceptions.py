@@ -64,13 +64,13 @@ class DisambiguationError(WikipediaException):
 
 class LanguageError(WikipediaException):
     
-    """Exception raised when a language is set which is not available"""
+    """Exception raised when a language prefix is set which is not available"""
     
     def __init__(self, language):
         self.language = language
         
     def __unicode__(self):
-        return u"\"{0}\" is not a language available in Wikipedia. Run wikipedia.languages().keys() to get available prefixes.".format(self.language)
+        return u"\"{0}\" is not a language prefix available in Wikipedia. Run wikipedia.languages().keys() to get available prefixes.".format(self.language)
     
 
 class RedirectError(WikipediaException):
