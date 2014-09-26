@@ -303,7 +303,7 @@ class WikipediaPage(object):
         getattr(self, prop)
 
   def __repr__(self):
-    return stdout_encode(u'<WikipediaPage \'{}\'>'.format(self.title))
+    return stdout_encode('<WikipediaPage \'{}\'>'.format(self.title))
 
   def __eq__(self, other):
     try:
@@ -663,7 +663,7 @@ class WikipediaPage(object):
            `section_title` and the next subheading, which is often empty.
     '''
 
-    section = u"== {} ==".format(section_title)
+    section = "== {} ==".format(section_title)
     try:
       index = self.content.index(section) + len(section)
     except ValueError:
