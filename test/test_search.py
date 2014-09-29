@@ -4,7 +4,7 @@ import unittest
 from collections import defaultdict
 
 from wikipedia import wikipedia
-from request_mock_data import mock_data
+from .request_mock_data import mock_data
 
 
 # mock out _wiki_request
