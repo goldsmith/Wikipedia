@@ -619,11 +619,10 @@ class WikipediaPage(object):
   def categories(self):
     '''
     List of categories of a page.
-
     '''
 
     if not getattr(self, '_categories', False):
-      self._categories = [re.sub("^Category:","",x) for x in 
+      self._categories = [re.sub(r'^Category:', '', x) for x in
         [link['title']
         for link in self.__continued_query({
           'prop': 'categories',

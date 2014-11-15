@@ -2,6 +2,11 @@
 
 ## Current
 
+## Version 1.4
+
+* Test wikipdia library on Python v3.4. PR [#52](https://github.com/goldsmith/Wikipedia/pull/52) by [frewsxcv](https://github.com/frewsxcv)
+* Add WikipediaPage.categories attribute. PR [#59](https://github.com/goldsmith/Wikipedia/pull/59) by [@willf](https://github.com/willf)
+
 ### Version 1.3.1
 
 * Determine package version without importing ``wikipedia`` in setup.py. Fixes [#50](https://github.com/goldsmith/Wikipedia/issues/50) reported by [@arcolife](https://github.com/arcolife)
