@@ -480,7 +480,7 @@ class WikipediaPage(object):
     '''
     query_params = {
       'action': 'wbgetentities',
-      'ids': "Q%s" % self.pageid
+      'ids': self.title
     }
     
     request = _wiki_request(query_params)
