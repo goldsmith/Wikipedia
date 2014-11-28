@@ -35,7 +35,7 @@ def set_lang(prefix):
   for cached_func in (search, suggest, summary):
     cached_func.clear_cache()
 
-def set_wikidata_lang(prefix):
+def set_wikidata():
   '''
   Change the language of the API being requested fior wikidata.
   Set `prefix` to one of the two letter prefixes found on the `list of all Wikipedias <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_.
@@ -45,11 +45,9 @@ def set_wikidata_lang(prefix):
   .. note:: Make sure you search for page titles in the language that you have set.
   '''
   global API_URL
-  if prefix.lower() == 'en':
-    API_URL = 'http://www.wikidata.org/w/api.php'
-  else:
-    API_URL = 'http://' + prefix.lower() + '.wikidata.org/w/api.php'
 
+  API_URL = 'http://www.wikidata.org/w/api.php'
+  
   for cached_func in (search, suggest, summary):
     cached_func.clear_cache()
 
@@ -475,6 +473,19 @@ class WikipediaPage(object):
 
     return self._html
 
+  def wbgetentities(self):
+    '''
+    Gget Wikibase
+
+    '''
+    query_params = {
+      'action': 'wbgetentities',
+      'ids': "Q%s" % self.pageid
+    }
+    
+    request = _wiki_request(query_params)
+    return request
+
   @property
   def content(self):
     '''
@@ -753,7 +764,7 @@ def _wiki_request(params):
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
-  debug(pprint.pformat({'URL':API_URL, 'params':params, 'headers':headers}))
+  #debug(pprint.pformat({"DEBUG": "",'URL':API_URL, 'params':params, 'headers':headers}))
   pprint.pprint({'URL':API_URL, 'params':params, 'headers':headers})
 
   r = requests.get(API_URL, params=params, headers=headers)
