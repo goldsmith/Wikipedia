@@ -642,6 +642,7 @@ class WikipediaPage(object):
       query_params = {
         'action': 'parse',
         'prop': 'sections',
+        'text': self.content
       }
       query_params.update(self.__title_query_param)
 
