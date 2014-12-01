@@ -746,3 +746,18 @@ def _wiki_request(params):
     RATE_LIMIT_LAST_CALL = datetime.now()
 
   return r.json()
+
+def new_session():
+  '''
+  Create a new session.
+
+  Replaces an old session, clearing cookies, auth, and proxy information,
+  and forcing a new HTTP connection.
+
+  '''
+  global SESSION
+  SESSION = requests.Session()
+
+def get_session():
+  # this seems to be necessary to get at the session for unit tests.
+  return SESSION
