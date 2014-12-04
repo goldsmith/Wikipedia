@@ -757,7 +757,3 @@ def new_session():
   '''
   global SESSION
   SESSION = requests.Session()
-
-def get_session():
-  # this seems to be necessary to get at the session for unit tests.
-  return SESSION
