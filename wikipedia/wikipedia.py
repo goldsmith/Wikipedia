@@ -423,10 +423,10 @@ class WikipediaPage(object):
         for datum in pages[self.pageid][prop]:
           yield datum
 
-      if 'continue' not in request:
+      if 'query-continue' not in request:
         break
 
-      last_continue = request['continue']
+      last_continue = request['query-continue'][prop]
 
   @property
   def __title_query_param(self):
