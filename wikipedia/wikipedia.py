@@ -302,6 +302,39 @@ class WikipediaPage(object):
       for prop in ('content', 'summary', 'images', 'references', 'links', 'sections'):
         getattr(self, prop)
 
+  def lang_title(self, lang_code):
+    query_params = {
+      'prop': 'langlinks',
+      'llurl': True,
+      'lllang': 'ru',
+      'pageids': self.pageid
+    }
+    request = _wiki_request(query_params)
+    pageid = list(request['query']['pages'])[0]
+    return request['query']['pages'][pageid]['langlinks'][0]['*']
+    # print self.title
+    # print self.pageid
+    # old_api_url = API_URL
+    # global API_URL
+    # API_URL = 'http://' + lang_code.lower() + '.wikipedia.org/w/api.php'
+    # lang_page_title = page('Constant-velocity joint').title
+    # set_lang(lang_code)
+    # API_URL = old_api_url
+    # return lang_page_title
+    # query_params = {
+    #   'prop': 'langlinks',
+    #   'llurl': True,
+    #   'lllang': 'ru',
+    #   'titles': 'Constant-velocity_joint'
+    # }
+    # request = _wiki_request(query_params)
+    # # global API_URL
+    # # API_URL = 'http://' + lang_code.lower() + '.wikipedia.org/w/api.php'
+    # for t in request['query']['pages']:
+    #     print request['query']['pages'][t]['langlinks'][0]['*']
+
+
+
   def __repr__(self):
     return stdout_encode(u'<WikipediaPage \'{}\'>'.format(self.title))
 
