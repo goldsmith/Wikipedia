@@ -11,8 +11,10 @@ from .exceptions import (
     WikipediaException, ODD_ERROR_MESSAGE)
 from .util import cache, stdout_encode, debug
 import re
-
-from urlparse import urljoin
+try:
+    from urlparse import urljoin
+except ImportError:
+    from urllib.parse import urljoin
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
