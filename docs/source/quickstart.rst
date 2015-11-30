@@ -3,9 +3,10 @@
 Quickstart
 **********
 
-Start using wikipedia for Python in less than 5 minutes! If you are looking for the the full developer API, see :ref:`api`.
+Start using Wikipedia for Python in less than 2 minutes!
+If you are looking for the the full developer API, see :ref:`api`.
 
-Begin by installing wikipedia::
+Begin by installing ``wikipedia``::
 
 	$ pip install wikipedia
 
@@ -36,7 +37,7 @@ To get the summary of an article, use ``wikipedia.summary``::
 	>>> wikipedia.summary("Apple III", sentences=1)
 	u'The Apple III (often rendered as Apple ///) is a business-oriented personal computer produced and released by Apple Computer that was intended as the successor to the Apple II series, but largely considered a failure in the market. '
 
-But watch out - ``wikipedia.summary`` will raise a ``DisambiguationError`` if the page is a disambiguation page, or a ``PageError`` if the page doesn't exist (although by default, it tries to find the page you meant with ``suggest`` and ``search``.)::
+But watch out - ``wikipedia.summary`` will raise a ``DisambiguationError`` if the page is a disambiguation page, or a ``PageError`` if the page does not exist (although by default, it tries to find the page you meant with ``suggest`` and ``search``)::
 
 	>>> wikipedia.summary("Mercury")
 	Traceback (most recent call last):
@@ -58,7 +59,8 @@ But watch out - ``wikipedia.summary`` will raise a ``DisambiguationError`` if th
 	...
 	wikipedia.exceptions.PageError: "zvv" does not match any pages. Try another query!
 
-``wikipedia.page`` enables you to load and access data from full Wikipedia pages. Initialize with a page title (keep in mind the errors listed above), and then access most properties using property methods::
+``wikipedia.page`` enables you to load and access data from full Wikipedia pages.
+Initialize with a page title (keep in mind the errors listed above), and then access most properties using property methods::
 
 	>>> ny = wikipedia.page("New York")
 
@@ -77,7 +79,8 @@ But watch out - ``wikipedia.summary`` will raise a ``DisambiguationError`` if th
 	>>> ny.links[0]
 	u'1790 United States Census'
 
-To change the language of the Wikipedia you are accessing, use ``wikipedia.set_lang``. Remember to search for page titles in the language that you have set, not English!::
+To change the language of the Wikipedia you are accessing, use ``wikipedia.set_lang``.
+Remember to search for page titles in the language that you have set, not English!::
 
 	>>> wikipedia.set_lang("fr")
 
