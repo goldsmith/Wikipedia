@@ -31,6 +31,10 @@ class TestSearch(unittest.TestCase):
     """Test limiting a request results."""
     self.assertEqual(wikipedia.search("Porsche", results=3), mock_data['data']["porsche.search"])
 
+  def test_offset(self):
+    """Test paginating a request results."""
+    self.assertEqual(wikipedia.search("Porsche", results=1, page=2), mock_data['data']["porsche.search.paginated"])
+
   def test_suggestion(self):
     """Test getting a suggestion as well as search results."""
     search, suggestion = wikipedia.search("hallelulejah", suggestion=True)

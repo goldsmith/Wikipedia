@@ -13,7 +13,7 @@ mock_data = {
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'purpleberry')):
     {'query': {'normalized': [{'to': 'Purpleberry', 'from': 'purpleberry'}], 'pages': {'-1': {'missing': '', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Purpleberry&action=edit', 'title': 'Purpleberry', 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Purpleberry'}}}},
 
-    (('limit', 1), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 1), ('srprop', ''), ('srsearch', 'Menlo Park, New Jersey')):
+    (('limit', 1), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 1), ('sroffset', 0), ('srprop', ''), ('srsearch', 'Menlo Park, New Jersey')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Edison, New Jersey'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Menlo Park, New Jersey')):
@@ -37,19 +37,19 @@ mock_data = {
     (('prop', 'revisions'), ('rvlimit', 1), ('rvparse', ''), ('rvprop', 'content'), ('titles', 'Dodge Ram (disambiguation)')):
     {'query-continue': {'revisions': {'rvcontinue': 556603298}}, 'query': {'pages': {'18803364': {'ns': 0, 'pageid': 18803364, 'revisions': [{'*': '<p><b><a href="/wiki/Dodge_Ram" title="Dodge Ram">Dodge Ram</a></b> is a collective nameplate for light trucks made by <a href="/wiki/Dodge" title="Dodge">Dodge</a>\n</p>\n<ul><li><a href="/wiki/Dodge_Ramcharger" title="Dodge Ramcharger">Dodge Ramcharger</a> - full-size SUV based on the Ram chassis (first vehicle to use the Ram name)\n</li><li><a href="/wiki/Dodge_Ram_Van" title="Dodge Ram Van">Dodge Ram Van</a> - full-size van\n</li><li><a href="/wiki/Dodge_Mini_Ram" title="Dodge Mini Ram" class="mw-redirect">Dodge Mini Ram</a> - cargo version of the Dodge Caravan\n<ul><li>See also:\n<ul><li><a href="/wiki/Dodge_Caravan_C/V" title="Dodge Caravan C/V" class="mw-redirect">Dodge Caravan C/V</a>\n</li><li><a href="/wiki/Ram_C/V" title="Ram C/V" class="mw-redirect">Ram C/V</a> (modern day equivalent)\n</li></ul>\n</li></ul>\n</li><li><a href="/wiki/Dodge_Ram_50" title="Dodge Ram 50" class="mw-redirect">Dodge Ram 50</a> - Dodge version of the Mitsubishi Mighty Max, predecessor to the Dakota\n</li></ul>\n<p>See also:\n</p>\n<ul><li><a href="/wiki/Dodge_D-Series" title="Dodge D-Series" class="mw-redirect">Dodge D-Series</a> - Ram\'s predecessor, page includes first Ram body style\n</li><li><a href="/wiki/Dodge_Rampage" title="Dodge Rampage">Dodge Rampage</a> - car-based pickup truck\n</li><li><a href="/wiki/Ram_Trucks" title="Ram Trucks">Ram (brand)</a> - truck brand based on the Ram pickup truck\n</li></ul>\n<table id="disambigbox" class="metadata plainlinks dmbox dmbox-disambig" style="" role="presentation">\n<tr>\n<td class="mbox-image" style="padding: 2px 0 2px 0.4em;"> <a href="/wiki/File:Disambig_gray.svg" class="image"><img alt="Disambiguation icon" src="//upload.wikimedia.org/wikipedia/en/thumb/5/5f/Disambig_gray.svg/30px-Disambig_gray.svg.png" width="30" height="23" srcset="//upload.wikimedia.org/wikipedia/en/thumb/5/5f/Disambig_gray.svg/45px-Disambig_gray.svg.png 1.5x, //upload.wikimedia.org/wikipedia/en/thumb/5/5f/Disambig_gray.svg/60px-Disambig_gray.svg.png 2x" /></a></td>\n<td class="mbox-text" style="padding: 0.25em 0.4em; font-style: italic;"> This <a href="/wiki/Help:Disambiguation" title="Help:Disambiguation">disambiguation</a> page lists articles associated with the same title. <br/> <small>If an <a class="external text" href="//en.wikipedia.org/w/index.php?title=Special:WhatLinksHere/Dodge_Ram_(disambiguation)&amp;namespace=0">internal link</a> led you here, you may wish to change the link to point directly to the intended article.</small> </td>\n</tr>\n</table>\n'}], 'title': 'Dodge Ram (disambiguation)'}}}},
 
-    (('limit', 1), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 1), ('srprop', ''), ('srsearch', 'butteryfly')):
+    (('limit', 1), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 1), ('sroffset', 0), ('srprop', ''), ('srsearch', 'butteryfly')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'searchinfo': {'suggestion': 'butterfly'}, 'search': [{'ns': 0, 'title': "Butterfly's Tongue"}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'butterfly')):
     {'query': {'normalized': [{'to': 'Butterfly', 'from': 'butterfly'}], 'pages': {'48338': {'lastrevid': 566847704, 'pageid': 48338, 'title': 'Butterfly',  'editurl': 'http://en.wikipedia.org/w/index.php?title=Butterfly&action=edit', 'counter': '', 'length': 60572, 'contentmodel': 'wikitext', '    pagelanguage': 'en', 'touched': '2013-08-07T11:15:37Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Butterfly'}}}},
 
-    (('limit', 1), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 1), ('srprop', ''), ('srsearch', 'Celtuce')):
+    (('limit', 1), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 1), ('sroffset', 0), ('srprop', ''), ('srsearch', 'Celtuce')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Celtuce'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
-    (('limit', 1), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 1), ('srprop', ''), ('srsearch', 'Tropical Depression Ten (2005)')):
+    (('limit', 1), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 1), ('sroffset', 0), ('srprop', ''), ('srsearch', 'Tropical Depression Ten (2005)')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Tropical Depression Ten (2005)'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
-    (('limit', 1), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 1), ('srprop', ''), ('srsearch', 'Great Wall of China')):
+    (('limit', 1), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 1), ('sroffset', 0), ('srprop', ''), ('srsearch', 'Great Wall of China')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Great Wall of China'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Celtuce')):
@@ -100,16 +100,19 @@ mock_data = {
     (('action', 'parse'), ('prop', 'sections'), ('titles', 'Tropical Depression Ten (2005)')):
     {'parse': {'sections': [{'index': '1', 'level': '2', 'fromtitle': 'Tropical_Depression_Ten_(2005)', 'toclevel': 1, 'number': '1', 'byteoffset': 1369, 'line': 'Meteorological history', 'anchor': 'Meteorological_history'}, {'index': '2', 'level': '2', 'fromtitle': 'Tropical_Depression_Ten_(2005)', 'toclevel': 1, 'number': '2', 'byteoffset': 6248, 'line': 'Impact', 'anchor': 'Impact'}, {'index': '3', 'level': '2', 'fromtitle': 'Tropical_Depression_Ten_(2005)', 'toclevel': 1, 'number': '3', 'byteoffset': 7678, 'line': 'See also', 'anchor': 'See_also'}, {'index': '4', 'level': '2', 'fromtitle': 'Tropical_Depression_Ten_(2005)', 'toclevel': 1, 'number': '4', 'byteoffset': 7885, 'line': 'References', 'anchor': 'References'}, {'index': '5', 'level': '2', 'fromtitle': 'Tropical_Depression_Ten_(2005)', 'toclevel': 1, 'number': '5', 'byteoffset': 7917, 'line': 'External links', 'anchor': 'External_links'}], 'title': 'Tropical Depression Ten (2005)'}},
 
-    (('limit', 10), ('list', 'search'), ('srlimit', 10), ('srprop', ''), ('srsearch', 'Barack Obama')):
+    (('limit', 10), ('list', 'search'), ('offset', 0), ('srlimit', 10), ('sroffset', 0), ('srprop', ''), ('srsearch', 'Barack Obama')):
     {'query-continue': {'search': {'sroffset': 10}}, 'query': {'searchinfo': {'totalhits': 12987}, 'search': [{'ns': 0, 'title': 'Barack Obama'}, {'ns': 0, 'title': 'Barack Obama, Sr.'}, {'ns': 0, 'title': 'Presidency of Barack Obama'}, {'ns': 0, 'title': 'Barack Obama presidential campaign, 2008'}, {'ns': 0, 'title': 'List of federal judges appointed by Barack Obama'}, {'ns': 0, 'title': 'Barack Obama in comics'}, {'ns': 0, 'title': 'Political positions of Barack Obama'}, {'ns': 0, 'title': 'Barack Obama on social media'}, {'ns': 0, 'title': 'List of Batman: The Brave and the Bold characters'}, {'ns': 0, 'title': 'Family of Barack Obama'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
-    (('limit', 3), ('list', 'search'), ('srlimit', 3), ('srprop', ''), ('srsearch', 'Porsche')):
+    (('limit', 3), ('list', 'search'), ('offset', 0), ('srlimit', 3), ('sroffset', 0), ('srprop', ''), ('srsearch', 'Porsche')):
     {'query-continue': {'search': {'sroffset': 3}}, 'query': {'searchinfo': {'totalhits': 5335}, 'search': [{'ns': 0, 'title': 'Porsche'}, {'ns': 0, 'title': 'Porsche in motorsport'}, {'ns': 0, 'title': 'Porsche 911 GT3'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
-    (('limit', 10), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 10), ('srprop', ''), ('srsearch', 'hallelulejah')):
+  (('limit', 1), ('list', 'search'), ('offset', 1), ('srlimit', 1), ('sroffset', 1), ('srprop', ''), ('srsearch', 'Porsche')):
+    {'query-continue': {'search': {'sroffset': 1}}, 'query': {'searchinfo': {'totalhits': 5335}, 'search': [{'ns': 0, 'title': 'Porsche in motorsport'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
+
+    (('limit', 10), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 10), ('sroffset', 0),  ('srprop', ''), ('srsearch', 'hallelulejah')):
     {'query': {'searchinfo': {'suggestion': 'hallelujah'}, 'search': []}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
-    (('limit', 10), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 10), ('srprop', ''), ('srsearch', 'qmxjsudek')):
+    (('limit', 10), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 10), ('sroffset', 0), ('srprop', ''), ('srsearch', 'qmxjsudek')):
     {'query': {'search': []}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
     (('inprop', 'url'), ('pageids', 1868108), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', '')):
@@ -173,6 +176,7 @@ mock_data = {
     "barack.search": ['Barack Obama', 'Barack Obama, Sr.', 'Presidency of Barack Obama', 'Barack Obama presidential campaign, 2008', 'List of federal judges appointed by Barack Obama', 'Barack Obama in comics', 'Political positions of Barack Obama', 'Barack Obama on social media', 'List of Batman: The Brave and the Bold characters', 'Family of Barack Obama'],
 
     "porsche.search": ['Porsche', 'Porsche in motorsport', 'Porsche 911 GT3'],
+    "porsche.search.paginated": ['Porsche in motorsport'],
 
     "great_wall_of_china.coordinates.lat": '40.677',
     "great_wall_of_china.coordinates.lon": '117.232',
