@@ -16,6 +16,9 @@ mock_data = {
     (('limit', 1), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 1), ('sroffset', 0), ('srprop', ''), ('srsearch', 'Menlo Park, New Jersey')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Edison, New Jersey'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
+    (('limit', 1), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 1), ('sroffset', 0), ('srprop', ''), ('srsearch', 'Bank')):
+    {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Bank'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
+
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Menlo Park, New Jersey')):
     {'query': {'redirects': [{'to': 'Edison, New Jersey', 'from': 'Menlo Park, New Jersey'}], 'pages': {'125414': {'lastrevid': 607768264, 'pageid': 125414, 'title': 'Edison, New Jersey', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Edison,_New_Jersey&action=edit', 'counter': '', 'length': 85175, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-14T17:10:49Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Edison,_New_Jersey'}}}},
 
@@ -51,6 +54,9 @@ mock_data = {
 
     (('limit', 1), ('list', 'search'), ('offset', 0), ('srinfo', 'suggestion'), ('srlimit', 1), ('sroffset', 0), ('srprop', ''), ('srsearch', 'Great Wall of China')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Great Wall of China'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
+
+    (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Bank')):
+    {'query': {'pages': {'1234821': {'lastrevid': 562756085, 'pageid': 1234821, 'title': 'Bank', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Bank&action=edit', 'counter': '', 'length': 1662, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2013-08-17T03:30:23Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Bank'}}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Celtuce')):
     {'query': {'pages': {'1868108': {'lastrevid': 562756085, 'pageid': 1868108, 'title': 'Celtuce', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Celtuce&action=edit', 'counter': '', 'length': 1662, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2013-08-17T03:30:23Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Celtuce'}}}},
@@ -120,6 +126,9 @@ mock_data = {
 
     (('colimit', 'max'), ('prop', 'coordinates'), ('titles', 'Great Wall of China')):
     {'query': {'pages': {'5094570': {'ns': 0, 'pageid': 5094570, 'coordinates': [{'lat': 40.6769, 'globe': 'earth', 'lon': 117.232, 'primary': ''}], 'title': 'Great Wall of China'}}}, 'limits': {'extlinks': 500}},
+
+    (('colimit', 'max'), ('prop', 'coordinates'), ('titles', 'Bank')):
+    {'query': {'pages': {'1234821': {'ns': 0, 'pageid': 1234821, 'title': 'Bank '}}}, 'limits': {'extlinks': 500}},
 
     (('gscoord', '40.67693|117.23193'), ('gslimit', 10), ('gsradius', 1000), ('list', 'geosearch')):
     {'query': {'geosearch': [{'pageid': 5094570, 'title': 'Great Wall of China', 'lon': 117.232, 'primary': '', 'lat': 40.6769, 'dist': 6.8, 'ns': 0}]}},
