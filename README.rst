@@ -63,7 +63,7 @@ Read the docs at https://wikipedia.readthedocs.org/en/latest/.
 -  `Quickstart <https://wikipedia.readthedocs.org/en/latest/quickstart.html>`__
 -  `Full API <https://wikipedia.readthedocs.org/en/latest/code.html>`__
 
-To run tests, clone the `respository on GitHub <https://github.com/goldsmith/Wikipedia>`__, then run:
+To run tests, clone the `repository on GitHub <https://github.com/goldsmith/Wikipedia>`__, then run:
 
 ::
 
