@@ -642,8 +642,8 @@ class WikipediaPage(object):
       query_params = {
         'action': 'parse',
         'prop': 'sections',
+        'page': self.title,
       }
-      query_params.update(self.__title_query_param)
 
       request = _wiki_request(query_params)
       self._sections = [section['line'] for section in request['parse']['sections']]
