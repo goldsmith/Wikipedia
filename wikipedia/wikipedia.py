@@ -11,6 +11,7 @@ from .exceptions import (
   WikipediaException, ODD_ERROR_MESSAGE)
 from .util import cache, stdout_encode, debug
 import re
+import pprint
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
@@ -31,6 +32,22 @@ def set_lang(prefix):
   global API_URL
   API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
 
+  for cached_func in (search, suggest, summary):
+    cached_func.clear_cache()
+
+def set_wikidata():
+  '''
+  Change the language of the API being requested fior wikidata.
+  Set `prefix` to one of the two letter prefixes found on the `list of all Wikipedias <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_.
+
+  After setting the language, the cache for ``search``, ``suggest``, and ``summary`` will be cleared.
+
+  .. note:: Make sure you search for page titles in the language that you have set.
+  '''
+  global API_URL
+
+  API_URL = 'http://www.wikidata.org/w/api.php'
+  
   for cached_func in (search, suggest, summary):
     cached_func.clear_cache()
 
@@ -456,6 +473,19 @@ class WikipediaPage(object):
 
     return self._html
 
+  def wbgetentities(self):
+    '''
+    Gget Wikibase
+
+    '''
+    query_params = {
+      'action': 'wbgetentities',
+      'ids': self.title
+    }
+    
+    request = _wiki_request(query_params)
+    return request
+
   @property
   def content(self):
     '''
@@ -733,6 +763,9 @@ def _wiki_request(params):
 
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
+
+  #debug(pprint.pformat({"DEBUG": "",'URL':API_URL, 'params':params, 'headers':headers}))
+  pprint.pprint({'URL':API_URL, 'params':params, 'headers':headers})
 
   r = requests.get(API_URL, params=params, headers=headers)
 
