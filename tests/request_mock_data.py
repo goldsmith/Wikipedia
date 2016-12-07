@@ -40,6 +40,12 @@ mock_data = {
     (('limit', 1), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 1), ('srprop', ''), ('srsearch', 'butteryfly')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'searchinfo': {'suggestion': 'butterfly'}, 'search': [{'ns': 0, 'title': "Butterfly's Tongue"}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
+    ((u'limit', 1), (u'list', u'search'), (u'srinfo', u'suggestion'), (u'srlimit', 1), (u'srprop', u''), (u'srsearch', u'butterfly')):
+      {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': "Butterfly"}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
+
+    (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Butterfly')):
+    {'query': {'pages': {'48338': {'lastrevid': 566847704, 'pageid': 48338, 'title': 'Butterfly',  'editurl': 'http://en.wikipedia.org/w/index.php?title=Butterfly&action=edit', 'counter': '', 'length': 60572, 'contentmodel': 'wikitext', '    pagelanguage': 'en', 'touched': '2013-08-07T11:15:37Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Butterfly'}}}},
+
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'butterfly')):
     {'query': {'normalized': [{'to': 'Butterfly', 'from': 'butterfly'}], 'pages': {'48338': {'lastrevid': 566847704, 'pageid': 48338, 'title': 'Butterfly',  'editurl': 'http://en.wikipedia.org/w/index.php?title=Butterfly&action=edit', 'counter': '', 'length': 60572, 'contentmodel': 'wikitext', '    pagelanguage': 'en', 'touched': '2013-08-07T11:15:37Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Butterfly'}}}},
 
