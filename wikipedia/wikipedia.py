@@ -16,6 +16,7 @@ API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
+TIMEOUT = 10
 USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
 
 
@@ -734,7 +735,7 @@ def _wiki_request(params):
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
-  r = requests.get(API_URL, params=params, headers=headers)
+  r = requests.get(API_URL, params=params, headers=headers, timeout=TIMEOUT)
 
   if RATE_LIMIT:
     RATE_LIMIT_LAST_CALL = datetime.now()
