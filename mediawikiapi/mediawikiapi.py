@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
 from .exceptions import (
-  PageError, HTTPTimeoutError, MediaWikiAPIException
+  LanguageError, PageError, HTTPTimeoutError, MediaWikiAPIException
 )
 from .util import cache
 from .wikipediapage import WikipediaPage, _wiki_request
@@ -13,10 +13,16 @@ from .config import Configuration
 
 config = Configuration()
 
+
 def set_lang(lang):
-  config.set_lang(lang)
-  for cached_func in (search, suggest, summary):
-    cached_func.clear_cache()
+  lang=lang.lower()
+  if lang in languages().keys():
+    config.set_lang(prefix=lang)
+    for cached_func in (search, suggest, summary):
+      cached_func.clear_cache()
+  else:
+    raise LanguageError(lang)
+
 
 @cache
 def search(query, results=10, suggestion=False):

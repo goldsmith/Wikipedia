@@ -42,6 +42,16 @@ class PageError(MediaWikiAPIException):
       return u"Page id \"{0}\" does not match any pages. Try another id!".format(self.pageid)
 
 
+class LanguageError(MediaWikiAPIException):
+    """Exception raised when a language prefix is set which is not available"""
+    
+    def __init__(self, language):
+        self.language = language
+    
+    def __unicode__(self):
+        return u"\"{0}\" is not a language prefix available in Wikipedia. Run wikipedia.languages().keys() to get available prefixes.".format(self.language)
+
+
 class DisambiguationError(MediaWikiAPIException):
   """
   Exception raised when a page resolves to a Disambiguation page.

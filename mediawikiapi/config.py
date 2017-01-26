@@ -59,7 +59,7 @@ class Configuration():
 
     After setting the language, the cache for ``search``, ``suggest``, and ``summary`` will be cleared.
     .. note:: Make sure you search for page titles in the language that you have set.
-    '''
+    '''  
     self.lang = prefix
     self.api_url = self.API_URL.format(self.lang)
 
