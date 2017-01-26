@@ -416,8 +416,8 @@ def _wiki_request(params):
 
     wait_time = (rate_limit_last_call + rate_limit_min_wait) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
-
-  r = requests.get(Configuration().get_api_url(), params=params, headers=headers)
+ 
+  r = Configuration().get_session().get(Configuration().get_api_url(), params=params, headers=headers)
 
   if rate_limit:
     rate_limit_last_call = datetime.now()

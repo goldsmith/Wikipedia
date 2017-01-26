@@ -18,6 +18,7 @@ class Configuration():
     self.rate_limit = False
     self.rate_limit_min_wait = None
     self.rate_limit_last_call = None
+    self.session = None
 
   def get_api_url(self):
     return self.api_url
@@ -36,6 +37,14 @@ class Configuration():
 
   def get_rate_limit_last_call(self):
     return self.rate_limit_last_call
+
+  def get_session(self):
+    if self.session is None:
+      # initialize a session
+      self.session = requests.Session()
+
+  def new_session(self):
+    self.session = None
 
   def set_lang(self, prefix):
     '''
