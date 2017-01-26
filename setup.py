@@ -3,7 +3,7 @@ import codecs
 import os
 import re
 import setuptools
-
+from mediawikiapi import __version__
 
 def local_file(file):
   return codecs.open(
@@ -16,24 +16,17 @@ install_reqs = [
   if line.strip() != ''
 ]
 
-version = re.search(
-  "^__version__ = \((\d+), (\d+), (\d+)\)$",
-  local_file('wikipedia/__init__.py').read(),
-  re.MULTILINE
-).groups()
-
-
 setuptools.setup(
-  name = "wikipedia",
-  version = '.'.join(version),
-  author = "Jonathan Goldsmith",
-  author_email = "jhghank@gmail.com",
+  name = "mediawikiapi",
+  version = __version__,
+  author = "Taras Lehinevych",
+  author_email = "tleginevych@gmail.com",
   description = "Wikipedia API for Python",
   license = "MIT",
-  keywords = "python wikipedia API",
-  url = "https://github.com/goldsmith/Wikipedia",
+  keywords = "python wikipedia API mediawiki",
+  url = "https://github.com/lehinevych/MediaWikiAPI",
   install_requires = install_reqs,
-  packages = ['wikipedia'],
+  packages = ['mediawikiapi'],
   long_description = local_file('README.rst').read(),
   classifiers = [
     'Development Status :: 4 - Beta',
