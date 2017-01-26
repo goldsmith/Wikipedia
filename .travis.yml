@@ -3,6 +3,7 @@ python:
   - 2.7
   - 3.3
   - 3.4
+  - 3.5
 env:
   - REQUESTS=2.0.0
   - REQUESTS=2.1.0

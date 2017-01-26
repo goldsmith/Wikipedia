@@ -17,7 +17,7 @@ mock_data = {
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Edison, New Jersey'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Menlo Park, New Jersey')):
-    {'query': {'redirects': [{'to': 'Edison, New Jersey', 'from': 'Menlo Park, New Jersey'}], 'pages': {'125414': {'lastrevid': 607768264, 'pageid': 125414, 'title': 'Edison, New Jersey', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Edison,_New_Jersey&action=edit', 'counter': '', 'length': 85175, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-14T17:10:49Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Edison,_New_Jersey'}}}},
+    {'query': {'redirects': [{'to': 'Edison, New Jersey', 'from': 'Menlo Park, New Jersey'}], 'pages': {'125414': {'lastrevid': 607768264, 'pageid': 125414, 'title': 'Edison, New Jersey', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Edison,_New_Jersey&action=edit', 'counter': '', 'length': 85175, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-14T17:10:49Z', 'ns': 0, 'fullurl': 'https://en.wikipedia.org/wiki/Edison,_New_Jersey'}}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Communist Party')):
     {'query': {'redirects': [{'to': 'Communist party', 'from': 'Communist Party'}], 'pages': {'37008': {'lastrevid': 608086859, 'pageid': 37008, 'title': 'Communist party', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Communist_party&action=edit', 'counter': '', 'length': 7868, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-26T01:19:01Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Communist_party'}}}},
@@ -29,7 +29,7 @@ mock_data = {
     {'query': {'pages': {'37008': {'lastrevid': 608086859, 'pageid': 37008, 'title': 'Communist party', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Communist_party&action=edit', 'counter': '', 'length': 7868, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-26T01:19:01Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Communist_party'}}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Edison, New Jersey')):
-    {'query': {'pages': {'125414': {'lastrevid': 607768264, 'pageid': 125414, 'title': 'Edison, New Jersey', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Edison,_New_Jersey&action=edit', 'counter': '', 'length': 85175, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-14T17:10:49Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Edison,_New_Jersey'}}}},
+    {'query': {'pages': {'125414': {'lastrevid': 607768264, 'pageid': 125414, 'title': 'Edison, New Jersey', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Edison,_New_Jersey&action=edit', 'counter': '', 'length': 85175, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-05-14T17:10:49Z', 'ns': 0, 'fullurl': 'https://en.wikipedia.org/wiki/Edison,_New_Jersey'}}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Dodge Ram (disambiguation)')):
     {'query': {'pages': {'18803364': {'lastrevid': 567152802, 'pageid': 18803364, 'title': 'Dodge Ram (disambiguation)', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Dodge_Ram_(disambiguation)&action=edit', 'counter': '', 'length': 702, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2013-08-08T15:12:27Z', 'ns': 0, 'pageprops': {'disambiguation': ''}, 'fullurl': 'http://en.wikipedia.org/wiki/Dodge_Ram_(disambiguation)'}}}},
@@ -41,7 +41,7 @@ mock_data = {
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'searchinfo': {'suggestion': 'butterfly'}, 'search': [{'ns': 0, 'title': "Butterfly's Tongue"}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'butterfly')):
-    {'query': {'normalized': [{'to': 'Butterfly', 'from': 'butterfly'}], 'pages': {'48338': {'lastrevid': 566847704, 'pageid': 48338, 'title': 'Butterfly',  'editurl': 'http://en.wikipedia.org/w/index.php?title=Butterfly&action=edit', 'counter': '', 'length': 60572, 'contentmodel': 'wikitext', '    pagelanguage': 'en', 'touched': '2013-08-07T11:15:37Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Butterfly'}}}},
+    {'query': {'normalized': [{'to': 'Butterfly', 'from': 'butterfly'}], 'pages': {'48338': {'lastrevid': 566847704, 'pageid': 48338, 'title': 'Butterfly',  'editurl': 'http://en.wikipedia.org/w/index.php?title=Butterfly&action=edit', 'counter': '', 'length': 60572, 'contentmodel': 'wikitext', '    pagelanguage': 'en', 'touched': '2013-08-07T11:15:37Z', 'ns': 0, 'fullurl': 'https://en.wikipedia.org/wiki/Butterfly'}}}},
 
     (('limit', 1), ('list', 'search'), ('srinfo', 'suggestion'), ('srlimit', 1), ('srprop', ''), ('srsearch', 'Celtuce')):
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Celtuce'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
@@ -53,7 +53,7 @@ mock_data = {
     {'query-continue': {'search': {'sroffset': 1}}, 'query': {'search': [{'ns': 0, 'title': 'Great Wall of China'}]}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Celtuce')):
-    {'query': {'pages': {'1868108': {'lastrevid': 562756085, 'pageid': 1868108, 'title': 'Celtuce', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Celtuce&action=edit', 'counter': '', 'length': 1662, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2013-08-17T03:30:23Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Celtuce'}}}},
+    {'query': {'pages': {'1868108': {'lastrevid': 562756085, 'pageid': 1868108, 'title': 'Celtuce', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Celtuce&action=edit', 'counter': '', 'length': 1662, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2013-08-17T03:30:23Z', 'ns': 0, 'fullurl': 'https://en.wikipedia.org/wiki/Celtuce'}}}},
 
     (('inprop', 'url'), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', ''), ('titles', 'Tropical Depression Ten (2005)')):
     {'query': {'pages': {'21196082': {'lastrevid': 572715399, 'pageid': 21196082, 'title': 'Tropical Depression Ten (2005)', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Tropical_Depression_Ten_(2005)&action=edit', 'counter': '', 'length': 8543, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2013-09-18T13:45:33Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Tropical_Depression_Ten_(2005)'}}}},
@@ -113,7 +113,7 @@ mock_data = {
     {'query': {'search': []}, 'warnings': {'main': {'*': "Unrecognized parameter: 'limit'"}}},
 
     (('inprop', 'url'), ('pageids', 1868108), ('ppprop', 'disambiguation'), ('prop', 'info|pageprops'), ('redirects', '')):
-    {'query': {'pages': {'1868108': {'lastrevid': 575687826, 'pageid': 1868108, 'title': 'Celtuce', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Celtuce&action=edit', 'counter': '', 'length': 1960, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-01-12T09:30:00Z', 'ns': 0, 'fullurl': 'http://en.wikipedia.org/wiki/Celtuce'}}}},
+    {'query': {'pages': {'1868108': {'lastrevid': 575687826, 'pageid': 1868108, 'title': 'Celtuce', 'editurl': 'http://en.wikipedia.org/w/index.php?title=Celtuce&action=edit', 'counter': '', 'length': 1960, 'contentmodel': 'wikitext', 'pagelanguage': 'en', 'touched': '2014-01-12T09:30:00Z', 'ns': 0, 'fullurl': 'https://en.wikipedia.org/wiki/Celtuce'}}}},
 
     (('colimit', 'max'), ('prop', 'coordinates'), ('titles', 'Great Wall of China')):
     {'query': {'pages': {'5094570': {'ns': 0, 'pageid': 5094570, 'coordinates': [{'lat': 40.6769, 'globe': 'earth', 'lon': 117.232, 'primary': ''}], 'title': 'Great Wall of China'}}}, 'limits': {'extlinks': 500}},
