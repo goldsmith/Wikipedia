@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-import requests
 import time
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta

@@ -1,3 +1,4 @@
+import requests
 from datetime import timedelta
 from .util import Singleton
 
@@ -8,6 +9,7 @@ class Configuration():
   __metaclass__ = Singleton
   DEFAULT_LANGUAGE='en'
   DEFAULT_USER_AGENT = 'mediawikiapi (https://github.com/lehinevych/MediaWikiAPI/)'
+  # DEFAULT_USER_AGENT = 'Mozilla/5.0'
   API_URL = 'https://{}.wikipedia.org/w/api.php'
   DONATE_URL = 'https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage'
   
@@ -19,6 +21,10 @@ class Configuration():
     self.rate_limit_min_wait = None
     self.rate_limit_last_call = None
     self.session = None
+
+  def __del__(self):
+    if self.session is not None:  
+      self.session.close()
 
   def get_api_url(self):
     return self.api_url
@@ -42,9 +48,11 @@ class Configuration():
     if self.session is None:
       # initialize a session
       self.session = requests.Session()
+    #return self.session
+    return requests
 
   def new_session(self):
-    self.session = None
+    self.session = requests.Session()
 
   def set_lang(self, prefix):
     '''
