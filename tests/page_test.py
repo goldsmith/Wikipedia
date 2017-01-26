@@ -118,18 +118,28 @@ class TestPage(unittest.TestCase):
 
   def test_images(self):
     """Test the list of image URLs."""
-    self.assertEqual(sorted(self.celtuce.images), mock_data['data']["celtuce.images"])
-    self.assertEqual(sorted(self.cyclone.images), mock_data['data']["cyclone.images"])
+    self.assertCountEqual(self.celtuce.images, mock_data['data']["celtuce.images"])
+    self.assertCountEqual(self.cyclone.images, mock_data['data']["cyclone.images"])
 
   def test_references(self):
     """Test the list of reference URLs."""
-    self.assertEqual(self.celtuce.references, mock_data['data']["celtuce.references"])
-    self.assertEqual(self.cyclone.references, mock_data['data']["cyclone.references"])
+    self.assertCountEqual(self.celtuce.references, mock_data['data']["celtuce.references"])
+    self.assertCountEqual(self.cyclone.references, mock_data['data']["cyclone.references"])
 
   def test_links(self):
     """Test the list of titles of links to Wikipedia pages."""
-    self.assertEqual(self.celtuce.links, mock_data['data']["celtuce.links"])
-    self.assertEqual(self.cyclone.links, mock_data['data']["cyclone.links"])
+    self.assertCountEqual(self.celtuce.links, mock_data['data']["celtuce.links"])
+    self.assertCountEqual(self.cyclone.links, mock_data['data']["cyclone.links"])
+
+  def test_html(self):
+    """Test the full HTML method."""
+    self.assertEqual(self.celtuce.html(), mock_data['data']["celtuce.html"])
+
+  def test_coordinates(self):
+    """Test geo coordinates of a page"""
+    lat, lon = self.great_wall_of_china.coordinates
+    self.assertEqual(str(lat.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lat'])
+    self.assertEqual(str(lon.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lon'])
 
   def test_summary(self):
     """Test the summary."""
@@ -138,24 +148,18 @@ class TestPage(unittest.TestCase):
 
   def test_categories(self):
     """Test the list of categories of Wikipedia pages."""
-    self.assertEqual(self.celtuce.categories, mock_data['data']["celtuce.categories"])
-    self.assertEqual(self.cyclone.categories, mock_data['data']["cyclone.categories"])
-
-  def test_html(self):
-    """Test the full HTML method."""
-    self.assertEqual(self.celtuce.html(), mock_data['data']["celtuce.html"])
+    self.assertCountEqual(self.celtuce.categories, mock_data['data']["celtuce.categories"])
+    self.assertCountEqual(self.cyclone.categories, mock_data['data']["cyclone.categories"])
 
   def test_sections(self):
     """Test the list of section titles."""
-    self.assertEqual(sorted(self.cyclone.sections), mock_data['data']["cyclone.sections"])
+    print("cyclone.sections")
+    print(self.cyclone.sections)
+    print(self.cyclone.title)
+    self.assertCountEqual(sorted(self.cyclone.sections), mock_data['data']["cyclone.sections"])
 
   def test_section(self):
     """Test text content of a single section."""
     self.assertEqual(self.cyclone.section("Impact"), mock_data['data']["cyclone.section.impact"])
     self.assertEqual(self.cyclone.section("History"), None)
 
-  def test_coordinates(self):
-    """Test geo coordinates of a page"""
-    lat, lon = self.great_wall_of_china.coordinates
-    self.assertEqual(str(lat.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lat'])
-    self.assertEqual(str(lon.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lon'])
