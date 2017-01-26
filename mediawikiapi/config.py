@@ -9,7 +9,6 @@ class Configuration():
   __metaclass__ = Singleton
   DEFAULT_LANGUAGE='en'
   DEFAULT_USER_AGENT = 'mediawikiapi (https://github.com/lehinevych/MediaWikiAPI/)'
-  # DEFAULT_USER_AGENT = 'Mozilla/5.0'
   API_URL = 'https://{}.wikipedia.org/w/api.php'
   DONATE_URL = 'https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage'
   
@@ -48,8 +47,7 @@ class Configuration():
     if self.session is None:
       # initialize a session
       self.session = requests.Session()
-    #return self.session
-    return requests
+    return self.session
 
   def new_session(self):
     self.session = requests.Session()

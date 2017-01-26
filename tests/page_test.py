@@ -162,4 +162,3 @@ class TestPage(unittest.TestCase):
     """Test text content of a single section."""
     self.assertEqual(self.cyclone.section("Impact"), mock_data['data']["cyclone.section.impact"])
     self.assertEqual(self.cyclone.section("History"), None)
-
