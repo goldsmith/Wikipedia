@@ -36,13 +36,13 @@ class Configuration():
   def get_rate_limit_last_call(self):
     return self.rate_limit_last_call
 
-  def set_lang(self, prefix):
+  def set_lang(self, lang):
     '''
     Change the language of the API being requested.
     Set `prefix` to one of the two letter prefixes found on the `list of all Wikipedias <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_.
     Raise error if prefix not in a list of predefined languages
     '''  
-    self.lang.set_lang(prefix) 
+    self.lang.set_lang(lang) 
     self.api_url = self.API_URL.format(self.lang)
 
   def set_user_agent(self, user_agent_string):

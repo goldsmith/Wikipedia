@@ -22,8 +22,8 @@ class WikiRequest(object):
     if self.session is not None:  
       self.session.close()
 
-  def set_lang(lang):
-    self.config.set_lang(prefix=lang)
+  def set_lang(self, lang):
+    self.config.set_lang(lang)
 
   def get_session(self):
     if self.session is None:

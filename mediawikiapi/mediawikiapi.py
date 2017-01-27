@@ -14,7 +14,7 @@ from .wikipediapage import WikipediaPage
 wiki = WikiRequest()
 
 def set_lang(lang):
-  wiki.set_lang(prefix=lang)
+  wiki.set_lang(lang)
   for cached_func in (search, suggest, summary):
     cached_func.clear_cache()
   
