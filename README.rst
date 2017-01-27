@@ -2,7 +2,7 @@ MediaWikiAPI
 ===================
 
 <!---
-.. image:: https://travis-ci.org/leginevych/MediaWikiAPI.png?branch=master
+.. image:: https://travis-ci.org/lehinevych/MediaWikiAPI.svg?branch=master
   :target: https://travis-ci.org/leginevych/MediaWikiAPI
 --->
 
