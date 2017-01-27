@@ -143,8 +143,9 @@ class TestPage(unittest.TestCase):
 
   def test_summary(self):
     """Test the summary."""
-    self.assertEqual(self.celtuce.summary, mock_data['data']["celtuce.summary"])
-    self.assertEqual(self.cyclone.summary, mock_data['data']["cyclone.summary"])
+    # Strip is used to nuke \n from the end
+    self.assertEqual(self.celtuce.summary.strip(), mock_data['data']["celtuce.summary"])
+    self.assertEqual(self.cyclone.summary.strip(), mock_data['data']["cyclone.summary"])
 
   def test_categories(self):
     """Test the list of categories of Wikipedia pages."""
@@ -162,3 +163,8 @@ class TestPage(unittest.TestCase):
     """Test text content of a single section."""
     self.assertEqual(self.cyclone.section("Impact"), mock_data['data']["cyclone.section.impact"])
     self.assertEqual(self.cyclone.section("History"), None)
+
+  def test_lang_title(self):
+    """ Test lang_title function"""
+    self.assertEqual(self.celtuce.lang_title('es'), mock_data['data']["celtuce.es_lang"])
+    self.assertEqual(self.cyclone.lang_title('ru'), mock_data['data']["cyclone.ru_lang"])

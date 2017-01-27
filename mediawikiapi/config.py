@@ -1,29 +1,22 @@
 import requests
 from datetime import timedelta
-from .util import Singleton
 
 
 class Configuration():
-  # in Python3 metaclass=Singleton
-  # For the compatibility with Python 2  
-  __metaclass__ = Singleton
-  DEFAULT_LANGUAGE='en'
+  """
+  Contains configuration
+  """
   DEFAULT_USER_AGENT = 'mediawikiapi (https://github.com/lehinevych/MediaWikiAPI/)'
   API_URL = 'https://{}.wikipedia.org/w/api.php'
   DONATE_URL = 'https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage'
   
-  def __init__(self, lang=None, user_agent=None):
-    self.lang = lang or self.DEFAULT_LANGUAGE
-    self.api_url = self.API_URL.format(self.lang)
+  def __init__(self, lang, user_agent=None):
+    self.lang = lang
+    self.api_url = self.API_URL.format(self.lang.get_lang())
     self.user_agent = user_agent or self.DEFAULT_USER_AGENT
     self.rate_limit = False
     self.rate_limit_min_wait = None
     self.rate_limit_last_call = None
-    self.session = None
-
-  def __del__(self):
-    if self.session is not None:  
-      self.session.close()
 
   def get_api_url(self):
     return self.api_url
@@ -43,24 +36,13 @@ class Configuration():
   def get_rate_limit_last_call(self):
     return self.rate_limit_last_call
 
-  def get_session(self):
-    if self.session is None:
-      # initialize a session
-      self.session = requests.Session()
-    return self.session
-
-  def new_session(self):
-    self.session = requests.Session()
-
   def set_lang(self, prefix):
     '''
     Change the language of the API being requested.
     Set `prefix` to one of the two letter prefixes found on the `list of all Wikipedias <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_.
-
-    After setting the language, the cache for ``search``, ``suggest``, and ``summary`` will be cleared.
-    .. note:: Make sure you search for page titles in the language that you have set.
+    Raise error if prefix not in a list of predefined languages
     '''  
-    self.lang = prefix
+    self.lang.set_lang(prefix) 
     self.api_url = self.API_URL.format(self.lang)
 
   def set_user_agent(self, user_agent_string):
