@@ -1,12 +1,23 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from wikipedia import wikipedia
+from mediawikiapi import LanguageError
+from mediawikiapi import set_lang, config
 
 
 class TestLang(unittest.TestCase):
-  """Test the ability for wikipedia to change the language of the API being accessed."""
+  """Test the ability for mediawikiapi to change the language of the API being accessed."""
+  def setUP(self):
+    set_lang("en")
+  
+  def tearDown(self):
+    set_lang("en")
 
-  def test_lang(self):
-    wikipedia.set_lang("fr")
-    self.assertEqual(wikipedia.API_URL, 'http://fr.wikipedia.org/w/api.php')
+  def test_lang(self):  
+    """ Test the set_lang function"""
+    set_lang("fr")
+    self.assertEqual(config.get_api_url(), 'https://fr.wikipedia.org/w/api.php')
+
+  def test_fake_lang(self):
+    """ Test exception when set_lang get wrong language"""
+    self.assertRaises(LanguageError, set_lang, "fakelang")
