@@ -1,8 +1,8 @@
 import requests
 from datetime import timedelta
+from .util import Singleton
 
-
-class Configuration():
+class Configuration(metaclass=Singleton):
   """
   Contains configuration
   """
@@ -17,6 +17,20 @@ class Configuration():
     self.rate_limit = False
     self.rate_limit_min_wait = None
     self.rate_limit_last_call = None
+    self.session = None
+
+  def __del__(self):
+    if self.session is not None:  
+      self.session.close()
+
+  def get_session(self):
+    if self.session is None:
+      # initialize a session
+      self.session = requests.Session()
+    return self.session
+
+  def new_session(self):
+    self.session = requests.Session()
 
   def get_api_url(self):
     return self.api_url

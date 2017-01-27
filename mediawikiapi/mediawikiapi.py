@@ -7,14 +7,13 @@ from .exceptions import (
 )
 from .config import Configuration
 from .language import Language
-from .wikirequest import WikiRequest
 from .util import cache
-from .wikipediapage import WikipediaPage
+from .wikipediapage import WikipediaPage, _wiki_request
 
-wiki = WikiRequest()
+config = Configuration(lang=Language())
 
 def set_lang(lang):
-  wiki.set_lang(lang)
+  config.set_lang(lang)
   for cached_func in (search, suggest, summary):
     cached_func.clear_cache()
   
@@ -40,7 +39,7 @@ def search(query, results=10, suggestion=False):
   if suggestion:
     search_params['srinfo'] = 'suggestion'
 
-  raw_results = wiki.request(search_params)
+  raw_results = _wiki_request(search_params)
 
   if 'error' in raw_results:
     if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
@@ -86,7 +85,7 @@ def geosearch(latitude, longitude, title=None, results=10, radius=1000):
   if title:
     search_params['titles'] = title
 
-  raw_results = wiki.request(search_params)
+  raw_results = _wiki_request(search_params)
 
   if 'error' in raw_results:
     if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
@@ -117,7 +116,7 @@ def suggest(query):
   }
   search_params['srsearch'] = query
 
-  raw_result = wiki.request(search_params)
+  raw_result = _wiki_request(search_params)
 
   if raw_result['query'].get('searchinfo'):
     return raw_result['query']['searchinfo']['suggestion']
@@ -142,7 +141,7 @@ def random(pages=1):
     'rnlimit': pages,
   }
 
-  request = wiki.request(query_params)
+  request = _wiki_request(query_params)
   titles = [page['title'] for page in request['query']['random']]
 
   if len(titles) == 1:
@@ -185,7 +184,7 @@ def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
   else:
     query_params['exintro'] = ''
 
-  request = wiki.request(query_params)
+  request = _wiki_request(query_params)
   summary = request['query']['pages'][pageid]['extract']
 
   return summary
@@ -218,6 +217,27 @@ def page(title=None, pageid=None, auto_suggest=True, redirect=True, preload=Fals
     return WikipediaPage(pageid=pageid, preload=preload)
   else:
     raise ValueError("Either a title or a pageid must be specified")
+
+
+def languages():
+    '''
+    List all the currently supported language prefixes (usually ISO language code).
+
+    Can be inputted to `set_lang` to change the Mediawiki that `wikipedia` requests
+    results from.
+
+    Returns: dict of <prefix>: <local_lang_name> pairs. To get just a list of prefixes,
+    use `wikipedia.languages().keys()`.
+    '''
+    response = _wiki_request({
+      'meta': 'siteinfo',
+      'siprop': 'languages'
+    })
+    languages = response['query']['languages']
+    return {
+      lang['code']: lang['*']
+      for lang in languages
+    }
 
 
 def donate():

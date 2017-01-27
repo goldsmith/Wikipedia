@@ -3,9 +3,9 @@ from .exceptions import (
 )
 from decimal import Decimal
 from bs4 import BeautifulSoup
+from .config import Configuration
 from .language import Language
 from .util import stdout_encode
-from .wikirequest import WikiRequest
 import re
 
 
@@ -14,8 +14,6 @@ class WikipediaPage(object):
   Contains data from a Wikipedia page.
   Uses property methods to filter data from the raw HTML.
   '''
-  wiki = WikiRequest()
-  
   def __init__(self, title=None, pageid=None, redirect=True, preload=False, original_title=''):
     if title is not None:
       self.title = title
@@ -62,7 +60,7 @@ class WikipediaPage(object):
     else:
       query_params['pageids'] = self.pageid
 
-    request = self.wiki.request(query_params)
+    request = _wiki_request(query_params)
    
     query = request['query']
     pageid = list(query['pages'].keys())[0]
@@ -110,7 +108,7 @@ class WikipediaPage(object):
         query_params['pageids'] = self.pageid
       else:
         query_params['titles'] = self.title
-      request = self.wiki.request(query_params)
+      request = _wiki_request(query_params)
       html = request['query']['pages'][pageid]['revisions'][0]['*']
 
       lis = BeautifulSoup(html, 'html.parser').find_all('li')
@@ -138,7 +136,7 @@ class WikipediaPage(object):
       params = query_params.copy()
       params.update(last_continue)
 
-      request = self.wiki.request(params)
+      request = _wiki_request(params)
 
       if 'query' not in request:
         break
@@ -178,7 +176,7 @@ class WikipediaPage(object):
         'titles': self.title
       }
 
-      request = self.wiki.request(query_params)
+      request = _wiki_request(query_params)
       self._html = request['query']['pages'][self.pageid]['revisions'][0]['*']
 
     return self._html
@@ -195,7 +193,7 @@ class WikipediaPage(object):
         'rvprop': 'ids'
       }
       query_params.update(self.__title_query_param)
-      request = self.wiki.request(query_params)
+      request = _wiki_request(query_params)
       self._content     = request['query']['pages'][self.pageid]['extract']
       self._revision_id = request['query']['pages'][self.pageid]['revisions'][0]['revid']
       self._parent_id   = request['query']['pages'][self.pageid]['revisions'][0]['parentid']
@@ -244,7 +242,7 @@ class WikipediaPage(object):
       }
       query_params.update(self.__title_query_param)
 
-      request = self.wiki.request(query_params)
+      request = _wiki_request(query_params)
       self._summary = request['query']['pages'][self.pageid]['extract']
 
     return self._summary
@@ -280,7 +278,7 @@ class WikipediaPage(object):
         'titles': self.title,
       }
 
-      request = self.wiki.request(query_params)
+      request = _wiki_request(query_params)
 
       if 'query' in request:
         coordinates = request['query']['pages'][self.pageid]['coordinates']
@@ -360,7 +358,7 @@ class WikipediaPage(object):
       else:
         query_params.update({'pageid': self.pageid})
 
-      request = self.wiki.request(query_params)
+      request = _wiki_request(query_params)
       self._sections = [section['line'] for section in request['parse']['sections']]
 
     return self._sections
@@ -402,10 +400,42 @@ class WikipediaPage(object):
     }
     query_params.update({'lllang': Language(lang_code).get_lang()})
     query_params.update(self.__title_query_param)
-    request = self.wiki.request(query_params)
+    request = _wiki_request(query_params)
     pageid = list(request['query']['pages'])[0]
     try:
         title = request['query']['pages'][pageid]['langlinks'][0]['*']
     except Exception as e:
         title = None
     return title
+
+
+def _wiki_request(params):
+    '''
+    Make a request to the Wikipedia API using the given search parameters.
+    Returns a parsed dict of the JSON response.
+    '''
+    params['format'] = 'json'
+    if not 'action' in params:
+      params['action'] = 'query'
+
+    headers = {
+      'User-Agent': Configuration().get_user_agent()
+    }
+
+    rate_limit = Configuration().get_rate_limit()
+    rate_limit_last_call = Configuration().get_rate_limit_last_call()
+    rate_limit_min_wait = Configuration().get_rate_limit_min_wait()
+    if rate_limit and rate_limit_last_call and \
+      rate_limit_last_call + rate_limit_min_wait > datetime.now():
+
+      # it hasn't been long enough since the last API call
+      # so wait until we're in the clear to make the request
+
+      wait_time = (rate_limit_last_call + rate_limit_min_wait) - datetime.now()
+      time.sleep(int(wait_time.total_seconds()))
+    r = Configuration().get_session().get(Configuration().get_api_url(), params=params, headers=headers)
+
+    if rate_limit:
+      rate_limit_last_call = datetime.now()
+
+    return r.json()
