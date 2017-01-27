@@ -2,11 +2,8 @@ MediaWikiAPI
 ===================
 
 <!---
-.. image:: https://travis-ci.org/goldsmith/Wikipedia.png?branch=master
-  :target: https://travis-ci.org/goldsmith/Wikipedia
-.. image:: https://pypip.in/license/wikiapi/badge.png
-  :target: https://pypi.python.org/pypi/wikiapi/
-  :alt: License
+.. image:: https://travis-ci.org/lehinevych/MediaWikiAPI.svg?branch=master
+  :target: https://travis-ci.org/leginevych/MediaWikiAPI
 --->
 
 
@@ -51,15 +48,12 @@ To install MediaWikiAPI, simply run:
 
   $ pip install mediawikiapi
 
-MediaWikiAPI is compatible with Python 2.6+ (2.7+ to run unittest discover) and Python 3.3+.
+MediaWikiAPI is compatible only with Python 3.3+. Support for Python 2.7 will be added soon.
 
 Documentation
 -------------
 
-Read the docs at https://wikiapi.readthedocs.org/en/latest/.
-
--  `Quickstart <https://wikiapi.readthedocs.org/en/latest/quickstart.html>`__
--  `Full API <https://wikiapi.readthedocs.org/en/latest/code.html>`__
+Soon will be available on readthedocs.
 
 To run tests, clone the `repository on GitHub <https://github.com/lehinevych/MediaWikiAPI>`__, then run:
 
