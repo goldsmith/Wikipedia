@@ -1,10 +1,9 @@
 MediaWikiAPI
 ===================
 
-<!---
 .. image:: https://travis-ci.org/lehinevych/MediaWikiAPI.svg?branch=master
   :target: https://travis-ci.org/leginevych/MediaWikiAPI
---->
+
 
 
 **MediaWikiAPI** is a Python library that makes it easy to access and parse
@@ -82,11 +81,4 @@ full details.
 
 Credits
 -------
-
--  `wiki-api <https://github.com/richardasaurus/wiki-api>`__ by
-   @richardasaurus for inspiration
--  @nmoroze and @themichaelyang for feedback and suggestions
--  The `Wikimedia
-   Foundation <http://wikimediafoundation.org/wiki/Home>`__ for giving
-   the world free access to data
 -  @goldsmith for making such a fantastic library to fork
