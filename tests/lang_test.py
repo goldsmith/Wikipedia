@@ -7,6 +7,11 @@ from mediawikiapi import set_lang, config
 
 class TestLang(unittest.TestCase):
   """Test the ability for mediawikiapi to change the language of the API being accessed."""
+  def setUP(self):
+    set_lang("en")
+  
+  def tearDown(self):
+    set_lang("en")
 
   def test_lang(self):  
     """ Test the set_lang function"""

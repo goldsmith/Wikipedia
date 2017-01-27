@@ -57,7 +57,7 @@ class Configuration(metaclass=Singleton):
     Raise error if prefix not in a list of predefined languages
     '''  
     self.lang.set_lang(lang) 
-    self.api_url = self.API_URL.format(self.lang)
+    self.api_url = self.API_URL.format(self.lang.get_lang())
 
   def set_user_agent(self, user_agent_string):
     '''
