@@ -19,7 +19,7 @@ from a page, and more. Wikipedia wraps the `MediaWiki
 API <https://www.mediawiki.org/wiki/API>`__ so you can focus on using
 Wikipedia data, not getting it.
 
-.. code:: python
+``` python
 
   >>> from mediawikiapi import MediaWikiAPI
   >>> mediawikiapi = MediaWikiAPI()
@@ -42,17 +42,16 @@ Wikipedia data, not getting it.
   >>> mediawikiapi.conf.language = "fr"
   >>> mediawikiapi.summary("Facebook", sentences=1)
   # Facebook est un service de réseautage social en ligne sur Internet permettant d'y publier des informations (photographies, liens, textes, etc.) en contrôlant leur visibilité par différentes catégories de personnes.
-
+```
 
 Installation
 ------------
 
 To install MediaWikiAPI, simply run:
 
-::
-
-  $ pip install mediawikiapi
-
+``` bash
+    pip install mediawikiapi
+```
 MediaWikiAPI is compatible only with Python 3 and Python 2.7.
 
 Documentation
@@ -62,21 +61,24 @@ Soon will be available on readthedocs.
 
 To run tests, clone the `repository on GitHub <https://github.com/lehinevych/MediaWikiAPI>`__, then run:
 
-::
+```bash
 
-  $ pip install -r requirements.txt
-  $ bash runtests  # will run tests for python and python3
-  $ python -m unittest discover tests/ '*test.py'  # manual style
+  pip install -r requirements.txt
+  bash runtests  # will run tests for python and python3
+  python -m unittest discover tests/ '*test.py'  # manual style
 
+```
 in the root project directory.
 
 To build the documentation yourself, after installing requirements.txt, run:
 
-::
+``` bash
 
-  $ pip install sphinx
-  $ cd docs/
-  $ make html
+  pip install sphinx
+  cd docs/
+  make html
+
+```
 
 License
 -------
