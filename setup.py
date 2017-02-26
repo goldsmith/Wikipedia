@@ -20,7 +20,7 @@ setuptools.setup(
   name = "mediawikiapi",
   version = __version__,
   author = "Taras Lehinevych",
-  author_email = "tleginevych@gmail.com",
+  author_email = "mediawikiapi@taraslehinevych.me",
   description = "Wikipedia API for Python",
   license = "MIT",
   keywords = "python wikipedia API mediawiki",
