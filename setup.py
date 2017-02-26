@@ -21,7 +21,7 @@ setuptools.setup(
   version = __version__,
   author = "Taras Lehinevych",
   author_email = "mediawikiapi@taraslehinevych.me",
-  description = "Wikipedia API for Python",
+  description = "Wikipedia API on Python",
   license = "MIT",
   keywords = "python wikipedia API mediawiki",
   url = "https://github.com/lehinevych/MediaWikiAPI",
@@ -32,7 +32,11 @@ setuptools.setup(
     'Development Status :: 4 - Beta',
     'Topic :: Software Development :: Libraries',
     'License :: OSI Approved :: MIT License',
-    'Programming Language :: Python',
+    'Programming Language :: Python :: 2.7'
     'Programming Language :: Python :: 3'
+    'Programming Language :: Python :: 3.3'
+    'Programming Language :: Python :: 3.4'
+    'Programming Language :: Python :: 3.5'
+    'Programming Language :: Python :: 3.6'
   ]
 )
