@@ -62,9 +62,11 @@ class DisambiguationError(MediaWikiAPIException):
   .. note:: `options` does not include titles that do not link to a valid Wikipedia page.
   """
 
-  def __init__(self, title, may_refer_to):
+  def __init__(self, title, may_refer_to, details=None):
     self.title = title
     self.options = may_refer_to
+    # details field is a dict which contains title, host_name, href, description
+    self.details = details
 
   def __unicode__(self):
     return u"\"{0}\" may refer to: \n{1}".format(self.title, '\n'.join(self.options))

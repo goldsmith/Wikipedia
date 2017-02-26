@@ -115,10 +115,20 @@ class WikipediaPage(object):
       html = request['query']['pages'][pageid]['revisions'][0]['*']
 
       lis = BeautifulSoup(html, 'html.parser').find_all('li')
-      filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
+      filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))] 
+      disambiguation = []
+      host_name = page["fullurl"]
+      for lis_item in filtered_lis:
+        item = lis_item.find_all("a")[0]
+        one_disambiguation = {}
+        one_disambiguation["title"] = item["title"]
+        one_disambiguation["host_name"] = host_name
+        one_disambiguation["href"] = item["href"]
+        one_disambiguation["description"] = lis_item.text
+        disambiguation.append(one_disambiguation)
       may_refer_to = [li.a.get_text() for li in filtered_lis if li.a]
+      raise DisambiguationError(getattr(self, 'title', page['title']), may_refer_to, disambiguation)
 
-      raise DisambiguationError(getattr(self, 'title', page['title']), may_refer_to)
 
     else:
       self.pageid = pageid
