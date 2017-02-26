@@ -1,6 +1,27 @@
 import requests
 from .exceptions import LanguageError
 
+def __get_available_languages():
+  '''
+    Internal static function for getting all available language on mediawiki
+  '''
+  params = {
+      'meta': 'siteinfo',
+      'siprop': 'languages',
+      'format': 'json',
+      'action': 'query',
+    }
+  headers = {
+    'User-Agent': 'mediawikiapi (https://github.com/lehinevych/MediaWikiAPI/)'
+  }
+  response = requests.get('https://en.wikipedia.org/w/api.php', params=params, headers=headers)
+  response = response.json()
+  languages = response['query']['languages']
+  return {lang['code']: lang['*'] for lang in languages}
+
+
+predefined_languages = __get_available_languages()
+
 
 class Language(object):
   '''
@@ -11,44 +32,34 @@ class Language(object):
   '''
   DEFAULT_LANGUAGE='en'
   
-  def __init__(self, lang=None):
-    params = {
-      'meta': 'siteinfo',
-      'siprop': 'languages',
-      'format': 'json',
-      'action': 'query',
-    }
-    headers = {
-      'User-Agent': 'mediawikiapi (https://github.com/lehinevych/MediaWikiAPI/)'
-    }
-    response = requests.get('https://en.wikipedia.org/w/api.php', params=params, headers=headers)
-    response = response.json()
-    languages = response['query']['languages']
-    self.predefined_languages ={
-      lang['code']: lang['*'] for lang in languages
-    }
-    if lang is None:
-      self.lang = self.DEFAULT_LANGUAGE
-
-    elif self._verify_lang(lang):
-      self.lang = lang
+  def __init__(self, language=None):
+    if language is None:
+      self.language = self.DEFAULT_LANGUAGE
     else:
-      raise LanguageError(lang)
+      self.language = language
 
-  def get_lang(self):
-    return self.lang
+  @property
+  def language(self):
+    '''
+    Return language
+    '''
+    return self._language
 
-  def set_lang(self, lang):
+  @language.setter
+  def language(self, language):
     '''
-    Verify language
-    Raise LanguageError if such doesn't exist 
+    Change the language of the API being requested.
+    Set `language` to one of the two letter prefixes found on the
+    `list of all Wikipedias <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_.
+    Raise error if language not in a list of predefined languages
+    Args:
+    * language - (string) a string specifying the language
     '''
-    lang=lang.lower()
-    if lang in self.predefined_languages.keys():
-      self.lang = lang
+    language=language.lower()
+    if language in predefined_languages.keys():
+      self._language = language
     else:
-      raise LanguageError(lang)
+      raise LanguageError(language)
 
-  def _verify_lang(self, lang):
-    return lang in self.predefined_languages.keys()
+
 
