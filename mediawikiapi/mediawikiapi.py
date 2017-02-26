@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from .exceptions import (
   PageError, HTTPTimeoutError, MediaWikiAPIException
 )
-from .configuration import Config
+from .config import Config
 from .util import memorized
 from .wikipediapage import WikipediaPage
 from .wikirequest import WikiRequest
