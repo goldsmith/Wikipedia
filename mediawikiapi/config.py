@@ -1,73 +1,74 @@
 import requests
 from datetime import timedelta
-from .util import Singleton
+from .language import Language
 
-class Configuration(metaclass=Singleton):
+
+class Config():
   """
-  Contains configuration
+  Contains global configuration
   """
   DEFAULT_USER_AGENT = 'mediawikiapi (https://github.com/lehinevych/MediaWikiAPI/)'
-  API_URL = 'https://{}.wikipedia.org/w/api.php'
   DONATE_URL = 'https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage'
-  
-  def __init__(self, lang, user_agent=None):
-    self.lang = lang
-    self.api_url = self.API_URL.format(self.lang.get_lang())
+  API_URL = 'https://{}.wikipedia.org/w/api.php'
+
+  def __init__(self, language=None, user_agent=None, rate_limit=None):
+    if language is not None:
+      self.__lang = Language(language)
+    else:
+      self.__lang = Language()
+    self.__rate_limit_last_call = None
+    self.__rate_limit = rate_limit
     self.user_agent = user_agent or self.DEFAULT_USER_AGENT
-    self.rate_limit = False
-    self.rate_limit_min_wait = None
-    self.rate_limit_last_call = None
-    self.session = None
 
-  def __del__(self):
-    if self.session is not None:  
-      self.session.close()
-
-  def get_session(self):
-    if self.session is None:
-      # initialize a session
-      self.session = requests.Session()
-    return self.session
-
-  def new_session(self):
-    self.session = requests.Session()
-
-  def get_api_url(self):
-    return self.api_url
-
-  def get_user_agent(self):
-    return self.user_agent
-
-  def get_donate_url(self):
+  @property
+  def donate_url(self):
+    '''Return media wiki donate url'''
     return self.DONATE_URL
 
-  def get_rate_limit(self):
-    return self.rate_limit
+  @property
+  def language(self):
+    '''Return current global language'''
+    return self.__lang.language
 
-  def get_rate_limit_min_wait(self):
-    return self.rate_limit_min_wait
-
-  def get_rate_limit_last_call(self):
-    return self.rate_limit_last_call
-
-  def set_lang(self, lang):
-    '''
-    Change the language of the API being requested.
-    Set `prefix` to one of the two letter prefixes found on the `list of all Wikipedias <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_.
-    Raise error if prefix not in a list of predefined languages
-    '''  
-    self.lang.set_lang(lang) 
-    self.api_url = self.API_URL.format(self.lang.get_lang())
-
-  def set_user_agent(self, user_agent_string):
-    '''
-    Set the User-Agent string to be used for all requests.
+  @language.setter
+  def language(self, language):
+    '''Set a new language
     Arguments:
-    * user_agent_string - (string) a string specifying the User-Agent header
+    * language - (string or Language instance) specifying the language
     '''
-    self.user_agent = user_agent_string
+    if isinstance(language, Language):
+      self.__lang=language
+    else:
+      self.__lang.language = language
 
-  def set_rate_limiting(self, rate_limit, min_wait=timedelta(milliseconds=50)):
+  def get_api_url(self, language=None):
+    '''Return api for specified language
+    Arguments:
+    * language - (string or Language instance) specifying the language
+    '''
+    if language is not None:
+      if isinstance(language, Language):
+        return self.API_URL.format(language.language)
+      else:
+        # does the language verification
+        lang = Language(language)
+        return self.API_URL.format(lang.language)
+    return self.API_URL.format(self.__lang.language)
+    
+  @property
+  def rate_limit(self):
+    return self.__rate_limit
+
+  @property
+  def rate_limit_last_call(self):
+    return self.__rate_limit_last_call
+
+  @rate_limit_last_call.setter
+  def rate_limit_last_call(self, last_call):
+    self.__rate_limit_last_call = last_call
+
+  @rate_limit.setter
+  def rate_limit(self, rate_limit):
     '''
     Enable or disable rate limiting on requests to the Mediawiki servers.
     If rate limiting is not enabled, under some circumstances (depending on
@@ -78,16 +79,15 @@ class Configuration(metaclass=Singleton):
     HTTPTimeoutError still might be raised.
 
     Arguments:
-    * rate_limit - (Boolean) whether to enable rate limiting or not
+    * min_wait - (integer or timedelta) describes the minimum time to wait in miliseconds before requests.
+           Example timedelta(milliseconds=50). If None, rate_limit won't be used.
 
-    Keyword arguments:
-    * min_wait - if rate limiting is enabled, `min_wait` is a timedelta describing the minimum time to wait before requests.
-           Defaults to timedelta(milliseconds=50)
     '''
-    self.rate_limit = rate_limit
-    if not rate_limit:
-      self.rate_limit_min_wait = None
-    else:
-      self.rate_limit_min_wait = min_wait
-
-    self.rate_limit_last_call = None
+    if rate_limit is None:
+      self.__rate_limit = None
+    elif isinstance(rate_limit, timedelta):
+      self.__rate_limit = rate_limit
+    else: 
+      self.__rate_limit = timedelta(milliseconds=rate_limit)
+    
+    self.__rate_limit_last_call = None
