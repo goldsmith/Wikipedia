@@ -18,7 +18,9 @@ class Config():
       self.__lang = Language()
     self.__rate_limit_last_call = None
     self.__rate_limit = rate_limit
+    self.timeout = None
     self.user_agent = user_agent or self.DEFAULT_USER_AGENT
+
 
   @property
   def donate_url(self):

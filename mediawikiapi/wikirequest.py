@@ -43,7 +43,7 @@ class WikiRequest(object):
         # so wait until we're in the clear to make the request
         wait_time = (rate_limit_last_call + rate_limit) - datetime.now()
         time.sleep(int(wait_time.total_seconds()))
-      r = self.session.get(self.config.get_api_url(language), params=params, headers=headers)
+      r = self.session.get(self.config.get_api_url(language), params=params, headers=headers, timeout=self.config.timeout)
 
       if rate_limit:
         self.config.rate_limit_last_call = datetime.now()
