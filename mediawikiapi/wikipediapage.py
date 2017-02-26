@@ -274,7 +274,7 @@ class WikipediaPage(object):
           'prop': 'imageinfo',
           'iiprop': 'url',
         })
-        if 'imageinfo' in page
+        if 'imageinfo' in page and 'url' in page['imageinfo'][0]
       ]
 
     return self._images
