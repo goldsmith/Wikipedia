@@ -187,10 +187,14 @@ class MediaWikiAPI(object):
     if title is not None:
       if auto_suggest:
         results, suggestion = self.search(title, results=1, suggestion=True)
+        if suggestion:
+          return self.page(
+            title=suggestion, pageid=pageid, auto_suggest=auto_suggest,
+            redirect=redirect, preload=preload)
         try:
-          title = suggestion or results[0]
+          title = results[0]
         except IndexError:
-          # if there is no suggestion or search results, the page doesn't exist
+          # if there are no suggestion or search results, the page doesn't exist
           raise PageError(title)
       return WikipediaPage(title, redirect=redirect, preload=preload, request=self.wiki_request.request)
     elif pageid is not None:
