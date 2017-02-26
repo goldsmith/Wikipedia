@@ -1,9 +1,9 @@
 .. _api:
 
-Wikipedia Documentation
+MediaWikiAPI Documentation
 ***********************
 
-Here you can find the full developer API for the wikipedia project.
+Here you can find the full developer API for the MediaWikiAPI project.
 
 Contents:
 
@@ -17,7 +17,7 @@ Contents:
 Functions and Classes
 ===============================
 
-.. automodule:: wikipedia
+.. automodule:: mediawikiapi
 
   .. autofunction:: search(query, results=10, suggestion=False)
 
@@ -29,23 +29,23 @@ Functions and Classes
 
   .. autofunction:: geosearch(latitude, longitude, title=None, results=10, radius=1000)
 
-.. autoclass:: wikipedia.WikipediaPage
+.. autoclass:: mediawikiapi.WikipediaPage
   :members:
 
-.. autofunction:: wikipedia.languages
+.. autofunction:: mediawikiapi.languages
 
-.. autofunction:: wikipedia.set_lang
+.. autofunction:: mediawikiapi.set_lang
 
-.. autofunction:: wikipedia.set_rate_limiting
+.. autofunction:: mediawikiapi.config.set_rate_limiting
 
-.. autofunction:: wikipedia.random
+.. autofunction:: mediawikiapi.random
 
-.. autofunction:: wikipedia.donate
+.. autofunction:: mediawikiapi.donate
 
 Exceptions
 ==========
 
-.. automodule:: wikipedia.exceptions
+.. automodule:: mediawikiapi.exceptions
   :members:
 
 Indices and tables

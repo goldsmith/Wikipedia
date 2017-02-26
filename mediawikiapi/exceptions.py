@@ -5,10 +5,10 @@ Global wikipedia exception and warning classes.
 import sys
 
 
-ODD_ERROR_MESSAGE = "This shouldn't happen. Please report on GitHub: github.com/goldsmith/Wikipedia"
+ODD_ERROR_MESSAGE = "This shouldn't happen. Please report on GitHub: github.com/lehinevych/MediaWikiAPI"
 
 
-class WikipediaException(Exception):
+class MediaWikiAPIException(Exception):
   """Base Wikipedia exception class."""
 
   def __init__(self, error):
@@ -26,7 +26,7 @@ class WikipediaException(Exception):
       return self.__unicode__().encode('utf8')
 
 
-class PageError(WikipediaException):
+class PageError(MediaWikiAPIException):
   """Exception raised when no Wikipedia matched a query."""
 
   def __init__(self, pageid=None, *args):
@@ -42,7 +42,17 @@ class PageError(WikipediaException):
       return u"Page id \"{0}\" does not match any pages. Try another id!".format(self.pageid)
 
 
-class DisambiguationError(WikipediaException):
+class LanguageError(MediaWikiAPIException):
+    """Exception raised when a language prefix is set which is not available"""
+    
+    def __init__(self, language):
+        self.language = language
+    
+    def __unicode__(self):
+        return u"\"{0}\" is not a language prefix available in Wikipedia. Run wikipedia.languages().keys() to get available prefixes.".format(self.language)
+
+
+class DisambiguationError(MediaWikiAPIException):
   """
   Exception raised when a page resolves to a Disambiguation page.
 
@@ -60,7 +70,7 @@ class DisambiguationError(WikipediaException):
     return u"\"{0}\" may refer to: \n{1}".format(self.title, '\n'.join(self.options))
 
 
-class RedirectError(WikipediaException):
+class RedirectError(MediaWikiAPIException):
   """Exception raised when a page title unexpectedly resolves to a redirect."""
 
   def __init__(self, title):
@@ -70,7 +80,7 @@ class RedirectError(WikipediaException):
     return u"\"{0}\" resulted in a redirect. Set the redirect property to True to allow automatic redirects.".format(self.title)
 
 
-class HTTPTimeoutError(WikipediaException):
+class HTTPTimeoutError(MediaWikiAPIException):
   """Exception raised when a request to the Mediawiki servers times out."""
 
   def __init__(self, query):
