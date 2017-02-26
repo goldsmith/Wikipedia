@@ -27,7 +27,7 @@ setuptools.setup(
   url = "https://github.com/lehinevych/MediaWikiAPI",
   install_requires = install_reqs,
   packages = ['mediawikiapi'],
-  long_description = local_file('README.rst').read(),
+  long_description = local_file('README.md').read(),
   classifiers = [
     'Development Status :: 4 - Beta',
     'Topic :: Software Development :: Libraries',
