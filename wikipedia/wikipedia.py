@@ -325,7 +325,6 @@ class WikipediaPage(object):
     query_params = {
       'prop': 'info|pageprops',
       'inprop': 'url',
-      'ppprop': 'disambiguation',
       'redirects': '',
     }
     if not getattr(self, 'pageid', None):
@@ -372,7 +371,7 @@ class WikipediaPage(object):
     # since we only asked for disambiguation in ppprop,
     # if a pageprop is returned,
     # then the page must be a disambiguation page
-    elif 'pageprops' in page:
+    elif 'pageprops' in page and 'disambiguation' in page['pageprops']:
       query_params = {
         'prop': 'revisions',
         'rvprop': 'content',
@@ -396,6 +395,7 @@ class WikipediaPage(object):
       self.pageid = pageid
       self.title = page['title']
       self.url = page['fullurl']
+      self.pageprops = page.get('pageprops', {})
 
   def __continued_query(self, query_params):
     '''
