@@ -94,7 +94,6 @@ def search(query, results=10, suggestion=False):
     'list': 'search',
     'srprop': '',
     'srlimit': results,
-    'limit': results,
     'srsearch': query
   }
   if suggestion:
