@@ -66,13 +66,13 @@ But watch out - ``wikipedia.summary`` will raise a ``DisambiguationError`` if th
 	u'New York'
 
 	>>> ny.url
-	u'http://en.wikipedia.org/wiki/NewYork'
+	u'https://en.wikipedia.org/wiki/NewYork'
 
 	>>> ny.content
 	u'New York is a state in the Northeastern region of the United States. New York is the 27th-most exten'...
 
 	>>> ny.images[0]
-	u'http://upload.wikimedia.org/wikipedia/commons/9/91/New_York_quarter%2C_reverse_side%2C_2001.jpg'
+	u'https://upload.wikimedia.org/wikipedia/commons/9/91/New_York_quarter%2C_reverse_side%2C_2001.jpg'
 
 	>>> ny.links[0]
 	u'1790 United States Census'

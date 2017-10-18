@@ -27,7 +27,7 @@ class TestPageSetUp(unittest.TestCase):
     mp = wikipedia.page("Menlo Park, New Jersey")
 
     self.assertEqual(mp.title, "Edison, New Jersey")
-    self.assertEqual(mp.url, "http://en.wikipedia.org/wiki/Edison,_New_Jersey")
+    self.assertEqual(mp.url, "https://en.wikipedia.org/wiki/Edison,_New_Jersey")
 
   def test_redirect_false(self):
     """Test that page raises an error on a redirect when redirect == False."""
@@ -74,7 +74,7 @@ class TestPageSetUp(unittest.TestCase):
     butterfly = wikipedia.page("butteryfly")
 
     self.assertEqual(butterfly.title, "Butterfly")
-    self.assertEqual(butterfly.url, "http://en.wikipedia.org/wiki/Butterfly")
+    self.assertEqual(butterfly.url, "https://en.wikipedia.org/wiki/Butterfly")
 
 
 class TestPage(unittest.TestCase):
@@ -97,8 +97,8 @@ class TestPage(unittest.TestCase):
 
   def test_url(self):
     """Test the url."""
-    self.assertEqual(self.celtuce.url, "http://en.wikipedia.org/wiki/Celtuce")
-    self.assertEqual(self.cyclone.url, "http://en.wikipedia.org/wiki/Tropical_Depression_Ten_(2005)")
+    self.assertEqual(self.celtuce.url, "https://en.wikipedia.org/wiki/Celtuce")
+    self.assertEqual(self.cyclone.url, "https://en.wikipedia.org/wiki/Tropical_Depression_Ten_(2005)")
 
   def test_content(self):
     """Test the plain text content."""
