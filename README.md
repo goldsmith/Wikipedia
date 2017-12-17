@@ -48,7 +48,7 @@ To install MediaWikiAPI, simply run:
 ``` bash
 pip install mediawikiapi
 ```
-MediaWikiAPI is compatible only with Python 3 and Python 2.7.
+MediaWikiAPI is compatible with Python 3 and Python 2.7.
 
 Documentation
 -------------

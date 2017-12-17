@@ -55,7 +55,6 @@ class WikipediaPage(object):
     query_params = {
       'prop': 'info|pageprops',
       'inprop': 'url',
-      'ppprop': 'disambiguation',
       'redirects': '',
     }
     if not getattr(self, 'pageid', None):
@@ -64,7 +63,7 @@ class WikipediaPage(object):
       query_params['pageids'] = self.pageid
 
     request = self._wiki_request(query_params)
-   
+
     query = request['query']
     pageid = list(query['pages'].keys())[0]
     page = query['pages'][pageid]
@@ -100,7 +99,7 @@ class WikipediaPage(object):
     # since we only asked for disambiguation in ppprop,
     # if a pageprop is returned,
     # then the page must be a disambiguation page
-    elif 'pageprops' in page:
+    elif 'pageprops' in page and 'disambiguation' in page['pageprops']:
       query_params = {
         'prop': 'revisions',
         'rvprop': 'content',
@@ -115,7 +114,7 @@ class WikipediaPage(object):
       html = request['query']['pages'][pageid]['revisions'][0]['*']
 
       lis = BeautifulSoup(html, 'html.parser').find_all('li')
-      filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))] 
+      filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
       disambiguation = []
       host_name = page["fullurl"]
       for lis_item in filtered_lis:
@@ -132,9 +131,10 @@ class WikipediaPage(object):
 
     else:
       self.pageid = pageid
-      self.title = page['title']
-      self.url = page['fullurl']
-      self.language = page['pagelanguage']
+      self.title = page.get('title')
+      self.url = page.get('fullurl')
+      self.language = page.get('pagelanguage')
+      self.pageprops = page.get('pageprops', {})
 
   def __continued_query(self, query_params):
     '''

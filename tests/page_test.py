@@ -171,3 +171,8 @@ class TestPage(unittest.TestCase):
     """ Test lang_title function"""
     self.assertEqual(self.celtuce.lang_title('es'), mock_data['data']["celtuce.es_lang"])
     self.assertEqual(self.cyclone.lang_title('ru'), mock_data['data']["cyclone.ru_lang"])
+
+  def test_pageprops(self):
+    """Test pageprops of a page"""
+    self.assertEqual(self.celtuce.pageprops, mock_data['data']["celtuce.pageprops"])
+    self.assertEqual(self.cyclone.pageprops, mock_data['data']["cyclone.pageprops"])
