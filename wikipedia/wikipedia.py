@@ -348,7 +348,8 @@ class WikipediaPage(object):
 
     # same thing for redirect, except it shows up in query instead of page for
     # whatever silly reason
-    elif 'redirects' in query:
+    # Skip if on the other end of a redirect.
+    elif 'redirects' in query and page['title'] != query['redirects'][0]['to']:
       if redirect:
         redirects = query['redirects'][0]
 
@@ -358,8 +359,11 @@ class WikipediaPage(object):
 
           from_title = normalized['to']
 
-        else:
+        elif hasattr(self, 'title'):
           from_title = self.title
+
+        else:
+          from_title = redirects['from']
 
         assert redirects['from'] == from_title, ODD_ERROR_MESSAGE
 
