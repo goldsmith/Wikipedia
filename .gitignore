@@ -6,6 +6,9 @@
 # C extensions
 *.so
 
+#vscode
+.vscode
+
 # Packages
 *.egg
 *.egg-info
