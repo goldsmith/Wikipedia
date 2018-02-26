@@ -94,6 +94,7 @@ def search(query, results=10, suggestion=False):
     'list': 'search',
     'srprop': '',
     'srlimit': results,
+    'srwhat': 'nearmatch',
     'limit': results,
     'srsearch': query
   }
@@ -118,6 +119,157 @@ def search(query, results=10, suggestion=False):
 
   return list(search_results)
 
+@cache
+def rawsearch(query, results=10):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'list': 'search',
+    'srprop': '',
+    'srlimit': results,
+    'srsearch': query
+  }
+
+  raw_results = _wiki_request(search_params)
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  return raw_results
+
+@cache
+def logsearch(title, logtype, results=50):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'list': 'logevents',
+    'lelimit': results,
+    'limit': results,
+    'letype': logtype,
+    'letitle': title
+  }
+
+  raw_results = _wiki_request(search_params)
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  return raw_results
+
+@cache
+def revisionsearch(query, title=False, results=500):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'prop': 'revisions',
+    'rvlimit': results
+  }
+
+  if title:
+    search_params['titles'] = query
+  else:
+    search_params['pageids'] = query
+
+  raw_results = _wiki_request(search_params)
+
+  page_id = raw_results['query']['pageids'][0]
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  search_results = list(raw_results['query']['pages'][page_id]['revisions'])
+
+  return search_results
+
+@cache
+def deletedrevisions(query, results=500):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Requires Auth Token for access
+  
+  '''
+
+  search_params = {
+    'prop': 'deletedrevisions',
+    'drvprop': 'user|comment|content',
+    'drvlimit': results,
+    'titles': query
+  }
+
+  raw_results = _wiki_request(search_params)
+
+  page_id = raw_results['query']['pageids'][0]
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  search_results = list(raw_results['query']['pages'][page_id]['deletedrevisions'])
+
+  return search_results
+
+@cache
+def templatesearch(title, results=500):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'prop': 'templates',
+    'tllimit': results,
+    'titles': title
+  }
+
+  raw_results = _wiki_request(search_params)
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  page_id = raw_results['query']['pageids'][0]
+  search_results = list(raw_results['query']['pages'][page_id]['templates'])
+
+  return search_results
 
 @cache
 def geosearch(latitude, longitude, title=None, results=10, radius=1000):
@@ -326,7 +478,7 @@ class WikipediaPage(object):
       'prop': 'info|pageprops',
       'inprop': 'url',
       'ppprop': 'disambiguation',
-      'redirects': '',
+      'redirects': ''
     }
     if not getattr(self, 'pageid', None):
       query_params['titles'] = self.title
@@ -396,6 +548,7 @@ class WikipediaPage(object):
       self.pageid = pageid
       self.title = page['title']
       self.url = page['fullurl']
+      self.touched = page['touched']
 
   def __continued_query(self, query_params):
     '''
@@ -509,7 +662,7 @@ class WikipediaPage(object):
       self.content
 
     return self._parent_id
-
+  
   @property
   def summary(self):
     '''
@@ -718,6 +871,7 @@ def _wiki_request(params):
   global USER_AGENT
 
   params['format'] = 'json'
+  params['indexpageids'] = True
   if not 'action' in params:
     params['action'] = 'query'
 
@@ -734,7 +888,7 @@ def _wiki_request(params):
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
-  r = requests.get(API_URL, params=params, headers=headers)
+  r = requests.get(API_URL, params=params, headers=headers, verify=False)
 
   if RATE_LIMIT:
     RATE_LIMIT_LAST_CALL = datetime.now()
