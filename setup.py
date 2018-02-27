@@ -16,16 +16,16 @@ install_reqs = [
   if line.strip() != ''
 ]
 
-version = re.search(
-  "^__version__ = \((\d+), (\d+), (\d+)\)$",
-  local_file('wikipedia/__init__.py').read(),
-  re.MULTILINE
-).groups()
+#version = re.search(
+#  "^__version__ = \((\d+), (\d+), (\d+)\)$",
+#  local_file('wikipedia/__init__.py').read(),
+#  re.MULTILINE
+#).groups()
 
 
 setuptools.setup(
   name = "wikipedia",
-  version = '.'.join(version),
+  version = '1.4.0',
   author = "Jonathan Goldsmith",
   author_email = "jhghank@gmail.com",
   description = "Wikipedia API for Python",
