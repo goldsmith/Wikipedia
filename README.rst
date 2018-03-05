@@ -3,11 +3,11 @@ Wikipedia
 
 .. image:: https://travis-ci.org/goldsmith/Wikipedia.png?branch=master
   :target: https://travis-ci.org/goldsmith/Wikipedia
-.. image:: https://pypip.in/d/wikipedia/badge.png
+.. image:: https://img.shields.io/pypi/dm/wikipedia.svg
   :target: https://crate.io/packages/wikipedia
-.. image:: https://pypip.in/v/wikipedia/badge.png
+.. image:: https://img.shields.io/pypi/v/wikipedia.svg
   :target: https://crate.io/packages/wikipedia
-.. image:: https://pypip.in/license/wikipedia/badge.png
+.. image:: https://img.shields.io/pypi/l/wikipedia.svg
     :target: https://pypi.python.org/pypi/wikipedia/
     :alt: License
 
