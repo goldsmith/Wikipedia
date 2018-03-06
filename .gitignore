@@ -9,6 +9,9 @@
 #vscode
 .vscode
 
+#config
+config.py
+
 # Packages
 *.egg
 *.egg-info

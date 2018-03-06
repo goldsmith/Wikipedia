@@ -129,7 +129,7 @@ def main():
 
     count = len(collection)
 
-    for r in collection[:10]:
+    for r in collection:
         if is_deleted(r):
             table_data.update({r:{'PAGEID': "Deleted",'TOUCHED': "Deleted", 'URL': "Deleted"}})
         else:
@@ -149,8 +149,8 @@ def main():
         temps = [s for s in get_templates(str(t)) if "delet" in str(s)]
         revs = [r for r in get_revisions(str(t)) if "delet" in str(r)]
         task = create_task(str(DATASET_MARKER),str(CAMPAIGN_NAME),str(values[index]['TOUCHED']),str(CAMPAIGN_NAME),str(random.randint(100000,99999999)),str(values[index]['PAGEID']),str(t),logs,temps,revs,str(values[index]['URL']))
-        print (task)
-        #tableservice.insert_entity(AZURE_TABLE, task)
+        #print (task)
+        tableservice.insert_entity(AZURE_TABLE, task)
 
 if __name__ == '__main__':
     main()
