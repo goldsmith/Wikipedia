@@ -20,24 +20,32 @@ DATASET_MARKER=sys.argv[2]
 WEB_URL=sys.argv[3]
 AZURE_TABLE=sys.argv[4]
 
-def get_campaign_articles(CAMP_NAME):
+def get_campaign_articles():
     '''
         Gets the outreachdashboard page and scrapes for WikiPedia Titles
     '''
     requests.packages.urllib3.disable_warnings()
     r = requests.get(WEB_URL, verify=False)
     parsed = BeautifulSoup(r.text, 'html.parser')
-    titles = parsed.find_all('td','title')
+    #titles = parsed.find_all('td','title')
+    tbody = parsed.find('tbody','list')
+    tr = tbody.findChildren("tr")
 
     items = []
 
     # Regex for string with "Q" and at least 2 numbers
-    p = re.compile(r'^(?![Q]\d{2})')
+    #p = re.compile(r'^(?![Q]\d{2})')
 
-    for t in titles:
-        for c in t.children:
-            if c.string != "\n" and c.string != "\n(deleted)\n" and p.search(c.string):
-                items.append(c.string)
+    #for t in titles:
+    #    for c in t.children:
+    #        if c.string != "\n" and c.string != "\n(deleted)\n" and p.search(c.string):
+    #            items.append(c.string)
+    
+    for t in tr:
+        if if t.find("td","lang_project").text.find('\n\nen.wikipedia\n\n') != -1:
+            for c in t.find("td","title").children:
+                if c.string != "\n" and c.string != "\n(deleted)\n":
+                    items.append(c.string)            
 
     return items
 
@@ -121,7 +129,7 @@ def table_service():
 
 def main():
 
-    collection=get_campaign_articles(CAMPAIGN_NAME)
+    collection=get_campaign_articles()
 
     print ("Collection Length:"+str(len(collection)))
 
