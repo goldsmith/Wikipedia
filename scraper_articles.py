@@ -145,11 +145,12 @@ def main():
     values = [x for x in table_data.values()]
 
     for index, t in enumerate(keys):
+
         logs = [l for l in get_logdata(str(t), 'delete') if "delet" in str(l)]
         temps = [s for s in get_templates(str(t)) if "delet" in str(s)]
         revs = [r for r in get_revisions(str(t)) if "delet" in str(r)]
         task = create_task(str(DATASET_MARKER),str(CAMPAIGN_NAME),str(values[index]['TOUCHED']),str(CAMPAIGN_NAME),str(random.randint(100000,99999999)),str(values[index]['PAGEID']),str(t),logs,temps,revs,str(values[index]['URL']))
-        #print (task)
+        print (task)
         tableservice.insert_entity(AZURE_TABLE, task)
 
 if __name__ == '__main__':
