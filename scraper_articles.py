@@ -20,12 +20,12 @@ DATASET_MARKER=sys.argv[2]
 WEB_URL=sys.argv[3]
 AZURE_TABLE=sys.argv[4]
 
-def get_campaign_articles():
+def get_campaign_articles(web):
     '''
         Gets the outreachdashboard page and scrapes for WikiPedia Titles
     '''
     requests.packages.urllib3.disable_warnings()
-    r = requests.get(WEB_URL, verify=False)
+    r = requests.get(web, verify=False)
     parsed = BeautifulSoup(r.text, 'html.parser')
     #titles = parsed.find_all('td','title')
     tbody = parsed.find('tbody','list')
@@ -40,14 +40,32 @@ def get_campaign_articles():
     #    for c in t.children:
     #        if c.string != "\n" and c.string != "\n(deleted)\n" and p.search(c.string):
     #            items.append(c.string)
+
+    print ("Program Count: "+str(len(tr)))
     
     for t in tr:
-        if if t.find("td","lang_project").text.find('\n\nen.wikipedia\n\n') != -1:
-            for c in t.find("td","title").children:
-                if c.string != "\n" and c.string != "\n(deleted)\n":
-                    items.append(c.string)            
+        #if if t.find("td","lang_project").text.find('\n\nen.wikipedia\n\n') != -1:
+        #    for c in t.find("td","title").children:
+        #        if c.string != "\n" and c.string != "\n(deleted)\n":
+        #            items.append(c.string)
+        __url = "https://outreachdashboard.wmflabs.org" + t.get("data-link") +"/articles/details.json"   
 
-    return items
+        try:   
+            __c = requests.get(__url, verify=False)
+            print (__c.url)
+            __art = __c.json()["course"]["articles"]
+            __items = [x["title"] for x in __art if x["new_article"] is True and x["language"] == 'en']
+            items.append(__items)
+        except:
+            print('Error loading URL: ' + __url)
+
+    __titles = [t for x in items for t in x]
+    
+    #for x in items:
+    #    for t in x:
+    #        __titles.append(t)
+    
+    return __titles
 
 def is_deleted(item):
     try:
@@ -129,9 +147,9 @@ def table_service():
 
 def main():
 
-    collection=get_campaign_articles()
+    collection=get_campaign_articles(WEB_URL)
 
-    print ("Collection Length:"+str(len(collection)))
+    print ("Article Count:" + str(len(collection)))
 
     table_data = {}
 
@@ -159,7 +177,7 @@ def main():
         revs = [r for r in get_revisions(str(t)) if "delet" in str(r)]
         task = create_task(str(DATASET_MARKER),str(CAMPAIGN_NAME),str(values[index]['TOUCHED']),str(CAMPAIGN_NAME),str(random.randint(100000,99999999)),str(values[index]['PAGEID']),str(t),logs,temps,revs,str(values[index]['URL']))
         print (task)
-        tableservice.insert_entity(AZURE_TABLE, task)
+        #tableservice.insert_entity(AZURE_TABLE, task)
 
 if __name__ == '__main__':
     main()
