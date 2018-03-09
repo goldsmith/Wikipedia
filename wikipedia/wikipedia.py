@@ -485,8 +485,6 @@ def user(user=None, redirect=True, preload=False):
   else:
     raise ValueError("Either a title or a pageid must be specified")
 
-
-
 class WikipediaPage(object):
   '''
   Contains data from a Wikipedia page.
