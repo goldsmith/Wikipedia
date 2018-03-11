@@ -40,7 +40,6 @@ def get_campaign_users(web,program):
         tbody = parsed.find('tbody','list')
         tr = tbody.findChildren("tr")
 
-
         print ("Program Count: "+str(len(tr)))
         
         for t in tr:

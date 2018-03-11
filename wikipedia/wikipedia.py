@@ -388,6 +388,30 @@ def random(pages=1):
 
   return titles
 
+def random_categories(categories=1):
+  '''
+  Get a list of random Wikipedia article titles.
+
+  .. note:: Random only gets articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
+
+  Keyword arguments:
+
+  * pages - the number of random pages returned (max of 10)
+  '''
+  #http://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=5000&format=jsonfm
+  query_params = {
+    'list': 'random',
+    'rnnamespace': 14,
+    'rnlimit': categories,
+  }
+
+  request = _wiki_request(query_params)
+  titles = [page['title'] for page in request['query']['random']]
+
+  if len(titles) == 1:
+    return titles[0]
+
+  return titles
 
 @cache
 def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
