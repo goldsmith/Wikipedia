@@ -5,41 +5,72 @@ import random
 from bs4 import BeautifulSoup
 from wikipedia import wikipedia
 import config
+from selenium import webdriver
 from azure.cosmosdb.table.tableservice import TableService
 from azure.cosmosdb.table.models import Entity
 
 '''
     Need to pip install azure 
+    Need to pip install selenium
     Run python setup.py install
+    Install PhantomJS
+    - https://www.vultr.com/docs/how-to-install-phantomjs-on-ubuntu-16-04
 
-    Get Wikipedia Article Titles and process data calls from Article Titles
+    Get Wikipedia Users and process data calls from Article Titles
 '''
 
 CAMPAIGN_NAME=sys.argv[1]
 DATASET_MARKER=sys.argv[2]
 WEB_URL=sys.argv[3]
 AZURE_TABLE=sys.argv[4]
+PROGRAM = sys.argv[5]
 
-def get_campaign_users():
+def get_campaign_users(web,program):
     '''
         Gets the outreachdashboard page and scrapes for WikiPedia Titles
     '''
     requests.packages.urllib3.disable_warnings()
-    r = requests.get(WEB_URL, verify=False)
-    parsed = BeautifulSoup(r.text, 'html.parser')
-    titles = parsed.find_all('td','title')
+    
+    users = []
 
-    items = []
+    if program == 'program':
 
-    # Regex for string with "Q" and at least 2 numbers
-    p = re.compile(r'^(?![Q]\d{2})')
+        r = requests.get(web, verify=False)
+        parsed = BeautifulSoup(r.text, 'html.parser')
+        tbody = parsed.find('tbody','list')
+        tr = tbody.findChildren("tr")
 
-    for t in titles:
-        for c in t.children:
-            if c.string != "\n" and c.string != "\n(deleted)\n" and p.search(c.string):
-                items.append(c.string)
 
-    return items
+        print ("Program Count: "+str(len(tr)))
+        
+        for t in tr:
+            __url = "https://outreachdashboard.wmflabs.org" + t.get("data-link") +"/students"   
+
+            try:   
+                driver = webdriver.PhantomJS()
+                driver.get(__url)
+                print (__url)
+                p = driver.find_elements_by_class_name("students")
+                __temp = [x.text.split("\n")[0] for x in p]
+                users.append(__temp)
+            except:
+                print('Error loading URL: ' + __url)
+
+        __users = [t for x in users for t in x]
+        
+        return __users
+
+    else:
+
+        try:
+            driver = webdriver.PhantomJS()
+            driver.get(web)
+            p = driver.find_elements_by_class_name("students")
+            __users = [x.text.split("\n")[0] for x in p]
+        except:
+            print('Error loading URL: ' + web)
+        
+        return __users
 
 def create_task(part_key,row_key,campaign,dataset,userid,name,editcount,registration,gender,groups):
     task = {
@@ -51,15 +82,9 @@ def create_task(part_key,row_key,campaign,dataset,userid,name,editcount,registra
         'NAME': name, 
         'EDITCOUNT': editcount, 
         'REGISTRATION': registration,
-        'GENDER': gender
+        'GENDER': gender,
+        'GROUPS': groups
     }
-
-    __ltmp = []
-    for l in groups:
-        __ltmp.append(l)
-
-    if __ltmp:
-        task.update({"GROUPS": str(__ltmp)})
 
     return task
 
@@ -80,7 +105,7 @@ def table_service():
 
 def main():
 
-    collection=get_campaign_users(CAMPAIGN_NAME)
+    collection=get_campaign_users(WEB_URL,PROGRAM)
 
     print ("Collection Length:"+str(len(collection)))
 
@@ -89,8 +114,10 @@ def main():
     count = len(collection)
 
     for r in collection:
-        p = wikipedia.user(r)
-        table_data.update({r:{'USERID': str(p.userid),'NAME': str(p.name), 'EDITCOUNT': str(p.editcount), 'REGISTRATION': str(p.registration),'GENDER': str(p.gender), 'GROUPS':list(p.groups)}})
+        tmp = wikipedia.usersearch(r)
+        p = [x for x in tmp['query']['users'][0].values()]
+        if len(p) == 6:
+            table_data.update({r:{'USERID': str(p[0]),'NAME': str(p[1]), 'EDITCOUNT': str(p[2]), 'REGISTRATION': str(p[3]),'GENDER': str(p[5]), 'GROUPS':list(p[4])}})
         count -= 1
         sys.stdout.write("\r%d%%" % count)
         sys.stdout.flush()
@@ -102,7 +129,7 @@ def main():
 
     for index, t in enumerate(keys):
 
-        task = create_task(str(random.randint(100000,99999999)),str(values[index]['USERID']),str(CAMPAIGN_NAME),str(DATASET_MARKER),str(values[index]['NAME']),str(values[index]['EDITCOUNT']),str(values[index]['REGISTRATION']),str(values[index]['GENDER']),str(values[index]['GROUPS']))
+        task = create_task(str(random.randint(100000,99999999)),str(values[index]['USERID']),str(CAMPAIGN_NAME),str(DATASET_MARKER),str(values[index]['USERID']),str(values[index]['NAME']),str(values[index]['EDITCOUNT']),str(values[index]['REGISTRATION']),str(values[index]['GENDER']),str(values[index]['GROUPS']))
         print (task)
         tableservice.insert_entity(AZURE_TABLE, task)
 

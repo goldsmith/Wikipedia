@@ -16,7 +16,7 @@ API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
-USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
+USER_AGENT = 'wikipedia (https://github.com/shawnj/Wikipedia/)'
 
 
 def set_lang(prefix):
@@ -328,7 +328,7 @@ def usersearch(query):
   search_params = {
     'list': 'users',
     'usprop': 'editcount|registration|gender|groups',
-    'usuers': query
+    'ususers': query
   }
 
   raw_results = _wiki_request(search_params)
@@ -471,17 +471,8 @@ def user(user=None, redirect=True, preload=False):
   * preload - load content, summary, images, references, and links during initialization
   '''
 
-  if title is not None:
-    if auto_suggest:
-      results, suggestion = search(title, results=1, suggestion=True)
-      try:
-        title = suggestion or results[0]
-      except IndexError:
-        # if there is no suggestion or search results, the page doesn't exist
-        raise PageError(title)
-    return WikipediaUser(title, redirect=redirect, preload=preload)
-  elif pageid is not None:
-    return WikipediaUser(pageid=pageid, preload=preload)
+  if user is not None:
+    return WikipediaUser(user, redirect=redirect, preload=preload)
   else:
     raise ValueError("Either a title or a pageid must be specified")
 
@@ -886,33 +877,20 @@ class WikipediaUser(object):
   Uses property methods to filter data from the raw HTML.
   '''
 
-  def __init__(self, title=None, pageid=None, redirect=True, preload=False, original_title=''):
+  def __init__(self, title=None, redirect=True, preload=False):
     if title is not None:
       self.title = title
-      self.original_title = original_title or title
-    elif pageid is not None:
-      self.pageid = pageid
     else:
       raise ValueError("Either a title or a pageid must be specified")
 
     self.__load(redirect=redirect, preload=preload)
 
     if preload:
-      for prop in ('content', 'summary', 'images', 'references', 'links', 'sections'):
+      for prop in ('groups','editcount','registration','gender'):
         getattr(self, prop)
 
   def __repr__(self):
-    return stdout_encode(u'<WikipediaPage \'{}\'>'.format(self.title))
-
-  def __eq__(self, other):
-    try:
-      return (
-        self.pageid == other.pageid
-        and self.title == other.title
-        and self.url == other.url
-      )
-    except:
-      return False
+    return stdout_encode(u'<WikipediaUser\'{}\'>'.format(self.title))
 
   def __load(self, redirect=True, preload=False):
     '''
@@ -997,36 +975,6 @@ class WikipediaUser(object):
       self.url = page['fullurl']
       self.touched = page['touched']
 
-  def __continued_query(self, query_params):
-    '''
-    Based on https://www.mediawiki.org/wiki/API:Query#Continuing_queries
-    '''
-    query_params.update(self.__title_query_param)
-
-    last_continue = {}
-    prop = query_params.get('prop', None)
-
-    while True:
-      params = query_params.copy()
-      params.update(last_continue)
-
-      request = _wiki_request(params)
-
-      if 'query' not in request:
-        break
-
-      pages = request['query']['pages']
-      if 'generator' in query_params:
-        for datum in pages.values():  # in python 3.3+: "yield from pages.values()"
-          yield datum
-      else:
-        for datum in pages[self.pageid][prop]:
-          yield datum
-
-      if 'continue' not in request:
-        break
-
-      last_continue = request['continue']
 
   @property
   def __title_query_param(self):
@@ -1056,123 +1004,7 @@ class WikipediaUser(object):
 
     return self._html
 
-  @property
-  def content(self):
-    '''
-    Plain text content of the page, excluding images, tables, and other data.
-    '''
 
-    if not getattr(self, '_content', False):
-      query_params = {
-        'prop': 'extracts|revisions',
-        'explaintext': '',
-        'rvprop': 'ids'
-      }
-      if not getattr(self, 'title', None) is None:
-         query_params['titles'] = self.title
-      else:
-         query_params['pageids'] = self.pageid
-      request = _wiki_request(query_params)
-      self._content     = request['query']['pages'][self.pageid]['extract']
-      self._revision_id = request['query']['pages'][self.pageid]['revisions'][0]['revid']
-      self._parent_id   = request['query']['pages'][self.pageid]['revisions'][0]['parentid']
-
-    return self._content
-
-  @property
-  def revision_id(self):
-    '''
-    Revision ID of the page.
-
-    The revision ID is a number that uniquely identifies the current
-    version of the page. It can be used to create the permalink or for
-    other direct API calls. See `Help:Page history
-    <http://en.wikipedia.org/wiki/Wikipedia:Revision>`_ for more
-    information.
-    '''
-
-    if not getattr(self, '_revid', False):
-      # fetch the content (side effect is loading the revid)
-      self.content
-
-    return self._revision_id
-
-  @property
-  def parent_id(self):
-    '''
-    Revision ID of the parent version of the current revision of this
-    page. See ``revision_id`` for more information.
-    '''
-
-    if not getattr(self, '_parentid', False):
-      # fetch the content (side effect is loading the revid)
-      self.content
-
-    return self._parent_id
-  
-  @property
-  def summary(self):
-    '''
-    Plain text summary of the page.
-    '''
-
-    if not getattr(self, '_summary', False):
-      query_params = {
-        'prop': 'extracts',
-        'explaintext': '',
-        'exintro': '',
-      }
-      if not getattr(self, 'title', None) is None:
-         query_params['titles'] = self.title
-      else:
-         query_params['pageids'] = self.pageid
-
-      request = _wiki_request(query_params)
-      self._summary = request['query']['pages'][self.pageid]['extract']
-
-    return self._summary
-
-  @property
-  def images(self):
-    '''
-    List of URLs of images on the page.
-    '''
-
-    if not getattr(self, '_images', False):
-      self._images = [
-        page['imageinfo'][0]['url']
-        for page in self.__continued_query({
-          'generator': 'images',
-          'gimlimit': 'max',
-          'prop': 'imageinfo',
-          'iiprop': 'url',
-        })
-        if 'imageinfo' in page
-      ]
-
-    return self._images
-
-  @property
-  def coordinates(self):
-    '''
-    Tuple of Decimals in the form of (lat, lon) or None
-    '''
-    if not getattr(self, '_coordinates', False):
-      query_params = {
-        'prop': 'coordinates',
-        'colimit': 'max',
-        'titles': self.title,
-      }
-
-      request = _wiki_request(query_params)
-
-      if 'query' in request:
-        coordinates = request['query']['pages'][self.pageid]['coordinates']
-        self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
-      else:
-        self._coordinates = None
-
-    return self._coordinates
 
   @property
   def references(self):
@@ -1194,43 +1026,6 @@ class WikipediaUser(object):
       ]
 
     return self._references
-
-  @property
-  def links(self):
-    '''
-    List of titles of Wikipedia page links on a page.
-
-    .. note:: Only includes articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
-    '''
-
-    if not getattr(self, '_links', False):
-      self._links = [
-        link['title']
-        for link in self.__continued_query({
-          'prop': 'links',
-          'plnamespace': 0,
-          'pllimit': 'max'
-        })
-      ]
-
-    return self._links
-
-  @property
-  def categories(self):
-    '''
-    List of categories of a page.
-    '''
-
-    if not getattr(self, '_categories', False):
-      self._categories = [re.sub(r'^Category:', '', x) for x in
-        [link['title']
-        for link in self.__continued_query({
-          'prop': 'categories',
-          'cllimit': 'max'
-        })
-      ]]
-
-    return self._categories
 
   @property
   def sections(self):
