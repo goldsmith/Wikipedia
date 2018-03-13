@@ -21,7 +21,7 @@ CAMPAIGN_NAME = "Random Sample"
 
 def get_random_articles():
     '''
-        Gets the outreachdashboard page and scrapes for WikiPedia Titles
+        Gets random articles sets
     '''
     requests.packages.urllib3.disable_warnings()
 
@@ -67,16 +67,11 @@ def get_templates(item):
         return list()
 
 def get_revisions(item,title):
-    #try:
-    __revs = wikipedia.revisionsearch(item, title=title)
-    return __revs
-    #except: 
-    #    return list()
-
-def get_oldrevision(item):
-    __revs = wikipedia.revision_oldest(item, title=False)
-    
-    return __revs
+    try:
+        __revs = wikipedia.revisionsearch(item, title=title)
+        return __revs
+    except: 
+        return list()
 
 def create_task(dataset_marker,camp_name,created,row_key,part_key,page_id,title,logs,temps,revs,url):
     task = {
