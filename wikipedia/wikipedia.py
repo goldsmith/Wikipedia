@@ -189,7 +189,8 @@ def revisionsearch(query, title=False, results=500):
 
   search_params = {
     'prop': 'revisions',
-    'rvlimit': results
+    'rvlimit': results,
+    'rvdir': 'newer'
   }
 
   if title:
@@ -378,10 +379,37 @@ def random(pages=1):
     'list': 'random',
     'rnnamespace': 0,
     'rnlimit': pages,
+    'rnfilterredir': 'nonredirects'
   }
 
   request = _wiki_request(query_params)
   titles = [page['title'] for page in request['query']['random']]
+
+  if len(titles) == 1:
+    return titles[0]
+
+  return titles
+
+def random_id(pages=1):
+  '''
+  Get a list of random Wikipedia article titles.
+
+  .. note:: Random only gets articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
+
+  Keyword arguments:
+
+  * pages - the number of random pages returned (max of 10)
+  '''
+  #http://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=5000&format=jsonfm
+  query_params = {
+    'list': 'random',
+    'rnnamespace': 0,
+    'rnlimit': pages,
+    'rnfilterredir': 'nonredirects'
+  }
+
+  request = _wiki_request(query_params)
+  titles = [page['id'] for page in request['query']['random']]
 
   if len(titles) == 1:
     return titles[0]
@@ -551,7 +579,7 @@ class WikipediaPage(object):
       query_params['titles'] = self.title
     else:
       query_params['pageids'] = self.pageid
-
+    
     request = _wiki_request(query_params)
 
     query = request['query']
@@ -608,9 +636,12 @@ class WikipediaPage(object):
       lis = BeautifulSoup(html, 'html.parser').find_all('li')
       filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
       may_refer_to = [li.a.get_text() for li in filtered_lis if li.a]
-
-      raise DisambiguationError(getattr(self, 'title', page['title']), may_refer_to)
-
+      
+      #raise DisambiguationError(getattr(self, 'title', page['title']), may_refer_to)
+      self.pageid = pageid
+      self.title = page['title']
+      self.url = page['fullurl']
+      self.touched = page['touched']
     else:
       self.pageid = pageid
       self.title = page['title']

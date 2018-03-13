@@ -1,9 +1,9 @@
 import requests
 import sys
-import re
 import random
 from bs4 import BeautifulSoup
 from wikipedia import wikipedia
+from datetime import datetime
 import config
 from azure.cosmosdb.table.tableservice import TableService
 from azure.cosmosdb.table.models import Entity
@@ -15,60 +15,19 @@ from azure.cosmosdb.table.models import Entity
     Get Wikipedia Article Titles and process data calls from Article Titles
 '''
 
-CAMPAIGN_NAME=sys.argv[1]
-DATASET_MARKER=sys.argv[2]
-WEB_URL=sys.argv[3]
-AZURE_TABLE=sys.argv[4]
-PROGRAM = sys.argv[5]
+DATASET_MARKER=sys.argv[1]
+AZURE_TABLE=sys.argv[2]
+CAMPAIGN_NAME = "Random Sample"
 
-def get_campaign_articles(web,program):
+def get_random_articles():
     '''
         Gets the outreachdashboard page and scrapes for WikiPedia Titles
     '''
     requests.packages.urllib3.disable_warnings()
+
+    __titles = wikipedia.random_id(pages=500)
     
-    items = []
-
-    if program == 'program':
-
-        r = requests.get(web, verify=False)
-        parsed = BeautifulSoup(r.text, 'html.parser')
-        #titles = parsed.find_all('td','title')
-        tbody = parsed.find('tbody','list')
-        tr = tbody.findChildren("tr")
-        
-        print ("Program Count: "+str(len(tr)))
-        
-        for t in tr:
-            __url = "https://outreachdashboard.wmflabs.org" + t.get("data-link") +"/articles/details.json"   
-
-            try:   
-                __c = requests.get(__url, verify=False)
-                print (__c.url)
-                __art = __c.json()["course"]["articles"]
-                __items = [x["title"] for x in __art if x["new_article"] is True and x["language"] == 'en']
-                items.append(__items)
-            except:
-                print('Error loading URL: ' + __url)
-
-        __titles = [t for x in items for t in x]
-        
-        return __titles
-
-    else:
-        __url = web +"/articles/details.json"
-        try:
-            __c = requests.get(__url, verify=False)
-            print (__c.url)
-            __art = __c.json()["course"]["articles"]
-            __items = [x["title"] for x in __art if x["new_article"] is True and x["language"] == 'en']
-            items.append(__items)
-        except:
-            print('Error loading URL: ' + __url)
-        
-        __titles = [t for x in items for t in x]
-        
-        return __titles
+    return __titles
 
 def is_deleted(item):
     try:
@@ -76,6 +35,22 @@ def is_deleted(item):
             return False
     except:
         return True
+
+def has_date(item):
+    try:
+        __page = wikipedia.page(title=None,pageid=item)
+        __dt = datetime.strptime(__page.touched,'%Y-%m-%dT%H:%M:%SZ')
+        if __dt.year >= 2015:
+            __revs = get_revisions(__page.pageid,False)
+            __tmpdt = datetime.strptime(__revs[0]['timestamp'],'%Y-%m-%dT%H:%M:%SZ')
+            if __tmpdt.year >= 2015 and __tmpdt.year <= 2017:
+                return __page
+            else:
+                return ""
+        else:
+            return ""
+    except:
+        return ""
 
 def get_logdata(item, logtype):
     try:
@@ -91,12 +66,17 @@ def get_templates(item):
     except:
         return list()
 
-def get_revisions(item):
-    try:
-        __revs = wikipedia.revisionsearch(item, title=True)
-        return __revs
-    except: 
-        return list()
+def get_revisions(item,title):
+    #try:
+    __revs = wikipedia.revisionsearch(item, title=title)
+    return __revs
+    #except: 
+    #    return list()
+
+def get_oldrevision(item):
+    __revs = wikipedia.revision_oldest(item, title=False)
+    
+    return __revs
 
 def create_task(dataset_marker,camp_name,created,row_key,part_key,page_id,title,logs,temps,revs,url):
     task = {
@@ -150,7 +130,7 @@ def table_service():
 
 def main():
 
-    collection=get_campaign_articles(WEB_URL,PROGRAM)
+    collection=get_random_articles()
 
     print ("Article Count:" + str(len(collection)))
 
@@ -159,14 +139,13 @@ def main():
     count = len(collection)
 
     for r in collection:
-        if is_deleted(r):
-            table_data.update({r:{'PAGEID': "Deleted",'TOUCHED': "Deleted", 'URL': "Deleted"}})
+        print (r)
+        __tmppge = has_date(r)
+        if __tmppge != "":
+            table_data.update({r:{'PAGEID': str(__tmppge.pageid),'TOUCHED': str(__tmppge.touched), 'URL': str(__tmppge.url), 'TITLE': str(__tmppge.title)}})
+            print ("Date Match")
         else:
-            p = wikipedia.page(r)
-            table_data.update({r:{'PAGEID': str(p.pageid),'TOUCHED': str(p.touched), 'URL': str(p.url)}})
-        count -= 1
-        sys.stdout.write("\r%d%%" % count)
-        sys.stdout.flush()
+            print ("Date Not Match")
 
     tableservice = table_service()
 
@@ -174,11 +153,11 @@ def main():
     values = [x for x in table_data.values()]
 
     for index, t in enumerate(keys):
-
+    
         logs = [l for l in get_logdata(str(t), 'delete') if "delet" in str(l)]
         temps = [s for s in get_templates(str(t)) if "delet" in str(s)]
         revs = [r for r in get_revisions(str(t)) if "delet" in str(r)]
-        task = create_task(str(DATASET_MARKER),str(CAMPAIGN_NAME),str(values[index]['TOUCHED']),str(CAMPAIGN_NAME),str(random.randint(100000,99999999)),str(values[index]['PAGEID']),str(t),logs,temps,revs,str(values[index]['URL']))
+        task = create_task(str(DATASET_MARKER),str(CAMPAIGN_NAME),str(values[index]['TOUCHED']),str(CAMPAIGN_NAME),str(random.randint(100000,99999999)),str(values[index]['PAGEID']),str(values[index]['TITLE']),logs,temps,revs,str(values[index]['URL']))
         print (task)
         tableservice.insert_entity(AZURE_TABLE, task)
 
