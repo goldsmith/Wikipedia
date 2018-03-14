@@ -137,7 +137,7 @@ def main():
         print (r)
         __tmppge = has_date(r)
         if __tmppge != "":
-            table_data.update({r:{'PAGEID': str(__tmppge.pageid),'TOUCHED': str(__tmppge.touched), 'URL': str(__tmppge.url), 'TITLE': str(__tmppge.title)}})
+            table_data.update({__tmppge.title:{'PAGEID': str(__tmppge.pageid),'TOUCHED': str(__tmppge.touched), 'URL': str(__tmppge.url), 'TITLE': str(__tmppge.title)}})
             print ("Date Match")
         else:
             print ("Date Not Match")
@@ -148,10 +148,9 @@ def main():
     values = [x for x in table_data.values()]
 
     for index, t in enumerate(keys):
-    
         logs = [l for l in get_logdata(str(t), 'delete') if "delet" in str(l)]
         temps = [s for s in get_templates(str(t)) if "delet" in str(s)]
-        revs = [r for r in get_revisions(str(t)) if "delet" in str(r)]
+        revs = [r for r in get_revisions(str(t),True) if "delet" in str(r)]
         task = create_task(str(DATASET_MARKER),str(CAMPAIGN_NAME),str(values[index]['TOUCHED']),str(CAMPAIGN_NAME),str(random.randint(100000,99999999)),str(values[index]['PAGEID']),str(values[index]['TITLE']),logs,temps,revs,str(values[index]['URL']))
         print (task)
         tableservice.insert_entity(AZURE_TABLE, task)
