@@ -16,7 +16,7 @@ API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
-USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
+USER_AGENT = 'wikipedia (https://github.com/shawnj/Wikipedia/)'
 
 
 def set_lang(prefix):
@@ -94,6 +94,7 @@ def search(query, results=10, suggestion=False):
     'list': 'search',
     'srprop': '',
     'srlimit': results,
+    'srwhat': 'nearmatch',
     'limit': results,
     'srsearch': query
   }
@@ -118,6 +119,158 @@ def search(query, results=10, suggestion=False):
 
   return list(search_results)
 
+@cache
+def rawsearch(query, results=10):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'list': 'search',
+    'srprop': '',
+    'srlimit': results,
+    'srsearch': query
+  }
+
+  raw_results = _wiki_request(search_params)
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  return raw_results
+
+@cache
+def logsearch(title, logtype, results=50):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'list': 'logevents',
+    'lelimit': results,
+    'limit': results,
+    'letype': logtype,
+    'letitle': title
+  }
+
+  raw_results = _wiki_request(search_params)
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  return raw_results
+
+@cache
+def revisionsearch(query, title=False, results=500):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'prop': 'revisions',
+    'rvlimit': results,
+    'rvdir': 'newer'
+  }
+
+  if title:
+    search_params['titles'] = query
+  else:
+    search_params['pageids'] = query
+
+  raw_results = _wiki_request(search_params)
+
+  page_id = raw_results['query']['pageids'][0]
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  search_results = list(raw_results['query']['pages'][page_id]['revisions'])
+
+  return search_results
+
+@cache
+def deletedrevisions(query, results=500):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Requires Auth Token for access
+  
+  '''
+
+  search_params = {
+    'prop': 'deletedrevisions',
+    'drvprop': 'user|comment|content',
+    'drvlimit': results,
+    'titles': query
+  }
+
+  raw_results = _wiki_request(search_params)
+
+  page_id = raw_results['query']['pageids'][0]
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  search_results = list(raw_results['query']['pages'][page_id]['deletedrevisions'])
+
+  return search_results
+
+@cache
+def templatesearch(title, results=500):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'prop': 'templates',
+    'tllimit': results,
+    'titles': title
+  }
+
+  raw_results = _wiki_request(search_params)
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  page_id = raw_results['query']['pageids'][0]
+  search_results = list(raw_results['query']['pages'][page_id]['templates'])
+
+  return search_results
 
 @cache
 def geosearch(latitude, longitude, title=None, results=10, radius=1000):
@@ -162,6 +315,32 @@ def geosearch(latitude, longitude, title=None, results=10, radius=1000):
 
   return list(search_results)
 
+@cache
+def usersearch(query):
+  '''
+  Do a Wikipedia search for `query`.
+
+  Keyword arguments:
+
+  * results - the maxmimum number of results returned
+  * suggestion - if True, return results and suggestion (if any) in a tuple
+  '''
+
+  search_params = {
+    'list': 'users',
+    'usprop': 'editcount|registration|gender|groups',
+    'ususers': query
+  }
+
+  raw_results = _wiki_request(search_params)
+
+  if 'error' in raw_results:
+    if raw_results['error']['info'] in ('HTTP request timed out.', 'Pool queue is full'):
+      raise HTTPTimeoutError(query)
+    else:
+      raise WikipediaException(raw_results['error']['info'])
+
+  return raw_results
 
 @cache
 def suggest(query):
@@ -200,6 +379,7 @@ def random(pages=1):
     'list': 'random',
     'rnnamespace': 0,
     'rnlimit': pages,
+    'rnfilterredir': 'nonredirects'
   }
 
   request = _wiki_request(query_params)
@@ -210,6 +390,56 @@ def random(pages=1):
 
   return titles
 
+def random_id(pages=1):
+  '''
+  Get a list of random Wikipedia article titles.
+
+  .. note:: Random only gets articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
+
+  Keyword arguments:
+
+  * pages - the number of random pages returned (max of 10)
+  '''
+  #http://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=5000&format=jsonfm
+  query_params = {
+    'list': 'random',
+    'rnnamespace': 0,
+    'rnlimit': pages,
+    'rnfilterredir': 'nonredirects'
+  }
+
+  request = _wiki_request(query_params)
+  titles = [page['id'] for page in request['query']['random']]
+
+  if len(titles) == 1:
+    return titles[0]
+
+  return titles
+
+def random_categories(categories=1):
+  '''
+  Get a list of random Wikipedia article titles.
+
+  .. note:: Random only gets articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
+
+  Keyword arguments:
+
+  * pages - the number of random pages returned (max of 10)
+  '''
+  #http://en.wikipedia.org/w/api.php?action=query&list=random&rnlimit=5000&format=jsonfm
+  query_params = {
+    'list': 'random',
+    'rnnamespace': 14,
+    'rnlimit': categories,
+  }
+
+  request = _wiki_request(query_params)
+  titles = [page['title'] for page in request['query']['random']]
+
+  if len(titles) == 1:
+    return titles[0]
+
+  return titles
 
 @cache
 def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
@@ -279,7 +509,24 @@ def page(title=None, pageid=None, auto_suggest=True, redirect=True, preload=Fals
   else:
     raise ValueError("Either a title or a pageid must be specified")
 
+def user(user=None, redirect=True, preload=False):
+  '''
+  Get a WikipediaPage object for the page with title `title` or the pageid
+  `pageid` (mutually exclusive).
 
+  Keyword arguments:
+
+  * title - the title of the page to load
+  * pageid - the numeric pageid of the page to load
+  * auto_suggest - let Wikipedia find a valid page title for the query
+  * redirect - allow redirection without raising RedirectError
+  * preload - load content, summary, images, references, and links during initialization
+  '''
+
+  if user is not None:
+    return WikipediaUser(user, redirect=redirect, preload=preload)
+  else:
+    raise ValueError("Either a title or a pageid must be specified")
 
 class WikipediaPage(object):
   '''
@@ -326,13 +573,13 @@ class WikipediaPage(object):
       'prop': 'info|pageprops',
       'inprop': 'url',
       'ppprop': 'disambiguation',
-      'redirects': '',
+      'redirects': ''
     }
     if not getattr(self, 'pageid', None):
       query_params['titles'] = self.title
     else:
       query_params['pageids'] = self.pageid
-
+    
     request = _wiki_request(query_params)
 
     query = request['query']
@@ -389,13 +636,17 @@ class WikipediaPage(object):
       lis = BeautifulSoup(html, 'html.parser').find_all('li')
       filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
       may_refer_to = [li.a.get_text() for li in filtered_lis if li.a]
-
-      raise DisambiguationError(getattr(self, 'title', page['title']), may_refer_to)
-
+      
+      #raise DisambiguationError(getattr(self, 'title', page['title']), may_refer_to)
+      self.pageid = pageid
+      self.title = page['title']
+      self.url = page['fullurl']
+      self.touched = page['touched']
     else:
       self.pageid = pageid
       self.title = page['title']
       self.url = page['fullurl']
+      self.touched = page['touched']
 
   def __continued_query(self, query_params):
     '''
@@ -509,7 +760,7 @@ class WikipediaPage(object):
       self.content
 
     return self._parent_id
-
+  
   @property
   def summary(self):
     '''
@@ -675,6 +926,205 @@ class WikipediaPage(object):
 
     return self.content[index:next_index].lstrip("=").strip()
 
+class WikipediaUser(object):
+  '''
+  Contains data from a Wikipedia page.
+  Uses property methods to filter data from the raw HTML.
+  '''
+
+  def __init__(self, title=None, redirect=True, preload=False):
+    if title is not None:
+      self.title = title
+    else:
+      raise ValueError("Either a title or a pageid must be specified")
+
+    self.__load(redirect=redirect, preload=preload)
+
+    if preload:
+      for prop in ('groups','editcount','registration','gender'):
+        getattr(self, prop)
+
+  def __repr__(self):
+    return stdout_encode(u'<WikipediaUser\'{}\'>'.format(self.title))
+
+  def __load(self, redirect=True, preload=False):
+    '''
+    Load basic information from Wikipedia.
+    Confirm that page exists and is not a disambiguation/redirect.
+
+    Does not need to be called manually, should be called automatically during __init__.
+    '''
+    query_params = {
+      'prop': 'info|pageprops',
+      'inprop': 'url',
+      'ppprop': 'disambiguation',
+      'redirects': ''
+    }
+    if not getattr(self, 'pageid', None):
+      query_params['titles'] = self.title
+    else:
+      query_params['pageids'] = self.pageid
+
+    request = _wiki_request(query_params)
+
+    query = request['query']
+    pageid = list(query['pages'].keys())[0]
+    page = query['pages'][pageid]
+
+    # missing is present if the page is missing
+    if 'missing' in page:
+      if hasattr(self, 'title'):
+        raise PageError(self.title)
+      else:
+        raise PageError(pageid=self.pageid)
+
+    # same thing for redirect, except it shows up in query instead of page for
+    # whatever silly reason
+    elif 'redirects' in query:
+      if redirect:
+        redirects = query['redirects'][0]
+
+        if 'normalized' in query:
+          normalized = query['normalized'][0]
+          assert normalized['from'] == self.title, ODD_ERROR_MESSAGE
+
+          from_title = normalized['to']
+
+        else:
+          from_title = self.title
+
+        assert redirects['from'] == from_title, ODD_ERROR_MESSAGE
+
+        # change the title and reload the whole object
+        self.__init__(redirects['to'], redirect=redirect, preload=preload)
+
+      else:
+        raise RedirectError(getattr(self, 'title', page['title']))
+
+    # since we only asked for disambiguation in ppprop,
+    # if a pageprop is returned,
+    # then the page must be a disambiguation page
+    elif 'pageprops' in page:
+      query_params = {
+        'prop': 'revisions',
+        'rvprop': 'content',
+        'rvparse': '',
+        'rvlimit': 1
+      }
+      if hasattr(self, 'pageid'):
+        query_params['pageids'] = self.pageid
+      else:
+        query_params['titles'] = self.title
+      request = _wiki_request(query_params)
+      html = request['query']['pages'][pageid]['revisions'][0]['*']
+
+      lis = BeautifulSoup(html, 'html.parser').find_all('li')
+      filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
+      may_refer_to = [li.a.get_text() for li in filtered_lis if li.a]
+
+      raise DisambiguationError(getattr(self, 'title', page['title']), may_refer_to)
+
+    else:
+      self.pageid = pageid
+      self.title = page['title']
+      self.url = page['fullurl']
+      self.touched = page['touched']
+
+
+  @property
+  def __title_query_param(self):
+    if getattr(self, 'title', None) is not None:
+      return {'titles': self.title}
+    else:
+      return {'pageids': self.pageid}
+
+  def html(self):
+    '''
+    Get full page HTML.
+
+    .. warning:: This can get pretty slow on long pages.
+    '''
+
+    if not getattr(self, '_html', False):
+      query_params = {
+        'prop': 'revisions',
+        'rvprop': 'content',
+        'rvlimit': 1,
+        'rvparse': '',
+        'titles': self.title
+      }
+
+      request = _wiki_request(query_params)
+      self._html = request['query']['pages'][self.pageid]['revisions'][0]['*']
+
+    return self._html
+
+
+
+  @property
+  def references(self):
+    '''
+    List of URLs of external links on a page.
+    May include external links within page that aren't technically cited anywhere.
+    '''
+
+    if not getattr(self, '_references', False):
+      def add_protocol(url):
+        return url if url.startswith('http') else 'http:' + url
+
+      self._references = [
+        add_protocol(link['*'])
+        for link in self.__continued_query({
+          'prop': 'extlinks',
+          'ellimit': 'max'
+        })
+      ]
+
+    return self._references
+
+  @property
+  def sections(self):
+    '''
+    List of section titles from the table of contents on the page.
+    '''
+
+    if not getattr(self, '_sections', False):
+      query_params = {
+        'action': 'parse',
+        'prop': 'sections',
+      }
+      query_params.update(self.__title_query_param)
+
+      request = _wiki_request(query_params)
+      self._sections = [section['line'] for section in request['parse']['sections']]
+
+    return self._sections
+
+  def section(self, section_title):
+    '''
+    Get the plain text content of a section from `self.sections`.
+    Returns None if `section_title` isn't found, otherwise returns a whitespace stripped string.
+
+    This is a convenience method that wraps self.content.
+
+    .. warning:: Calling `section` on a section that has subheadings will NOT return
+           the full text of all of the subsections. It only gets the text between
+           `section_title` and the next subheading, which is often empty.
+    '''
+
+    section = u"== {} ==".format(section_title)
+    try:
+      index = self.content.index(section) + len(section)
+    except ValueError:
+      return None
+
+    try:
+      next_index = self.content.index("==", index)
+    except ValueError:
+      next_index = len(self.content)
+
+    return self.content[index:next_index].lstrip("=").strip()
+
 
 @cache
 def languages():
@@ -718,6 +1168,7 @@ def _wiki_request(params):
   global USER_AGENT
 
   params['format'] = 'json'
+  params['indexpageids'] = True
   if not 'action' in params:
     params['action'] = 'query'
 
@@ -734,7 +1185,7 @@ def _wiki_request(params):
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
-  r = requests.get(API_URL, params=params, headers=headers)
+  r = requests.get(API_URL, params=params, headers=headers, verify=False)
 
   if RATE_LIMIT:
     RATE_LIMIT_LAST_CALL = datetime.now()
