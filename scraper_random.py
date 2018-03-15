@@ -25,9 +25,9 @@ def get_random_articles():
     '''
     requests.packages.urllib3.disable_warnings()
 
-    __titles = wikipedia.random_id(pages=500)
+    _titles = wikipedia.random_id(pages=500)
     
-    return __titles
+    return _titles
 
 def is_deleted(item):
     try:
@@ -38,13 +38,13 @@ def is_deleted(item):
 
 def has_date(item):
     try:
-        __page = wikipedia.page(title=None,pageid=item)
-        __dt = datetime.strptime(__page.touched,'%Y-%m-%dT%H:%M:%SZ')
-        if __dt.year >= 2015:
-            __revs = get_revisions(__page.pageid,False)
-            __tmpdt = datetime.strptime(__revs[0]['timestamp'],'%Y-%m-%dT%H:%M:%SZ')
-            if __tmpdt.year >= 2015 and __tmpdt.year <= 2017:
-                return __page
+        _page = wikipedia.page(title=None,pageid=item)
+        _dt = datetime.strptime(_page.touched,'%Y-%m-%dT%H:%M:%SZ')
+        if _dt.year >= 2015:
+            _revs = get_revisions(_page.pageid,False)
+            _tmpdt = datetime.strptime(_revs[0]['timestamp'],'%Y-%m-%dT%H:%M:%SZ')
+            if _tmpdt.year >= 2015 and _tmpdt.year <= 2017:
+                return _page
             else:
                 return ""
         else:
@@ -54,22 +54,22 @@ def has_date(item):
 
 def get_logdata(item, logtype):
     try:
-        __logs = wikipedia.logsearch(item,logtype)
-        return list(__logs['query']['logevents'])
+        _logs = wikipedia.logsearch(item,logtype)
+        return list(_logs['query']['logevents'])
     except:
         return list()
 
 def get_templates(item):
     try:
-        __templates = wikipedia.templatesearch(item)
-        return __templates
+        _templates = wikipedia.templatesearch(item)
+        return _templates
     except:
         return list()
 
 def get_revisions(item,title):
     try:
-        __revs = wikipedia.revisionsearch(item, title=title)
-        return __revs
+        _revs = wikipedia.revisionsearch(item, title=title)
+        return _revs
     except: 
         return list()
 
@@ -85,26 +85,26 @@ def create_task(dataset_marker,camp_name,created,row_key,part_key,page_id,title,
         'DATASET': dataset_marker
     }
 
-    __ltmp = []
+    _ltmp = []
     for l in logs:
-        __ltmp.append(l)
+        _ltmp.append(l)
 
-    if __ltmp:
-        task.update({"LOGS": str(__ltmp)})
+    if _ltmp:
+        task.update({"LOGS": str(_ltmp)})
 
-    __ttmp = []
+    _ttmp = []
     for t in temps:
-        __ttmp.append(t['title'])
+        _ttmp.append(t['title'])
 
-    if __ttmp:
-        task.update({"TEMPLATES": str(__ttmp)})
+    if _ttmp:
+        task.update({"TEMPLATES": str(_ttmp)})
     
-    __rtmp = []
+    _rtmp = []
     for r in revs:
-        __rtmp.append(r)
+        _rtmp.append(r)
 
-    if __rtmp:
-        task.update({"REVISIONS": str(__rtmp)})
+    if _rtmp:
+        task.update({"REVISIONS": str(_rtmp)})
 
     return task
 
@@ -135,9 +135,9 @@ def main():
 
     for r in collection:
         print (r)
-        __tmppge = has_date(r)
-        if __tmppge != "":
-            table_data.update({__tmppge.title:{'PAGEID': str(__tmppge.pageid),'TOUCHED': str(__tmppge.touched), 'URL': str(__tmppge.url), 'TITLE': str(__tmppge.title)}})
+        _tmppge = has_date(r)
+        if _tmppge != "":
+            table_data.update({_tmppge.title:{'PAGEID': str(_tmppge.pageid),'TOUCHED': str(_tmppge.touched), 'URL': str(_tmppge.url), 'TITLE': str(_tmppge.title)}})
             print ("Date Match")
         else:
             print ("Date Not Match")

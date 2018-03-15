@@ -40,35 +40,35 @@ def get_campaign_articles(web,program):
         print ("Program Count: "+str(len(tr)))
         
         for t in tr:
-            __url = "https://outreachdashboard.wmflabs.org" + t.get("data-link") +"/articles/details.json"   
+            _url = "https://outreachdashboard.wmflabs.org" + t.get("data-link") +"/articles/details.json"   
 
             try:   
-                __c = requests.get(__url, verify=False)
-                print (__c.url)
-                __art = __c.json()["course"]["articles"]
-                __items = [x["title"] for x in __art if x["new_article"] is True and x["language"] == 'en']
-                items.append(__items)
+                _c = requests.get(_url, verify=False)
+                print (_c.url)
+                _art = _c.json()["course"]["articles"]
+                _items = [x["title"] for x in _art if x["new_article"] is True and x["language"] == 'en']
+                items.append(_items)
             except:
-                print('Error loading URL: ' + __url)
+                print('Error loading URL: ' + _url)
 
-        __titles = [t for x in items for t in x]
+        _titles = [t for x in items for t in x]
         
-        return __titles
+        return _titles
 
     else:
-        __url = web +"/articles/details.json"
+        _url = web +"/articles/details.json"
         try:
-            __c = requests.get(__url, verify=False)
-            print (__c.url)
-            __art = __c.json()["course"]["articles"]
-            __items = [x["title"] for x in __art if x["new_article"] is True and x["language"] == 'en']
-            items.append(__items)
+            _c = requests.get(_url, verify=False)
+            print (_c.url)
+            _art = _c.json()["course"]["articles"]
+            _items = [x["title"] for x in _art if x["new_article"] is True and x["language"] == 'en']
+            items.append(_items)
         except:
-            print('Error loading URL: ' + __url)
+            print('Error loading URL: ' + _url)
         
-        __titles = [t for x in items for t in x]
+        _titles = [t for x in items for t in x]
         
-        return __titles
+        return _titles
 
 def is_deleted(item):
     try:
@@ -79,22 +79,22 @@ def is_deleted(item):
 
 def get_logdata(item, logtype):
     try:
-        __logs = wikipedia.logsearch(item,logtype)
-        return list(__logs['query']['logevents'])
+        _logs = wikipedia.logsearch(item,logtype)
+        return list(_logs['query']['logevents'])
     except:
         return list()
 
 def get_templates(item):
     try:
-        __templates = wikipedia.templatesearch(item)
-        return __templates
+        _templates = wikipedia.templatesearch(item)
+        return _templates
     except:
         return list()
 
 def get_revisions(item):
     try:
-        __revs = wikipedia.revisionsearch(item, title=True)
-        return __revs
+        _revs = wikipedia.revisionsearch(item, title=True)
+        return _revs
     except: 
         return list()
 
@@ -110,26 +110,26 @@ def create_task(dataset_marker,camp_name,created,row_key,part_key,page_id,title,
         'DATASET': dataset_marker
     }
 
-    __ltmp = []
+    _ltmp = []
     for l in logs:
-        __ltmp.append(l)
+        _ltmp.append(l)
 
-    if __ltmp:
-        task.update({"LOGS": str(__ltmp)})
+    if _ltmp:
+        task.update({"LOGS": str(_ltmp)})
 
-    __ttmp = []
+    _ttmp = []
     for t in temps:
-        __ttmp.append(t['title'])
+        _ttmp.append(t['title'])
 
-    if __ttmp:
-        task.update({"TEMPLATES": str(__ttmp)})
+    if _ttmp:
+        task.update({"TEMPLATES": str(_ttmp)})
     
-    __rtmp = []
+    _rtmp = []
     for r in revs:
-        __rtmp.append(r)
+        _rtmp.append(r)
 
-    if __rtmp:
-        task.update({"REVISIONS": str(__rtmp)})
+    if _rtmp:
+        task.update({"REVISIONS": str(_rtmp)})
 
     return task
 

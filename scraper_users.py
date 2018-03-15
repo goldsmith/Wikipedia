@@ -43,21 +43,21 @@ def get_campaign_users(web,program):
         print ("Program Count: "+str(len(tr)))
         
         for t in tr:
-            __url = "https://outreachdashboard.wmflabs.org" + t.get("data-link") +"/students"   
+            _url = "https://outreachdashboard.wmflabs.org" + t.get("data-link") +"/students"   
 
             try:   
                 driver = webdriver.PhantomJS()
-                driver.get(__url)
-                print (__url)
+                driver.get(_url)
+                print (_url)
                 p = driver.find_elements_by_class_name("students")
-                __temp = [x.text.split("\n")[0] for x in p]
-                users.append(__temp)
+                _temp = [x.text.split("\n")[0] for x in p]
+                users.append(_temp)
             except:
-                print('Error loading URL: ' + __url)
+                print('Error loading URL: ' + _url)
 
-        __users = [t for x in users for t in x]
+        _users = [t for x in users for t in x]
         
-        return __users
+        return _users
 
     else:
 
@@ -65,11 +65,11 @@ def get_campaign_users(web,program):
             driver = webdriver.PhantomJS()
             driver.get(web)
             p = driver.find_elements_by_class_name("students")
-            __users = [x.text.split("\n")[0] for x in p]
+            _users = [x.text.split("\n")[0] for x in p]
         except:
             print('Error loading URL: ' + web)
         
-        return __users
+        return _users
 
 def create_task(part_key,row_key,campaign,dataset,userid,name,editcount,registration,gender,groups):
     task = {
