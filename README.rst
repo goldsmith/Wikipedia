@@ -30,7 +30,7 @@ Wikipedia data, not getting it.
 
   >>> ny = wikipedia.page("New York")
   >>> ny.title
-  # u'New York'
+  # u'New York (state)'
   >>> ny.url
   # u'http://en.wikipedia.org/wiki/New_York'
   >>> ny.content
