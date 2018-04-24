@@ -280,6 +280,37 @@ def page(title=None, pageid=None, auto_suggest=True, redirect=True, preload=Fals
     raise ValueError("Either a title or a pageid must be specified")
 
 
+def category_members(category=None, pageid=None, cmlimit=10, cmtype='page'):
+  '''
+  Get list of page titles belonging to a category.
+
+  Keyword arguments:
+
+  * cmlimit - the maximum number of titles to return
+  * cmtype - which type of page to include. ("page", "subcat", or "file")
+  '''
+
+  if category is not None:
+      query_params = {
+        'list': 'categorymembers',
+        'cmtitle': 'Category:' + category,
+        'cmlimit': str(cmlimit),
+        'cmtype': cmtype
+      }
+  elif pageid is not None:
+      query_params = {
+        'list': 'categorymembers',
+        'cmpageid': pageid,
+        'cmlimit': str(cmlimit),
+        'cmtype': cmtype
+      }
+  else:
+      raise ValueError("Either a category or a pageid must be specified")
+
+  request = _wiki_request(query_params)
+
+  return map(lambda member: member['title'], request['query']['categorymembers'])
+
 
 class WikipediaPage(object):
   '''
