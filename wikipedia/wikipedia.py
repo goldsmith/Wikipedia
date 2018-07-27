@@ -625,7 +625,6 @@ class WikipediaPage(object):
     if not getattr(self, '_languages', False):
       query_params = {
         'prop': 'langlinks',
-        'llprop': 'url',
         'lllimit': '500',
       }
       query_params.update(self.__title_query_param)
@@ -633,7 +632,7 @@ class WikipediaPage(object):
       request = _wiki_request(query_params)
       pages = request['query']['pages'].keys()
       for page in pages:
-        self._languages = {langlink['lang']: langlink['url'] for langlink in request['query']['pages'][page]['langlinks']}
+        self._languages = {langlink['lang']: langlink['title'] for langlink in request['query']['pages'][page]['langlinks']}
 
     return self._languages
   
