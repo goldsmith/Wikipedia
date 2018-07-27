@@ -618,7 +618,7 @@ class WikipediaPage(object):
   @property
   def languages(self):
     '''
-    List of URLs of the same article in a different language
+    Dict of language abbreviations as keys and titles of the same article in a different languages as values
     https://www.mediawiki.org/wiki/API:Langlinks
     '''
 
