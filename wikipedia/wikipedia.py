@@ -618,7 +618,7 @@ class WikipediaPage(object):
   @property
   def languages(self):
     '''
-    Dict of language abbreviations as keys and titles of the same article in a different languages as values
+    Dict of language abbreviations as keys and titles of the same article in a different languages as
     https://www.mediawiki.org/wiki/API:Langlinks
     '''
 
@@ -632,7 +632,7 @@ class WikipediaPage(object):
       request = _wiki_request(query_params)
       pages = request['query']['pages'].keys()
       for page in pages:
-        self._languages = {langlink['lang']: langlink['title'] for langlink in request['query']['pages'][page]['langlinks']}
+        self._languages = {langlink['lang']: langlink['*'] for langlink in request['query']['pages'][page]['langlinks']}
 
     return self._languages
   
