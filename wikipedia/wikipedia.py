@@ -1,17 +1,16 @@
 from __future__ import unicode_literals
 
-import re
+import requests
 import time
+from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from decimal import Decimal
-
-import requests
-from bs4 import BeautifulSoup
 
 from .exceptions import (
   PageError, DisambiguationError, RedirectError, HTTPTimeoutError,
   WikipediaException, ODD_ERROR_MESSAGE)
-from .util import cache, stdout_encode
+from .util import cache, stdout_encode, debug
+import re
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
@@ -512,7 +511,7 @@ class WikipediaPage(object):
         })
       ]
     return self._revision_timestamp[0]
-
+  
   @property
   def parent_id(self):
     '''
