@@ -420,7 +420,7 @@ class WikipediaPage(object):
         for datum in pages.values():  # in python 3.3+: "yield from pages.values()"
           yield datum
       else:
-        for datum in pages[self.pageid][prop]:
+        for datum in pages[self.pageid].get(prop, []):
           yield datum
 
       if 'continue' not in request:
