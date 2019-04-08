@@ -1,0 +1,26 @@
+image: upress/gitlab-base:23
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_HOST: tcp://localhost:2375
+  DOCKER_DRIVER: overlay
+
+stages:
+  - 📦 pypi
+  - flake
+
+build-push:
+  stage: 📦 pypi
+  script:
+    - python3 setup.py sdist
+    - twine upload --repository-url https://pkg.ubiquity.press/simple/ -u $PKG_UBIQUITY_USER -p $PKG_UBIQUITY_PW dist/*
+  only:
+    - tags
+
+flake:
+  stage: flake
+  script:
+    - flake8 wikipedia
+  allow_failure: true
