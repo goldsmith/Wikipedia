@@ -12,6 +12,7 @@ from .exceptions import (
 from .util import cache, stdout_encode, debug
 import re
 
+# anna
 API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
@@ -31,7 +32,7 @@ def set_lang(prefix):
   global API_URL
   API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
 
-  for cached_func in (search, suggest, summary):
+  for cached_func in (geosearch, search, suggest, summary):
     cached_func.clear_cache()
 
 
@@ -386,7 +387,7 @@ class WikipediaPage(object):
       request = _wiki_request(query_params)
       html = request['query']['pages'][pageid]['revisions'][0]['*']
 
-      lis = BeautifulSoup(html, 'html.parser').find_all('li')
+      lis = BeautifulSoup(html).find_all('li')
       filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
       may_refer_to = [li.a.get_text() for li in filtered_lis if li.a]
 
@@ -511,6 +512,29 @@ class WikipediaPage(object):
     return self._parent_id
 
   @property
+  def revisions(self):
+    '''
+    All revisions in revision history for a page.
+    '''
+
+    if not getattr(self, '_revision', False):
+      query_params = {
+        'prop': 'extracts|revisions',
+        'rvprop': 'timestamp|user|comment|content',
+        'rvslots': 'main',
+        'rvlimit': 500,
+      }
+      if not getattr(self, 'title', None) is None:
+         query_params['titles'] = self.title
+      else:
+         query_params['pageids'] = self.pageid
+
+      request = _wiki_request(query_params)
+      self._revisions = request['query']['pages'][self.pageid]['revisions']
+
+    return self._revisions
+
+  @property
   def summary(self):
     '''
     Plain text summary of the page.
@@ -566,10 +590,10 @@ class WikipediaPage(object):
 
       request = _wiki_request(query_params)
 
-      if 'query' in request:
+      try:
         coordinates = request['query']['pages'][self.pageid]['coordinates']
         self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
-      else:
+      except KeyError:
         self._coordinates = None
 
     return self._coordinates
