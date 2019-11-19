@@ -420,6 +420,7 @@ class WikipediaPage(object):
         for datum in pages.values():  # in python 3.3+: "yield from pages.values()"
           yield datum
       else:
+        print(pages[self.pageid])
         for datum in pages[self.pageid][prop]:
           yield datum
 
@@ -608,14 +609,17 @@ class WikipediaPage(object):
       def add_protocol(url):
         return url if url.startswith('http') else 'http:' + url
 
-      self._references = [
-        add_protocol(link['*'])
-        for link in self.__continued_query({
-          'prop': 'extlinks',
-          'ellimit': 'max'
-        })
-      ]
+      try:
 
+        self._references = [
+          add_protocol(link['*'])
+          for link in self.__continued_query({
+            'prop': 'extlinks',
+            'ellimit': 'max'
+          }) 
+        ]
+      except KeyError:
+        self._references = []
     return self._references
 
   @property
