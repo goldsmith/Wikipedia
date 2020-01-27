@@ -12,7 +12,7 @@ from .exceptions import (
 from .util import cache, stdout_encode, debug
 import re
 
-API_URL = 'http://en.wikipedia.org/w/api.php'
+API_URL = 'https://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
@@ -29,7 +29,7 @@ def set_lang(prefix):
   .. note:: Make sure you search for page titles in the language that you have set.
   '''
   global API_URL
-  API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
+  API_URL = 'https://' + prefix.lower() + '.wikipedia.org/w/api.php'
 
   for cached_func in (search, suggest, summary):
     cached_func.clear_cache()
