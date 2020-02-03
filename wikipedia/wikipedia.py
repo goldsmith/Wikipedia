@@ -419,7 +419,7 @@ class WikipediaPage(object):
       if 'generator' in query_params:
         for datum in pages.values():  # in python 3.3+: "yield from pages.values()"
           yield datum
-      else:
+      elif prop in pages[self.pageid].keys():
         for datum in pages[self.pageid][prop]:
           yield datum
 
@@ -513,24 +513,43 @@ class WikipediaPage(object):
   @property
   def revisions(self):
     '''
-    All revisions in revision history for a page.
+    Get all revisions in the revision history for a page.
     '''
+
+    today = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    print('processing revisions...')
 
     if not getattr(self, '_revision', False):
       query_params = {
-        'prop': 'extracts|revisions',
+        'prop': 'revisions',
         'rvprop': 'timestamp|user|comment|content',
         'rvslots': 'main',
-        'rvlimit': 500,
+        'rvlimit': max,
+        'rvstart': today,
       }
       if not getattr(self, 'title', None) is None:
-         query_params['titles'] = self.title
+        query_params['titles'] = self.title
       else:
-         query_params['pageids'] = self.pageid
+        query_params['pageids'] = self.pageid
 
       request = _wiki_request(query_params)
       self._revisions = request['query']['pages'][self.pageid]['revisions']
+      
+      max_revisions = 20000
+      num_revisions = 0
 
+      while True and num_revisions < max_revisions:
+        
+        if 'continue' in request:
+          query_params['continue'] = request['continue']['continue']
+          query_params['rvcontinue'] = request['continue']['rvcontinue']
+
+          request = _wiki_request(query_params)
+          self._revisions = self._revisions + request['query']['pages'][self.pageid]['revisions']
+          num_revisions = len(self._revisions)
+
+        else:
+          break
     return self._revisions
 
   @property
