@@ -517,14 +517,14 @@ class WikipediaPage(object):
     '''
 
     today = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
-    print('processing revisions...')
+    print('\t* Processing revisions *')
 
     if not getattr(self, '_revision', False):
       query_params = {
         'prop': 'revisions',
         'rvprop': 'timestamp|user|comment|content',
         'rvslots': 'main',
-        'rvlimit': max,
+        'rvlimit': 500000,
         'rvstart': today,
       }
       if not getattr(self, 'title', None) is None:
@@ -533,9 +533,9 @@ class WikipediaPage(object):
         query_params['pageids'] = self.pageid
 
       request = _wiki_request(query_params)
+      if "error" in request.keys(): return None
       self._revisions = request['query']['pages'][self.pageid]['revisions']
-      
-      max_revisions = 20000
+      max_revisions = 40000
       num_revisions = 0
 
       while True and num_revisions < max_revisions:
