@@ -20,9 +20,9 @@ You can use this library to extract the data, and use the `WikiRevParser <https:
 
 Beside these two important differences, this fork is identical to the `master version <https://github.com/goldsmith/Wikipedia>`_ in installation, test, and functionalities.
 
-"Search Wikipedia, get article summaries, get data like links and images
+Search Wikipedia, get article summaries, get data like links and images
 from a page, and more. Wikipedia wraps the `MediaWiki API <https://www.mediawiki.org/wiki/API>`__ so you can focus on using
-Wikipedia data, not getting it."
+Wikipedia data, not getting it.
 
 .. code:: python
 
