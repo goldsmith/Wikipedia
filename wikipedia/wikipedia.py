@@ -6,9 +6,10 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from decimal import Decimal
 
+from wikipedia.languages_tool import init_list_languages, find_language
 from .exceptions import (
-  PageError, DisambiguationError, RedirectError, HTTPTimeoutError,
-  WikipediaException, ODD_ERROR_MESSAGE)
+    PageError, DisambiguationError, RedirectError, HTTPTimeoutError,
+    WikipediaException, ODD_ERROR_MESSAGE, BadParameterException)
 from .util import cache, stdout_encode, debug
 import re
 
@@ -17,6 +18,7 @@ RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
 USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
+LIST_LANGUAGES = init_list_languages()
 
 
 def set_lang(prefix):
@@ -28,12 +30,14 @@ def set_lang(prefix):
 
   .. note:: Make sure you search for page titles in the language that you have set.
   '''
-  global API_URL
-  API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
+  if find_language(LIST_LANGUAGES, prefix):
+    global API_URL
+    API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
 
-  for cached_func in (search, suggest, summary):
-    cached_func.clear_cache()
-
+    for cached_func in (search, suggest, summary):
+      cached_func.clear_cache()
+  else:
+    raise BadParameterException('The entered "language" parameter "{0}" is not supported by Wikipedia'.format(prefix))
 
 def set_user_agent(user_agent_string):
   '''
@@ -97,6 +101,8 @@ def search(query, results=10, suggestion=False):
     'limit': results,
     'srsearch': query
   }
+  if not query:
+    raise BadParameterException('The entered "query" parameter should not be empty')
   if suggestion:
     search_params['srinfo'] = 'suggestion'
 
