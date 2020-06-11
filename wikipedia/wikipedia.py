@@ -89,7 +89,11 @@ def search(query, results=10, suggestion=False):
   * results - the maxmimum number of results returned
   * suggestion - if True, return results and suggestion (if any) in a tuple
   '''
-
+  
+  query = query.strip()
+  if len(query) == 0:
+    raise WikipediaException('Query parameter must not be empty.')
+   
   search_params = {
     'list': 'search',
     'srprop': '',
