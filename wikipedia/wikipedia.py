@@ -16,6 +16,8 @@ API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
+MAX_LAG = 5
+MAX_WAIT = 120
 USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
 
 
@@ -77,8 +79,33 @@ def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
     RATE_LIMIT_MIN_WAIT = min_wait
 
   RATE_LIMIT_LAST_CALL = None
+  
 
+def set_lag_and_wait(maxlag, maxwait=120):
+  '''
+  The default maxlag is set to 5 seconds as this is an appropriate non-aggressive value and recommended as default.
+  Higher values mean more aggressive behaviour but lower values are nicer.
+  Interactive tasks (where a user is waiting for the result) may omit the maxlag parameter with 'None'. 
+  Noninteractive tasks should always use it.
+  When the maxlag parameter is set, the API will wait upto 'maxwait' number of seconds
+  before timing out (the default is 2 minutes). If maxlag is unset, setting this value will do nothing.
+  
+  Arguments:
 
+  * maxlag - To modify the default maxlag parameter
+  
+  Keyword arguments:
+  
+  * maxwait - (int) Will wait a maximum of 'maxwait' seconds before timing out
+  '''
+  global MAX_LAG
+  global MAX_WAIT
+  if maxlag > 0 or maxlag is None: # negative and 0 values will always return a 503 error code
+    MAX_LAG = maxlag
+  if maxwait >= 0:  # validate for negative values
+    MAX_WAIT = maxwait
+  
+  
 @cache
 def search(query, results=10, suggestion=False):
   '''
@@ -716,8 +743,12 @@ def _wiki_request(params):
   '''
   global RATE_LIMIT_LAST_CALL
   global USER_AGENT
+  global MAX_LAG
+  global MAX_WAIT
 
   params['format'] = 'json'
+  if MAX_LAG is not None:
+    params['maxlag'] = MAX_LAG
   if not 'action' in params:
     params['action'] = 'query'
 
@@ -735,8 +766,23 @@ def _wiki_request(params):
     time.sleep(int(wait_time.total_seconds()))
 
   r = requests.get(API_URL, params=params, headers=headers)
+  lastrequest = firstrequest = datetime.now()
 
   if RATE_LIMIT:
-    RATE_LIMIT_LAST_CALL = datetime.now()
+    RATE_LIMIT_LAST_CALL = firstrequest
+  
+  while r.headers.get('Retry-After') is not None: # only evaluates if maxlag is set
+      retryafter = int(r.headers['Retry-After'])
+
+      if retryafter >= MAX_WAIT or lastrequest - firstrequest > timedelta(seconds=MAX_WAIT):
+        raise WikipediaException(r.json()['error']['info'] + ' If this is an interactive task, unset \
+                                 the maxlag parameter or increase the maxwait parameter with set_lag_and_wait()')
+      time.sleep(retryafter)  # wait for the recommended amount of time 
+      params['maxlag'] = params['maxlag'] * 2  # multiplicatively increase aggressiveness
+      r = requests.get(API_URL, params=params, headers=headers)
+
+      lastrequest = datetime.now()
+      if RATE_LIMIT:
+        RATE_LIMIT_LAST_CALL = lastrequest
 
   return r.json()
