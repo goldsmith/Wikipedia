@@ -24,14 +24,14 @@ version = re.search(
 
 
 setuptools.setup(
-  name = "wikipedia",
+  name = "wikipedia_sections",
   version = '.'.join(version),
-  author = "Jonathan Goldsmith",
-  author_email = "jhghank@gmail.com",
-  description = "Wikipedia API for Python",
+  author = "Sacha Vakili",
+  author_email = "vakili.sacha@gmail.com",
+  description = "Wikipedia API for Python extracting sections",
   license = "MIT",
   keywords = "python wikipedia API",
-  url = "https://github.com/goldsmith/Wikipedia",
+  url = "https://github.com/sachavakili/Wikipedia",
   install_requires = install_reqs,
   packages = ['wikipedia'],
   long_description = local_file('README.rst').read(),
