@@ -41,5 +41,6 @@ setuptools.setup(
     'License :: OSI Approved :: MIT License',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3'
-  ]
+  ],
+  download_url='https://github.com/sachavakili/Wikipedia/archive/v2.0.tar.gz',
 )
