@@ -643,7 +643,8 @@ class WikipediaPage(object):
         'action': 'parse',
         'prop': 'sections',
       }
-      query_params.update(self.__title_query_param)
+      if not getattr(self, 'title', None) is None:
+          query_params["page"] = self.title
 
       request = _wiki_request(query_params)
       self._sections = [section['line'] for section in request['parse']['sections']]
@@ -734,9 +735,13 @@ def _wiki_request(params):
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
+  print(f"GET request: {params}")
+
   r = requests.get(API_URL, params=params, headers=headers)
 
   if RATE_LIMIT:
     RATE_LIMIT_LAST_CALL = datetime.now()
+
+  print(f"GET response: {r.json()}")
 
   return r.json()
