@@ -32,7 +32,7 @@ Wikipedia data, not getting it.
   >>> ny.title
   # u'New York'
   >>> ny.url
-  # u'http://en.wikipedia.org/wiki/New_York'
+  # u'https://en.wikipedia.org/wiki/New_York'
   >>> ny.content
   # u'New York is a state in the Northeastern region of the United States. New York is the 27th-most exten'...
   >>> ny.links[0]
@@ -42,7 +42,7 @@ Wikipedia data, not getting it.
   >>> wikipedia.summary("Facebook", sentences=1)
   # Facebook est un service de réseautage social en ligne sur Internet permettant d'y publier des informations (photographies, liens, textes, etc.) en contrôlant leur visibilité par différentes catégories de personnes.
 
-Note: this library was designed for ease of use and simplicity, not for advanced use. If you plan on doing serious scraping or automated requests, please use `Pywikipediabot <http://www.mediawiki.org/wiki/Manual:Pywikipediabot>`__ (or one of the other more advanced `Python MediaWiki API wrappers <http://en.wikipedia.org/wiki/Wikipedia:Creating_a_bot#Python>`__), which has a larger API, rate limiting, and other features so we can be considerate of the MediaWiki infrastructure.
+Note: this library was designed for ease of use and simplicity, not for advanced use. If you plan on doing serious scraping or automated requests, please use `Pywikibot <https://www.mediawiki.org/wiki/Manual:Pywikibot>`__ (or one of the other more advanced `Python MediaWiki API wrappers <https://en.wikipedia.org/wiki/Wikipedia:Creating_a_bot#Python>`__), which has a larger API, rate limiting, and other features so we can be considerate of the MediaWiki infrastructure.
 
 Installation
 ------------
@@ -95,7 +95,7 @@ Credits
    @richardasaurus for inspiration
 -  @nmoroze and @themichaelyang for feedback and suggestions
 -  The `Wikimedia
-   Foundation <http://wikimediafoundation.org/wiki/Home>`__ for giving
+   Foundation <https://wikimediafoundation.org/wiki/Home>`__ for giving
    the world free access to data
 
 

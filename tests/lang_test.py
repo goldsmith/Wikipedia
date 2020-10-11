@@ -9,4 +9,4 @@ class TestLang(unittest.TestCase):
 
   def test_lang(self):
     wikipedia.set_lang("fr")
-    self.assertEqual(wikipedia.API_URL, 'http://fr.wikipedia.org/w/api.php')
+    self.assertEqual(wikipedia.API_URL, 'https://fr.wikipedia.org/w/api.php')

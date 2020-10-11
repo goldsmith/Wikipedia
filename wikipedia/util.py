@@ -33,7 +33,7 @@ class cache(object):
     self._cache = {}
 
 
-# from http://stackoverflow.com/questions/3627793/best-output-type-and-encoding-practices-for-repr-functions
+# from https://stackoverflow.com/questions/3627793/best-output-type-and-encoding-practices-for-repr-functions
 def stdout_encode(u, default='UTF8'):
   encoding = sys.stdout.encoding or default
   if sys.version_info > (3, 0):
