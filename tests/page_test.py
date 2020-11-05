@@ -159,3 +159,9 @@ class TestPage(unittest.TestCase):
     lat, lon = self.great_wall_of_china.coordinates
     self.assertEqual(str(lat.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lat'])
     self.assertEqual(str(lon.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lon'])
+
+  def test_pageprops(self):
+    """Test pageprops of a page"""
+    self.assertEqual(self.celtuce.pageprops, mock_data['data']["celtuce.pageprops"])
+    self.assertEqual(self.cyclone.pageprops, mock_data['data']["cyclone.pageprops"])
+
