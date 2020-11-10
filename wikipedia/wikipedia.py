@@ -676,6 +676,25 @@ class WikipediaPage(object):
 
     return self.content[index:next_index].lstrip("=").strip()
 
+  def lang_title(self, lang_code):
+    '''
+    Get the title in specified language code
+    Returns None if lang code or title isn't found, otherwise returns a string with title.
+    '''
+    query_params = {
+      'prop': 'langlinks',
+      'llurl': True,
+      'lllang': lang_code,
+      'pageids': self.pageid
+    }
+    request = _wiki_request(query_params)
+    pageid = list(request['query']['pages'])[0]
+    try:
+        title = request['query']['pages'][pageid]['langlinks'][0]['*']
+    except Exception as e:
+        title = None
+    return title
+
 
 @cache
 def languages():
