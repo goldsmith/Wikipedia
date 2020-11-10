@@ -4,7 +4,7 @@ import unittest
 from collections import defaultdict
 
 from wikipedia import wikipedia
-from request_mock_data import mock_data
+from tests.request_mock_data import mock_data
 
 
 # mock out _wiki_request
@@ -30,6 +30,10 @@ class TestSearch(unittest.TestCase):
   def test_limit(self):
     """Test limiting a request results."""
     self.assertEqual(wikipedia.search("Porsche", results=3), mock_data['data']["porsche.search"])
+
+  def test_offset(self):
+    """Test paginating a request results."""
+    self.assertEqual(wikipedia.search("Porsche", results=1, page=2), mock_data['data']["porsche.search.paginated"])
 
   def test_suggestion(self):
     """Test getting a suggestion as well as search results."""

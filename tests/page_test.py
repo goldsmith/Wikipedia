@@ -3,7 +3,7 @@ from decimal import Decimal
 import unittest
 
 from wikipedia import wikipedia
-from request_mock_data import mock_data
+from tests.request_mock_data import mock_data
 
 
 # mock out _wiki_request
@@ -85,6 +85,7 @@ class TestPage(unittest.TestCase):
     self.celtuce = wikipedia.page("Celtuce")
     self.cyclone = wikipedia.page("Tropical Depression Ten (2005)")
     self.great_wall_of_china = wikipedia.page("Great Wall of China")
+    self.bank = wikipedia.page("Bank")
 
   def test_from_page_id(self):
     """Test loading from a page id"""
@@ -159,3 +160,9 @@ class TestPage(unittest.TestCase):
     lat, lon = self.great_wall_of_china.coordinates
     self.assertEqual(str(lat.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lat'])
     self.assertEqual(str(lon.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lon'])
+
+  def test_coordinates_shouldnt_throw_error_if_they_dont_exist(self):
+    """Test geo co-ordinates can be None for a non place"""
+    lat, lon = self.bank.coordinates
+    self.assertEqual(lat, None)
+    self.assertEqual(lon, None)

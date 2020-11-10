@@ -80,7 +80,7 @@ def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
 
 
 @cache
-def search(query, results=10, suggestion=False):
+def search(query, results=10, page=1, suggestion=False):
   '''
   Do a Wikipedia search for `query`.
 
@@ -89,13 +89,15 @@ def search(query, results=10, suggestion=False):
   * results - the maxmimum number of results returned
   * suggestion - if True, return results and suggestion (if any) in a tuple
   '''
-
+  offset = (page - 1) * results
   search_params = {
     'list': 'search',
     'srprop': '',
     'srlimit': results,
     'limit': results,
-    'srsearch': query
+    'srsearch': query,
+    'offset': offset,
+    'sroffset': offset
   }
   if suggestion:
     search_params['srinfo'] = 'suggestion'
@@ -564,14 +566,16 @@ class WikipediaPage(object):
         'titles': self.title,
       }
 
-      request = _wiki_request(query_params)
+      response = _wiki_request(query_params)
 
-      if 'query' in request:
-        coordinates = request['query']['pages'][self.pageid]['coordinates']
-        self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
+      if 'query' in response:
+        coordinates = (response['query']['pages'][self.pageid]).get('coordinates')
+        if not(coordinates == None):
+          self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
+        else:
+          self._coordinates = (None, None)
       else:
-        self._coordinates = None
-
+        self._coordinates = (None, None)
     return self._coordinates
 
   @property
