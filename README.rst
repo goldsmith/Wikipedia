@@ -14,9 +14,14 @@ Wikipedia
 **Wikipedia** is a Python library that makes it easy to access and parse
 data from Wikipedia.
 
+This forked version differs from the `Wikipedia master <https://github.com/goldsmith/Wikipedia>`_ (by @goldsmith) by enabling extraction of the entire revision history of a Wikipedia page as well as having non-English language support for the geo-search functionality.
+
+You can use this library to extract the data, and use the `WikiRevParser <https://github.com/ajoer/WikRevParser>`_ to parse and organize the information in each revision. Without the `WikiRevParser <https://github.com/ajoer/WikRevParser>`_, the data for each revision will be a noisy string, so parsing it first before processing or analysing the data is highly recommended.  
+
+Beside these two important differences, this fork is identical to the `master version <https://github.com/goldsmith/Wikipedia>`_ in installation, test, and functionalities.
+
 Search Wikipedia, get article summaries, get data like links and images
-from a page, and more. Wikipedia wraps the `MediaWiki
-API <https://www.mediawiki.org/wiki/API>`__ so you can focus on using
+from a page, and more. Wikipedia wraps the `MediaWiki API <https://www.mediawiki.org/wiki/API>`__ so you can focus on using
 Wikipedia data, not getting it.
 
 .. code:: python
@@ -91,16 +96,8 @@ full details.
 Credits
 -------
 
--  `wiki-api <https://github.com/richardasaurus/wiki-api>`__ by
-   @richardasaurus for inspiration
--  @nmoroze and @themichaelyang for feedback and suggestions
+-  `Wikipedia <https://github.com/goldsmith/Wikipedia>`_ for initial implementation
 -  The `Wikimedia
    Foundation <http://wikimediafoundation.org/wiki/Home>`__ for giving
    the world free access to data
-
-
-
-.. image:: https://d2weczhvl823v0.cloudfront.net/goldsmith/wikipedia/trend.png
-   :alt: Bitdeli badge
-   :target: https://bitdeli.com/free
 

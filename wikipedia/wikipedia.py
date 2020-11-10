@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
+import re
 import requests
 import time
+
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -10,14 +12,12 @@ from .exceptions import (
   PageError, DisambiguationError, RedirectError, HTTPTimeoutError,
   WikipediaException, ODD_ERROR_MESSAGE)
 from .util import cache, stdout_encode, debug
-import re
 
 API_URL = 'http://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
 USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
-
 
 def set_lang(prefix):
   '''
@@ -31,7 +31,7 @@ def set_lang(prefix):
   global API_URL
   API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
 
-  for cached_func in (search, suggest, summary):
+  for cached_func in (geosearch, search, suggest, summary):
     cached_func.clear_cache()
 
 
@@ -419,7 +419,7 @@ class WikipediaPage(object):
       if 'generator' in query_params:
         for datum in pages.values():  # in python 3.3+: "yield from pages.values()"
           yield datum
-      else:
+      elif prop in pages[self.pageid].keys():
         for datum in pages[self.pageid][prop]:
           yield datum
 
@@ -511,6 +511,48 @@ class WikipediaPage(object):
     return self._parent_id
 
   @property
+  def revisions(self):
+    '''
+    Get all revisions in the revision history for a page.
+    '''
+
+    today = datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ")
+    print('\t* Processing revisions *')
+
+    if not getattr(self, '_revision', False):
+      query_params = {
+        'prop': 'revisions',
+        'rvprop': 'timestamp|user|comment|content',
+        'rvslots': 'main',
+        'rvlimit': 500000,
+        'rvstart': today,
+      }
+      if not getattr(self, 'title', None) is None:
+        query_params['titles'] = self.title
+      else:
+        query_params['pageids'] = self.pageid
+
+      request = _wiki_request(query_params)
+      if "error" in request.keys(): return None
+      self._revisions = request['query']['pages'][self.pageid]['revisions']
+      max_revisions = 40000
+      num_revisions = 0
+
+      while True and num_revisions < max_revisions:
+        
+        if 'continue' in request:
+          query_params['continue'] = request['continue']['continue']
+          query_params['rvcontinue'] = request['continue']['rvcontinue']
+
+          request = _wiki_request(query_params)
+          self._revisions = self._revisions + request['query']['pages'][self.pageid]['revisions']
+          num_revisions = len(self._revisions)
+
+        else:
+          break
+    return self._revisions
+
+  @property
   def summary(self):
     '''
     Plain text summary of the page.
@@ -566,10 +608,10 @@ class WikipediaPage(object):
 
       request = _wiki_request(query_params)
 
-      if 'query' in request:
+      try:
         coordinates = request['query']['pages'][self.pageid]['coordinates']
         self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
-      else:
+      except KeyError:
         self._coordinates = None
 
     return self._coordinates
@@ -585,14 +627,17 @@ class WikipediaPage(object):
       def add_protocol(url):
         return url if url.startswith('http') else 'http:' + url
 
-      self._references = [
-        add_protocol(link['*'])
-        for link in self.__continued_query({
-          'prop': 'extlinks',
-          'ellimit': 'max'
-        })
-      ]
+      try:
 
+        self._references = [
+          add_protocol(link['*'])
+          for link in self.__continued_query({
+            'prop': 'extlinks',
+            'ellimit': 'max'
+          }) 
+        ]
+      except KeyError:
+        self._references = []
     return self._references
 
   @property
