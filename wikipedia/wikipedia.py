@@ -498,6 +498,21 @@ class WikipediaPage(object):
     return self._revision_id
 
   @property
+  def revision_timestamp(self):
+    '''
+    Timestamp of most recent revision of Wikipedia page.
+    '''
+    if not getattr(self, '_revision_timestamp', False):
+      self._revision_timestamp = [
+        revision['timestamp']
+        for revision in self.__continued_query({
+          'prop': 'revisions',
+          'ellimit': 'max'
+        })
+      ]
+    return self._revision_timestamp[0]
+  
+  @property
   def parent_id(self):
     '''
     Revision ID of the parent version of the current revision of this
