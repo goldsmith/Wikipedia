@@ -35,6 +35,14 @@ def set_lang(prefix):
     cached_func.clear_cache()
 
 
+def set_api_url(api_url):
+  """
+  Added by Jibo, to allow dependency injection for mocking purposes.
+  """
+  global API_URL
+  API_URL = api_url
+
+
 def set_user_agent(user_agent_string):
   '''
   Set the User-Agent string to be used for all requests.
