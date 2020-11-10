@@ -17,6 +17,7 @@ RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
 USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
+PROXY_CONF = {}
 
 
 def set_lang(prefix):
@@ -45,6 +46,18 @@ def set_user_agent(user_agent_string):
   '''
   global USER_AGENT
   USER_AGENT = user_agent_string
+
+
+def set_proxy(proxy_dict):
+  '''
+  Set the proxy config to be used for all requests.
+
+  Arguments:
+
+  * proxy_dict - (dict) a dict specifying the proxy config
+  '''
+  global PROXY_CONF
+  PROXY_CONF = proxy_dict
 
 
 def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
@@ -717,6 +730,7 @@ def _wiki_request(params):
   '''
   global RATE_LIMIT_LAST_CALL
   global USER_AGENT
+  global PROXY_CONF
 
   params['format'] = 'json'
   if not 'action' in params:
@@ -735,7 +749,7 @@ def _wiki_request(params):
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
-  r = requests.get(API_URL, params=params, headers=headers)
+  r = requests.get(API_URL, params=params, headers=headers, proxies=PROXY_CONF)
 
   if RATE_LIMIT:
     RATE_LIMIT_LAST_CALL = datetime.now()
