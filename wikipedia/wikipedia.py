@@ -616,6 +616,28 @@ class WikipediaPage(object):
     return self._links
 
   @property
+  def languages(self):
+    '''
+    Dict of language abbreviations as keys and titles of the same article in a different languages as
+    https://www.mediawiki.org/wiki/API:Langlinks
+    '''
+
+    if not getattr(self, '_languages', False):
+      query_params = {
+        'prop': 'langlinks',
+        'lllimit': '500',
+      }
+      query_params.update(self.__title_query_param)
+
+      request = _wiki_request(query_params)
+      pages = request['query']['pages'].keys()
+      for page in pages:
+        self._languages = {langlink['lang']: langlink['*'] for langlink in request['query']['pages'][page]['langlinks']}
+
+    return self._languages
+  
+
+  @property
   def categories(self):
     '''
     List of categories of a page.

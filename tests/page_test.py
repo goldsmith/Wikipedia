@@ -159,3 +159,9 @@ class TestPage(unittest.TestCase):
     lat, lon = self.great_wall_of_china.coordinates
     self.assertEqual(str(lat.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lat'])
     self.assertEqual(str(lon.quantize(Decimal('1.000'))), mock_data['data']['great_wall_of_china.coordinates.lon'])
+
+  def test_page_languages(self):
+    # print(self.celtuce.languages)
+    self.assertEqual(self.celtuce.languages['eo'], mock_data['data']["celtuce.languages[eo]"])
+    self.assertEqual(self.great_wall_of_china.languages['de'], mock_data['data']['great_wall_of_china.languages[de]'])
+
