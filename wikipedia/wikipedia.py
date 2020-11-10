@@ -566,10 +566,10 @@ class WikipediaPage(object):
 
       request = _wiki_request(query_params)
 
-      if 'query' in request:
+      try:
         coordinates = request['query']['pages'][self.pageid]['coordinates']
         self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
-      else:
+      except KeyError:
         self._coordinates = None
 
     return self._coordinates
