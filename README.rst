@@ -53,6 +53,8 @@ To install Wikipedia, simply run:
 
   $ pip install wikipedia
 
+After installation to define parameter 'WIKIPEDIA_PROJECT' with the path to the current project in system variables.
+
 Wikipedia is compatible with Python 2.6+ (2.7+ to run unittest discover) and Python 3.3+.
 
 Documentation

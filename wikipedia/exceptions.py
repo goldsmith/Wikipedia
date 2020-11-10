@@ -78,3 +78,10 @@ class HTTPTimeoutError(WikipediaException):
 
   def __unicode__(self):
     return u"Searching for \"{0}\" resulted in a timeout. Try again in a few seconds, and make sure you have rate limiting set to True.".format(self.query)
+
+
+class BadParameterException(WikipediaException):
+  """Exception raised when an incorrectly set parameter, such as language, query parameter and etc."""
+
+  def __unicode__(self):
+    return "The parameter is set incorrectly. {0}".format(self.error)
