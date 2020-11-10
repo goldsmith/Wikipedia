@@ -212,9 +212,9 @@ def random(pages=1):
 
 
 @cache
-def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
+def summary(title=None, pageid=None, sentences=0, chars=0, auto_suggest=True, redirect=True):
   '''
-  Plain text summary of the page.
+  Plain text summary of the page with title `title` or the pageid `pageid` (mutually exclusive).
 
   .. note:: This is a convenience wrapper - auto_suggest and redirect are enabled by default
 
@@ -228,7 +228,7 @@ def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
 
   # use auto_suggest and redirect to get the correct article
   # also, use page's error checking to raise DisambiguationError if necessary
-  page_info = page(title, auto_suggest=auto_suggest, redirect=redirect)
+  page_info = page(title, pageid, auto_suggest=auto_suggest, redirect=redirect)
   title = page_info.title
   pageid = page_info.pageid
 
