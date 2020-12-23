@@ -22,25 +22,25 @@ Wikipedia data, not getting it.
 .. code:: python
 
   >>> import wikipedia
-  >>> print wikipedia.summary("Wikipedia")
-  # Wikipedia (/ˌwɪkɨˈpiːdiə/ or /ˌwɪkiˈpiːdiə/ WIK-i-PEE-dee-ə) is a collaboratively edited, multilingual, free Internet encyclopedia supported by the non-profit Wikimedia Foundation...
+  >>> print(wikipedia.summary("Wikipedia"))
+  Wikipedia ( (listen) wik-ih-PEE-dee-ə or  (listen) wik-ee-) is a multilingual open-collaborative online encyclopedia created and maintained by a community of volunteer editors...
 
   >>> wikipedia.search("Barack")
-  # [u'Barak (given name)', u'Barack Obama', u'Barack (brandy)', u'Presidency of Barack Obama', u'Family of Barack Obama', u'First inauguration of Barack Obama', u'Barack Obama presidential campaign, 2008', u'Barack Obama, Sr.', u'Barack Obama citizenship conspiracy theories', u'Presidential transition of Barack Obama']
+  ['Barack Obama', 'Family of Barack Obama', 'Barack Obama Sr.', 'Barack (disambiguation)', 'Presidency of Barack Obama', 'Barack Adama', 'Barack (name)', 'Barack Obama religion conspiracy theories', 'Early life and career of Barack Obama', 'Michelle Obama']
 
-  >>> ny = wikipedia.page("New York")
+  >>> ny = wikipedia.page("New York City")
   >>> ny.title
-  # u'New York'
+  'New York City'
   >>> ny.url
-  # u'http://en.wikipedia.org/wiki/New_York'
+  'https://en.wikipedia.org/wiki/New_York_City'
   >>> ny.content
-  # u'New York is a state in the Northeastern region of the United States. New York is the 27th-most exten'...
+  'New York City (NYC), often called simply New York, is the most populous city in the United States.'...
   >>> ny.links[0]
-  # u'1790 United States Census'
+  '10 Hudson Yards'
 
   >>> wikipedia.set_lang("fr")
-  >>> wikipedia.summary("Facebook", sentences=1)
-  # Facebook est un service de réseautage social en ligne sur Internet permettant d'y publier des informations (photographies, liens, textes, etc.) en contrôlant leur visibilité par différentes catégories de personnes.
+  >>> wikipedia.summary("Python", sentences=1)
+  'Python (prononcé en anglais /ˈpaɪ.θɑn/) est un langage de programmation interprété, multi-paradigme et multiplateformes.'
 
 Note: this library was designed for ease of use and simplicity, not for advanced use. If you plan on doing serious scraping or automated requests, please use `Pywikipediabot <http://www.mediawiki.org/wiki/Manual:Pywikipediabot>`__ (or one of the other more advanced `Python MediaWiki API wrappers <http://en.wikipedia.org/wiki/Wikipedia:Creating_a_bot#Python>`__), which has a larger API, rate limiting, and other features so we can be considerate of the MediaWiki infrastructure.
 
