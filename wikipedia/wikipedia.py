@@ -86,7 +86,7 @@ def search(query, results=10, suggestion=False):
 
   Keyword arguments:
 
-  * results - the maxmimum number of results returned
+  * results - the maximum number of results returned
   * suggestion - if True, return results and suggestion (if any) in a tuple
   '''
 
