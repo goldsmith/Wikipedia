@@ -88,7 +88,7 @@ class TestPage(unittest.TestCase):
 
   def test_from_page_id(self):
     """Test loading from a page id"""
-    self.assertEqual(self.celtuce, wikipedia.page(pageid=1868108))
+    self.assertEqual(self.celtuce, wikipedia.page(page_id=1868108))
 
   def test_title(self):
     """Test the title."""

@@ -31,7 +31,7 @@ class PageError(WikipediaException):
 
   def __init__(self, pageid=None, *args):
     if pageid:
-      self.pageid = pageid
+      self.page_id = pageid
     else:
       self.title = args[0]
 
@@ -39,7 +39,7 @@ class PageError(WikipediaException):
     if hasattr(self, 'title'):
       return u"\"{0}\" does not match any pages. Try another query!".format(self.title)
     else:
-      return u"Page id \"{0}\" does not match any pages. Try another id!".format(self.pageid)
+      return u"Page id \"{0}\" does not match any pages. Try another id!".format(self.page_id)
 
 
 class DisambiguationError(WikipediaException):
