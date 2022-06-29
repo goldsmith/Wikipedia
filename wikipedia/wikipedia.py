@@ -268,11 +268,7 @@ def page(title=None, pageid=None, auto_suggest=True, redirect=True, preload=Fals
   if title is not None:
     if auto_suggest:
       results, suggestion = search(title, results=1, suggestion=True)
-      try:
-        title = suggestion or results[0]
-      except IndexError:
-        # if there is no suggestion or search results, the page doesn't exist
-        raise PageError(title)
+      title = results[0] if results else suggestion      
     return WikipediaPage(title, redirect=redirect, preload=preload)
   elif pageid is not None:
     return WikipediaPage(pageid=pageid, preload=preload)
