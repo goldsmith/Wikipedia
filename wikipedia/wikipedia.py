@@ -269,7 +269,7 @@ def page(title=None, pageid=None, auto_suggest=True, redirect=True, preload=Fals
     if auto_suggest:
       results, suggestion = search(title, results=1, suggestion=True)
       try:
-        title = suggestion or results[0]
+        title = results[0] or suggestion
       except IndexError:
         # if there is no suggestion or search results, the page doesn't exist
         raise PageError(title)
