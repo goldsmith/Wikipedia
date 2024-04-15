@@ -17,6 +17,7 @@ RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
 USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
+PROXIES = None
 
 
 def set_lang(prefix):
@@ -735,7 +736,7 @@ def _wiki_request(params):
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
     time.sleep(int(wait_time.total_seconds()))
 
-  r = requests.get(API_URL, params=params, headers=headers)
+  r = requests.get(API_URL, params=params, headers=headers, proxies=PROXIES)
 
   if RATE_LIMIT:
     RATE_LIMIT_LAST_CALL = datetime.now()
