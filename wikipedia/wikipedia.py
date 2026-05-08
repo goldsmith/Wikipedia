@@ -312,7 +312,7 @@ class WikipediaPage(object):
         and self.title == other.title
         and self.url == other.url
       )
-    except:
+    except Exception:
       return False
 
   def __load(self, redirect=True, preload=False):
