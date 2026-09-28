@@ -3,24 +3,17 @@
 Wikipedia
 =========
 
-Wikipedia
-*********
+A small synchronous Python library for searching Wikipedia, reading article text,
+and retrieving page metadata. This documentation describes the unreleased
+1.5.0 candidate, which supports Python 3.10–3.14.
 
-Wikipedia is a Python library that makes it easy to access and parse data from Wikipedia.
+.. toctree::
+   :maxdepth: 2
 
-Search Wikipedia, get article summaries, get data like links and images from a page, and more. Wikipedia wraps the `MediaWiki API <https://www.mediawiki.org/wiki/API>`_ so you can focus on using Wikipedia data, not getting it.
+   quickstart
+   code
 
-::
-
-	>>> import wikipedia
-
-	>>> print wikipedia.summary("Wikipedia")
-	# Wikipedia (/ˌwɪkɨˈpiːdiə/ or /ˌwɪkiˈpiːdiə/ WIK-i-PEE-dee-ə) is a collaboratively edited, multilingual, free Internet encyclopedia supported by the non-profit Wikimedia Foundation...
-
-Go to the :ref:`quickstart` to start using ``wikipedia`` now, or see the :ref:`api`.
-
-Indices and tables
-==================
+Article data comes from the `MediaWiki Action API <https://www.mediawiki.org/wiki/API>`_.
 
 * :ref:`genindex`
 * :ref:`modindex`
