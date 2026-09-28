@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wikipedia"
+version = "1.4.0"
+description = "Wikipedia API for Python"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Jonathan Goldsmith", email = "jhghank@gmail.com" }]
+keywords = ["python", "wikipedia", "API"]
+requires-python = ">=3.9"
+dependencies = [
+  "beautifulsoup4>=4.4.0",
+  "requests>=2.20.0,<3.0.0",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Topic :: Software Development :: Libraries",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+]
+
+[project.urls]
+Homepage = "https://github.com/goldsmith/Wikipedia"
+Documentation = "https://wikipedia.readthedocs.io/"
+Changelog = "https://github.com/goldsmith/Wikipedia/blob/master/CHANGELOG.md"
+Issues = "https://github.com/goldsmith/Wikipedia/issues"
+
+[tool.setuptools]
+packages = ["wikipedia"]

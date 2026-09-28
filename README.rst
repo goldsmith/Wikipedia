@@ -53,7 +53,7 @@ To install Wikipedia, simply run:
 
   $ pip install wikipedia
 
-Wikipedia is compatible with Python 2.6+ (2.7+ to run unittest discover) and Python 3.3+.
+Wikipedia requires Python 3.9 or newer. Older Python versions can keep using 1.4.0.
 
 Documentation
 -------------
@@ -67,13 +67,12 @@ To run tests, clone the `repository on GitHub <https://github.com/goldsmith/Wiki
 
 ::
 
-  $ pip install -r requirements.txt
-  $ bash runtests  # will run tests for python and python3
-  $ python -m unittest discover tests/ '*test.py'  # manual style
+  $ pip install -e .
+  $ python -m unittest discover tests/ '*test.py'
 
 in the root project directory.
 
-To build the documentation yourself, after installing requirements.txt, run:
+To build the documentation yourself, after ``pip install -e .``, run:
 
 ::
 
