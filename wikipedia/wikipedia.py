@@ -12,11 +12,24 @@ from .exceptions import (
 from .util import cache, stdout_encode, debug
 import re
 
-API_URL = 'http://en.wikipedia.org/w/api.php'
+API_URL = 'https://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
-USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
+# Wikimedia's User-Agent policy asks for a descriptive agent with contact
+# details (https://meta.wikimedia.org/wiki/User-Agent_policy). Applications
+# should add their own with set_user_agent().
+USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/) python-requests/{0}'.format(
+  requests.__version__)
+# Seconds to wait for Wikipedia to respond (connect and read). Without a
+# timeout a stalled connection blocks the caller forever.
+REQUEST_TIMEOUT = 30
+# Extra attempts after HTTP 429 or 5xx, or a dropped connection, honouring
+# Retry-After (capped at RETRY_MAX_WAIT seconds).
+MAX_RETRIES = 2
+RETRY_MAX_WAIT = 30
+
+_session = None
 
 
 def set_lang(prefix):
@@ -29,7 +42,7 @@ def set_lang(prefix):
   .. note:: Make sure you search for page titles in the language that you have set.
   '''
   global API_URL
-  API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
+  API_URL = 'https://' + prefix.lower() + '.wikipedia.org/w/api.php'
 
   for cached_func in (search, suggest, summary):
     cached_func.clear_cache()
@@ -45,6 +58,19 @@ def set_user_agent(user_agent_string):
   '''
   global USER_AGENT
   USER_AGENT = user_agent_string
+
+
+def set_timeout(seconds):
+  '''
+  Set how long to wait for Wikipedia to respond, in seconds (default 30).
+  A timeout raises HTTPTimeoutError.
+
+  Arguments:
+
+  * seconds - (number) the timeout, or None to wait indefinitely
+  '''
+  global REQUEST_TIMEOUT
+  REQUEST_TIMEOUT = seconds
 
 
 def set_rate_limiting(rate_limit, min_wait=timedelta(milliseconds=50)):
@@ -269,7 +295,12 @@ def page(title=None, pageid=None, auto_suggest=True, redirect=True, preload=Fals
     if auto_suggest:
       results, suggestion = search(title, results=1, suggestion=True)
       try:
-        title = suggestion or results[0]
+        if results and results[0].lower() == title.lower():
+          # The title exists as typed: don't let the spelling suggestion
+          # "correct" it into a different page.
+          title = results[0]
+        else:
+          title = suggestion or results[0]
       except IndexError:
         # if there is no suggestion or search results, the page doesn't exist
         raise PageError(title)
@@ -710,13 +741,23 @@ def donate():
   webbrowser.open('https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage', new=2)
 
 
+def _get_session():
+  global _session
+  if _session is None:
+    _session = requests.Session()
+  return _session
+
+
 def _wiki_request(params):
   '''
   Make a request to the Wikipedia API using the given search parameters.
   Returns a parsed dict of the JSON response.
   '''
+  return _http_get_json(params)
+
+
+def _http_get_json(params):
   global RATE_LIMIT_LAST_CALL
-  global USER_AGENT
 
   params['format'] = 'json'
   if not 'action' in params:
@@ -733,11 +774,42 @@ def _wiki_request(params):
     # so wait until we're in the clear to make the request
 
     wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
-    time.sleep(int(wait_time.total_seconds()))
+    # total_seconds(), not int(): the default 50 ms wait rounded down to 0
+    time.sleep(max(0, wait_time.total_seconds()))
 
-  r = requests.get(API_URL, params=params, headers=headers)
+  query = params.get('srsearch') or params.get('titles') or params.get('pageids') or ''
+  attempt = 0
+  while True:
+    try:
+      r = _get_session().get(API_URL, params=params, headers=headers, timeout=REQUEST_TIMEOUT)
+    except requests.exceptions.Timeout:
+      raise HTTPTimeoutError(query)
+    except requests.exceptions.ConnectionError:
+      if attempt >= MAX_RETRIES:
+        raise
+      time.sleep(_backoff(attempt, None))
+      attempt += 1
+      continue
 
-  if RATE_LIMIT:
-    RATE_LIMIT_LAST_CALL = datetime.now()
+    if RATE_LIMIT:
+      RATE_LIMIT_LAST_CALL = datetime.now()
 
-  return r.json()
+    if (r.status_code == 429 or r.status_code >= 500) and attempt < MAX_RETRIES:
+      time.sleep(_backoff(attempt, r.headers.get('Retry-After')))
+      attempt += 1
+      continue
+
+    try:
+      return r.json()
+    except ValueError:
+      raise WikipediaException(
+        'Wikipedia returned HTTP {0} with a non-JSON body for "{1}"'.format(r.status_code, query))
+
+
+def _backoff(attempt, retry_after):
+  '''Seconds to wait before retrying: Retry-After if given, else 1, 2, 4... capped.'''
+  try:
+    wait = float(retry_after)
+  except (TypeError, ValueError):
+    wait = 2 ** attempt
+  return max(0, min(wait, RETRY_MAX_WAIT))

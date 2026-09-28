@@ -2,6 +2,15 @@
 
 ## Current
 
+* Talk to the API over HTTPS (it was plain HTTP, redirected on every call), including after ``set_lang``.
+* Requests time out after 30 seconds (``wikipedia.set_timeout()`` to change) and raise ``HTTPTimeoutError``; before, a stalled connection could block forever.
+* Retry HTTP 429 and 5xx responses and dropped connections up to twice, honouring ``Retry-After`` (capped at 30 s).
+* Non-JSON error pages raise ``WikipediaException`` with the HTTP status instead of a bare JSON decoding error.
+* Reuse one HTTP connection (``requests.Session``) across calls.
+* Fix ``set_rate_limiting``: waits shorter than a second, including the 50 ms default, were rounded down to no wait.
+* The default User-Agent also names the requests version; apps should still set their own with ``set_user_agent`` (Wikimedia User-Agent policy).
+* ``page(auto_suggest=True)`` no longer replaces a title that exists as typed with Wikipedia's spelling suggestion; typos are still corrected.
+
 ## Version 1.4
 
 * Test wikipdia library on Python v3.4. PR [#52](https://github.com/goldsmith/Wikipedia/pull/52) by [frewsxcv](https://github.com/frewsxcv)
