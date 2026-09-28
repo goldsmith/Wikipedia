@@ -1,4 +1,2 @@
 #!/bin/sh
-
-python -m unittest discover tests/ '*test.py' &&
-python3 -m unittest discover tests/ '*test.py'
+exec python -m pytest "$@"

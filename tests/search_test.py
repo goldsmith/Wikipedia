@@ -7,19 +7,6 @@ from wikipedia import wikipedia
 from request_mock_data import mock_data
 
 
-# mock out _wiki_request
-class _wiki_request(object):
-
-  calls = defaultdict(int)
-
-  @classmethod
-  def __call__(cls, params):
-    cls.calls[params.__str__()] += 1
-    return mock_data["_wiki_request calls"][tuple(sorted(params.items()))]
-
-wikipedia._wiki_request = _wiki_request()
-
-
 class TestSearch(unittest.TestCase):
   """Test the functionality of wikipedia.search."""
 

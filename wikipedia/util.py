@@ -2,6 +2,11 @@ from __future__ import print_function, unicode_literals
 
 import sys
 import functools
+import inspect
+import time
+from collections import OrderedDict
+from copy import deepcopy
+from threading import RLock
 
 def debug(fn):
   def wrapper(*args, **kwargs):
@@ -17,25 +22,40 @@ class cache(object):
 
   def __init__(self, fn):
     self.fn = fn
-    self._cache = {}
+    self._cache = OrderedDict()
+    self._signature = inspect.signature(fn)
+    self._lock = RLock()
     functools.update_wrapper(self, fn)
 
   def __call__(self, *args, **kwargs):
-    key = str(args) + str(kwargs)
-    if key in self._cache:
-      ret = self._cache[key]
-    else:
-      ret = self._cache[key] = self.fn(*args, **kwargs)
-
-    return ret
+    bound = self._signature.bind(*args, **kwargs)
+    bound.apply_defaults()
+    key = (self.fn.__globals__.get('API_URL'), tuple(bound.arguments.items()))
+    try:
+      hash(key)
+    except TypeError:
+      return self.fn(*args, **kwargs)
+    with self._lock:
+      entry = self._cache.get(key)
+      if entry is not None:
+        expires, value = entry
+        if time.monotonic() < expires:
+          self._cache.move_to_end(key)
+          return deepcopy(value)
+        del self._cache[key]
+    value = self.fn(*args, **kwargs)
+    with self._lock:
+      self._cache[key] = (time.monotonic() + 300, deepcopy(value))
+      self._cache.move_to_end(key)
+      while len(self._cache) > 256:
+        self._cache.popitem(last=False)
+    return value
 
   def clear_cache(self):
-    self._cache = {}
+    with self._lock:
+      self._cache.clear()
 
 
-# from http://stackoverflow.com/questions/3627793/best-output-type-and-encoding-practices-for-repr-functions
 def stdout_encode(u, default='UTF8'):
-  encoding = sys.stdout.encoding or default
-  if sys.version_info > (3, 0):
-    return u.encode(encoding).decode(encoding)
-  return u.encode(encoding)
+  """Return Unicode text; encoding belongs to the caller's output stream."""
+  return u
