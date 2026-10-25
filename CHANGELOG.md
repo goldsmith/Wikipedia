@@ -1,6 +1,6 @@
 # Changes
 
-## 1.5.0 — unreleased stabilization candidate
+## 1.5.0 — 2026-10-24
 
 - Require Python 3.10 or newer; test through 3.14. Modern build metadata, wheels,
   offline pytest coverage and GitHub Actions replace the obsolete Travis setup.
