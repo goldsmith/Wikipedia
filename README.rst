@@ -1,143 +1,126 @@
 Wikipedia
 =========
 
-**Wikipedia** is a small synchronous Python library for searching Wikipedia,
-reading article text, and retrieving page metadata.
+**Wikipedia** is a Python library that makes it easy to access and parse
+data from Wikipedia.
+
+Search Wikipedia, get article summaries, get data like links and images
+from a page, and more. Wikipedia wraps the `MediaWiki
+API <https://www.mediawiki.org/wiki/API>`__ so you can focus on using
+Wikipedia data, not getting it.
+
+.. code:: python
+
+  >>> import wikipedia
+  >>> wikipedia.summary("Wikipedia", sentences=1)
+  'Wikipedia is a free online encyclopedia written and maintained by a community of volunteer editors, known as Wikipedians...'
+
+  >>> wikipedia.search("Barack")
+  ['Barack Obama', 'Barack Obama Sr.', 'Barack (disambiguation)', 'Family of Barack Obama', ...]
+
+  >>> ny = wikipedia.page("New York City")
+  >>> ny.title
+  'New York City'
+  >>> ny.url
+  'https://en.wikipedia.org/wiki/New_York_City'
+  >>> ny.content
+  'New York, often called New York City (NYC), is the most populous city in the United States...'
+  >>> ny.links[0]
+  '116 John Street'
+
+  >>> wikipedia.set_lang("fr")
+  >>> wikipedia.summary("Facebook", sentences=1)
+  'Facebook [ˈfeɪs.bʊk] (litt. ...'
 
 Installation
 ------------
 
-This branch contains an **unreleased 1.5.0 candidate**. To try the examples below,
-install from a checkout of this branch in a virtual environment:
+To install Wikipedia, simply run:
 
 ::
 
-   python -m pip install .
+  $ pip install wikipedia
 
-``python -m pip install wikipedia`` installs the latest published release,
-currently 1.4.0, which does not include the new APIs or behavior described here.
-
-The proposed 1.5 series supports Python 3.10–3.14. Python 2 and Python 3.9 and
-older are no longer supported.
-
-Quick start
------------
-
-.. code-block:: python
-
-   import wikipedia
-
-   # Replace this example URL with your application's contact page.
-   wikipedia.set_user_agent("MyApplication/1.0 (https://example.org/contact)")
-   wikipedia.set_timeout((5, 15))
-   wikipedia.set_lang("en")
-
-   titles = wikipedia.search("Earth", results=3)
-   earth = wikipedia.page("Earth")
-   print(earth.title, earth.url)
-   print(earth.summary)
-   print(earth.sections)
-
-   wikipedia.set_lang("fr")
-   print(wikipedia.summary("Terre", sentences=2))
-   # The existing earth object still fetches from English Wikipedia.
-
-Exact titles are resolved before trying search suggestions. Set
-``auto_suggest=False`` to disable the fallback. An exact disambiguation page
-raises ``DisambiguationError``; it is not silently replaced by another article.
-
-.. code-block:: python
-
-   try:
-       article = wikipedia.page("Mercury", auto_suggest=False)
-   except wikipedia.DisambiguationError as error:
-       print(error.options)
-   except wikipedia.PageError as error:
-       print(error)
-   except wikipedia.HTTPTimeoutError as error:
-       print(error)
-   except wikipedia.RequestError as error:
-       print(error.status_code, error.api_code, error.retry_after)
-
-Requests and caching
---------------------
-
-Requests use HTTPS, a shared connection pool, and a default connect/read timeout
-of ``(5, 15)`` seconds. ``set_timeout(10)`` applies ten seconds to both phases;
-``set_timeout(None)`` explicitly disables timeouts. A read timeout limits socket
-inactivity, not total operation time. A page property can require several requests.
-
-Transient failures receive at most two retries per request. Server retry delays
-are respected, with a total retry-sleep budget of 30 seconds per request. Longer
-server delays raise ``RequestError`` with ``retry_after`` instead of retrying early.
-Permanent HTTP/API failures and malformed responses raise ``RequestError``;
-exhausted timeouts raise ``HTTPTimeoutError``. Both inherit ``WikipediaException``.
-
-Set an informative application user agent with contact information, as required
-by `Wikimedia's API guidance <https://www.mediawiki.org/wiki/API:Etiquette>`_.
-``set_rate_limiting(True)`` spaces requests by at least 50 milliseconds; supply
-``min_wait=datetime.timedelta(...)`` for a longer interval. Make automated requests
-serially and respect server limits. Requests' standard proxy environment variables
-(``HTTPS_PROXY``, ``HTTP_PROXY``, ``NO_PROXY``) remain supported.
-
-Cached module functions hold at most 256 entries each, expiring after five minutes.
-Language is part of their keys, and ``set_lang`` clears them. Call, for example,
-``wikipedia.search.clear_cache()`` to clear a function's cache manually. Returned
-lists and dictionaries can be edited without changing cached results. A page
-object caches fetched properties for its lifetime, including empty results.
-
-Configuration remains process-wide. Changing language, timeout, rate limit, or user
-agent concurrently with requests is not supported. This is not a thread-safe client
-architecture. Use separate processes for independently configured concurrent workloads.
-
-Content and compatibility
--------------------------
-
-``content`` and ``summary`` use MediaWiki's plain-text extracts, which omit tables,
-images and some other markup. Sentence and character limits use the upstream
-extract API and are approximate. ``section(name)`` returns text through the next
-heading, excluding subsections; a missing section returns ``None``.
-
-``links`` and ``images`` follow the API's order, not article display order.
-``references`` means external links, including links that are not citations.
-Missing list properties return ``[]``; missing coordinates return ``None``.
-Coordinates remain a tuple of ``Decimal`` values. ``random(1)`` returns a string;
-multiple random pages return a list. ``__version__`` remains a three-item tuple.
-The existing positional function signatures are preserved.
-
-See ``CHANGELOG.md`` for intentional changes from 1.4.0 and ``CONTRIBUTIONS.md``
-for PR attribution. This release does not add async support, translation lookup,
-infoboxes, tables, category-member traversal, or a new client API.
-
-Development
------------
-
-::
-
-   python -m pip install -e '.[dev,docs]'
-   python -m pytest
-   python -m ruff check wikipedia tests scripts
-   python -m build
-   python -m twine check dist/*
-   python scripts/check_distributions.py
-   python -m sphinx -W --keep-going -b html docs/source docs/_build/html
-
-The default test suite is offline and blocks unexpected HTTP calls. The optional
-LangChain integration test uses ``langchain-community==0.4.2`` and synthetic HTTP
-responses. ``python scripts/live_smoke.py`` runs the separate opt-in live checks,
-with a persistent budget of at most 30 requests per budget file.
+Wikipedia 1.5 supports Python 3.10 and newer. If you're still on an older
+Python, ``pip install "wikipedia<1.5"`` will keep working the way it
+always has.
 
 Documentation
 -------------
 
-The public documentation is at https://wikipedia.readthedocs.io/.
-Build locally to inspect documentation for this unreleased branch.
+Read the docs at https://wikipedia.readthedocs.io/.
 
-License and credits
--------------------
+-  `Quickstart <https://wikipedia.readthedocs.io/en/latest/quickstart.html>`__
+-  `Full API <https://wikipedia.readthedocs.io/en/latest/code.html>`__
 
-MIT licensed; see ``LICENSE``. Original author: Jonathan Goldsmith.
+Playing nicely with Wikipedia
+-----------------------------
 
-Thanks to ``wiki-api`` by @richardasaurus for inspiration, @nmoroze and
-@themichaelyang for feedback, the project's contributors, and the Wikimedia
-Foundation and volunteers who make Wikipedia possible.
+One small thing before you script away: Wikimedia asks that API clients
+say who they are, so please set a user agent with a way to reach you:
+
+.. code:: python
+
+  >>> wikipedia.set_user_agent("my-cool-project/1.0 (https://example.com/contact)")
+
+The library takes care of the rest: requests go over HTTPS, share a
+connection pool, give up after a 5-second connect / 15-second read timeout
+(``set_timeout`` if you want different limits), and retry transient
+failures at most twice before raising ``RequestError`` or
+``HTTPTimeoutError``. ``set_rate_limiting(True)`` keeps at least 50 ms
+between requests if you want to be extra polite. Results are cached for
+five minutes so asking twice doesn't cost Wikipedia a dime.
+
+Note: this library was designed for ease of use and simplicity, not for
+advanced use. If you plan on doing serious scraping or automated requests,
+please use `Pywikibot <https://www.mediawiki.org/wiki/Manual:Pywikibot>`__
+(or one of the other more advanced `Python MediaWiki API wrappers
+<https://en.wikipedia.org/wiki/Wikipedia:Creating_a_bot#Python>`__), which
+has a larger API, rate limiting, and other features so we can be
+considerate of the MediaWiki infrastructure.
+
+What's new in 1.5
+-----------------
+
+Thirteen years of gentle maintenance, collected: exact titles resolve
+before suggestions, disambiguation pages raise instead of silently
+picking a different article for you, redirects and sections behave,
+missing properties return ``[]`` or ``None`` instead of exploding, and
+page objects remember which language you fetched them in. Python 3.10+
+only, real packaging, and an offline test suite that doesn't hammer the
+API. See ``CHANGELOG.md`` for the full list and ``CONTRIBUTIONS.md`` for
+the many people whose pull requests informed it.
+
+Development
+-----------
+
+To run tests, clone the `repository on GitHub
+<https://github.com/goldsmith/Wikipedia>`__, then run:
+
+::
+
+  $ pip install -e '.[dev]'
+  $ bash runtests
+
+The test suite runs offline — it stubs HTTP rather than pestering
+Wikipedia. ``python scripts/live_smoke.py`` runs the opt-in live checks
+against the real API (rate limited, capped at 30 requests), and
+``pip install -e '.[docs]'`` plus ``sphinx -b html docs/source
+docs/_build/html`` builds the documentation.
+
+License
+-------
+
+MIT licensed. See the `LICENSE
+file <https://github.com/goldsmith/Wikipedia/blob/master/LICENSE>`__ for
+full details.
+
+Credits
+-------
+
+-  `wiki-api <https://github.com/richardasaurus/wiki-api>`__ by
+   @richardasaurus for inspiration
+-  @nmoroze and @themichaelyang for feedback and suggestions
+-  The `Wikimedia
+   Foundation <https://wikimediafoundation.org/>`__ for giving
+   the world free access to data
