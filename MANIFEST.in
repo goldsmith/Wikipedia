@@ -1,1 +1,5 @@
-include README.rst LICENSE requirements.txt
+include README.rst LICENSE requirements.txt pytest.ini runtests
+include CHANGELOG.md CONTRIBUTIONS.md
+recursive-include tests *.py
+recursive-include docs *.rst *.py
+recursive-include scripts *.py

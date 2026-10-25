@@ -1,16 +1,6 @@
 Wikipedia
 =========
 
-.. image:: https://travis-ci.org/goldsmith/Wikipedia.png?branch=master
-  :target: https://travis-ci.org/goldsmith/Wikipedia
-.. image:: https://pypip.in/d/wikipedia/badge.png
-  :target: https://crate.io/packages/wikipedia
-.. image:: https://pypip.in/v/wikipedia/badge.png
-  :target: https://crate.io/packages/wikipedia
-.. image:: https://pypip.in/license/wikipedia/badge.png
-    :target: https://pypi.python.org/pypi/wikipedia/
-    :alt: License
-
 **Wikipedia** is a Python library that makes it easy to access and parse
 data from Wikipedia.
 
@@ -22,27 +12,25 @@ Wikipedia data, not getting it.
 .. code:: python
 
   >>> import wikipedia
-  >>> print wikipedia.summary("Wikipedia")
-  # Wikipedia (/ˌwɪkɨˈpiːdiə/ or /ˌwɪkiˈpiːdiə/ WIK-i-PEE-dee-ə) is a collaboratively edited, multilingual, free Internet encyclopedia supported by the non-profit Wikimedia Foundation...
+  >>> wikipedia.summary("Wikipedia", sentences=1)
+  'Wikipedia is a free online encyclopedia written and maintained by a community of volunteer editors, known as Wikipedians...'
 
   >>> wikipedia.search("Barack")
-  # [u'Barak (given name)', u'Barack Obama', u'Barack (brandy)', u'Presidency of Barack Obama', u'Family of Barack Obama', u'First inauguration of Barack Obama', u'Barack Obama presidential campaign, 2008', u'Barack Obama, Sr.', u'Barack Obama citizenship conspiracy theories', u'Presidential transition of Barack Obama']
+  ['Barack Obama', 'Barack Obama Sr.', 'Barack (disambiguation)', 'Family of Barack Obama', ...]
 
-  >>> ny = wikipedia.page("New York")
+  >>> ny = wikipedia.page("New York City")
   >>> ny.title
-  # u'New York'
+  'New York City'
   >>> ny.url
-  # u'http://en.wikipedia.org/wiki/New_York'
+  'https://en.wikipedia.org/wiki/New_York_City'
   >>> ny.content
-  # u'New York is a state in the Northeastern region of the United States. New York is the 27th-most exten'...
+  'New York, often called New York City (NYC), is the most populous city in the United States...'
   >>> ny.links[0]
-  # u'1790 United States Census'
+  '116 John Street'
 
   >>> wikipedia.set_lang("fr")
   >>> wikipedia.summary("Facebook", sentences=1)
-  # Facebook est un service de réseautage social en ligne sur Internet permettant d'y publier des informations (photographies, liens, textes, etc.) en contrôlant leur visibilité par différentes catégories de personnes.
-
-Note: this library was designed for ease of use and simplicity, not for advanced use. If you plan on doing serious scraping or automated requests, please use `Pywikipediabot <http://www.mediawiki.org/wiki/Manual:Pywikipediabot>`__ (or one of the other more advanced `Python MediaWiki API wrappers <http://en.wikipedia.org/wiki/Wikipedia:Creating_a_bot#Python>`__), which has a larger API, rate limiting, and other features so we can be considerate of the MediaWiki infrastructure.
+  'Facebook [ˈfeɪs.bʊk] (litt. ...'
 
 Installation
 ------------
@@ -53,33 +41,72 @@ To install Wikipedia, simply run:
 
   $ pip install wikipedia
 
-Wikipedia is compatible with Python 2.6+ (2.7+ to run unittest discover) and Python 3.3+.
+Wikipedia 1.5 supports Python 3.10 and newer. If you're still on an older
+Python, ``pip install "wikipedia<1.5"`` will keep working the way it
+always has.
 
 Documentation
 -------------
 
-Read the docs at https://wikipedia.readthedocs.org/en/latest/.
+Read the docs at https://wikipedia.readthedocs.io/.
 
--  `Quickstart <https://wikipedia.readthedocs.org/en/latest/quickstart.html>`__
--  `Full API <https://wikipedia.readthedocs.org/en/latest/code.html>`__
+-  `Quickstart <https://wikipedia.readthedocs.io/en/latest/quickstart.html>`__
+-  `Full API <https://wikipedia.readthedocs.io/en/latest/code.html>`__
 
-To run tests, clone the `repository on GitHub <https://github.com/goldsmith/Wikipedia>`__, then run:
+Playing nicely with Wikipedia
+-----------------------------
+
+One small thing before you script away: Wikimedia asks that API clients
+say who they are, so please set a user agent with a way to reach you:
+
+.. code:: python
+
+  >>> wikipedia.set_user_agent("my-cool-project/1.0 (https://example.com/contact)")
+
+The library takes care of the rest: requests go over HTTPS, share a
+connection pool, give up after a 5-second connect / 15-second read timeout
+(``set_timeout`` if you want different limits), and retry transient
+failures at most twice before raising ``RequestError`` or
+``HTTPTimeoutError``. ``set_rate_limiting(True)`` keeps at least 50 ms
+between requests if you want to be extra polite. Results are cached for
+five minutes so asking twice doesn't cost Wikipedia a dime.
+
+Note: this library was designed for ease of use and simplicity, not for
+advanced use. If you plan on doing serious scraping or automated requests,
+please use `Pywikibot <https://www.mediawiki.org/wiki/Manual:Pywikibot>`__
+(or one of the other more advanced `Python MediaWiki API wrappers
+<https://en.wikipedia.org/wiki/Wikipedia:Creating_a_bot#Python>`__), which
+has a larger API, rate limiting, and other features so we can be
+considerate of the MediaWiki infrastructure.
+
+What's new in 1.5
+-----------------
+
+Thirteen years of gentle maintenance, collected: exact titles resolve
+before suggestions, disambiguation pages raise instead of silently
+picking a different article for you, redirects and sections behave,
+missing properties return ``[]`` or ``None`` instead of exploding, and
+page objects remember which language you fetched them in. Python 3.10+
+only, real packaging, and an offline test suite that doesn't hammer the
+API. See ``CHANGELOG.md`` for the full list and ``CONTRIBUTIONS.md`` for
+the many people whose pull requests informed it.
+
+Development
+-----------
+
+To run tests, clone the `repository on GitHub
+<https://github.com/goldsmith/Wikipedia>`__, then run:
 
 ::
 
-  $ pip install -r requirements.txt
-  $ bash runtests  # will run tests for python and python3
-  $ python -m unittest discover tests/ '*test.py'  # manual style
+  $ pip install -e '.[dev]'
+  $ bash runtests
 
-in the root project directory.
-
-To build the documentation yourself, after installing requirements.txt, run:
-
-::
-
-  $ pip install sphinx
-  $ cd docs/
-  $ make html
+The test suite runs offline — it stubs HTTP rather than pestering
+Wikipedia. ``python scripts/live_smoke.py`` runs the opt-in live checks
+against the real API (rate limited, capped at 30 requests), and
+``pip install -e '.[docs]'`` plus ``sphinx -b html docs/source
+docs/_build/html`` builds the documentation.
 
 License
 -------
@@ -95,12 +122,5 @@ Credits
    @richardasaurus for inspiration
 -  @nmoroze and @themichaelyang for feedback and suggestions
 -  The `Wikimedia
-   Foundation <http://wikimediafoundation.org/wiki/Home>`__ for giving
+   Foundation <https://wikimediafoundation.org/>`__ for giving
    the world free access to data
-
-
-
-.. image:: https://d2weczhvl823v0.cloudfront.net/goldsmith/wikipedia/trend.png
-   :alt: Bitdeli badge
-   :target: https://bitdeli.com/free
-

@@ -6,12 +6,6 @@ from wikipedia import wikipedia
 from request_mock_data import mock_data
 
 
-# mock out _wiki_request
-def _wiki_request(params):
-  return mock_data["_wiki_request calls"][tuple(sorted(params.items()))]
-wikipedia._wiki_request = _wiki_request
-
-
 class TestPageSetUp(unittest.TestCase):
   """Test the functionality of wikipedia.page's __init__ and load functions."""
 
@@ -66,7 +60,8 @@ class TestPageSetUp(unittest.TestCase):
       options = e.options
 
     self.assertTrue(error_raised)
-    self.assertEqual(options, [u'Dodge Ramcharger', u'Dodge Ram Van', u'Dodge Mini Ram', u'Dodge Caravan C/V', u'Dodge Caravan C/V', u'Ram C/V', u'Dodge Ram 50', u'Dodge D-Series', u'Dodge Rampage', u'Ram (brand)'])
+    # Resolve href targets (Ram Trucks), not labels, and deduplicate targets.
+    self.assertEqual(options, [u'Dodge Ramcharger', u'Dodge Ram Van', u'Dodge Mini Ram', u'Dodge Caravan C/V', u'Ram C/V', u'Dodge Ram 50', u'Dodge D-Series', u'Dodge Rampage', u'Ram Trucks'])
 
   def test_auto_suggest(self):
     """Test that auto_suggest properly corrects a typo."""

@@ -26,14 +26,31 @@ class WikipediaException(Exception):
       return self.__unicode__().encode('utf8')
 
 
+class RequestError(WikipediaException):
+  """HTTP, MediaWiki API, or invalid-response failure.
+
+  ``status_code``, ``api_code`` and ``retry_after`` are None when unavailable.
+  Retry delays are expressed in seconds.
+  """
+
+  def __init__(self, error, status_code=None, api_code=None, retry_after=None):
+    super().__init__(error)
+    self.status_code = status_code
+    self.api_code = api_code
+    self.retry_after = retry_after
+
+  def __unicode__(self):
+    return str(self.error)
+
+
 class PageError(WikipediaException):
   """Exception raised when no Wikipedia matched a query."""
 
   def __init__(self, pageid=None, *args):
-    if pageid:
+    if pageid is not None:
       self.pageid = pageid
     else:
-      self.title = args[0]
+      self.title = args[0] if args else ''
 
   def __unicode__(self):
     if hasattr(self, 'title'):

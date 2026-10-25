@@ -1,52 +1,21 @@
 .. _api:
 
-Wikipedia Documentation
-***********************
+API reference
+=============
 
 Here you can find the full developer API for the wikipedia project.
 
-Contents:
-
-.. toctree::
-
-   code
-
 .. automodule:: wikipedia
-  :members:
-
-Functions and Classes
-===============================
-
-.. automodule:: wikipedia
-
-  .. autofunction:: search(query, results=10, suggestion=False)
-
-  .. autofunction:: suggest(query)
-
-  .. autofunction:: summary(query, sentences=0, chars=0, auto_suggest=True, redirect=True)
-
-  .. autofunction:: page
-
-  .. autofunction:: geosearch(latitude, longitude, title=None, results=10, radius=1000)
+   :members: search, suggest, summary, page, geosearch, languages, set_lang, set_user_agent, set_timeout, set_rate_limiting, random, donate
 
 .. autoclass:: wikipedia.WikipediaPage
-  :members:
-
-.. autofunction:: wikipedia.languages
-
-.. autofunction:: wikipedia.set_lang
-
-.. autofunction:: wikipedia.set_rate_limiting
-
-.. autofunction:: wikipedia.random
-
-.. autofunction:: wikipedia.donate
+   :members:
 
 Exceptions
-==========
+----------
 
 .. automodule:: wikipedia.exceptions
-  :members:
+   :members: WikipediaException, RequestError, PageError, DisambiguationError, RedirectError, HTTPTimeoutError
 
 Indices and tables
 ==================

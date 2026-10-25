@@ -38,3 +38,10 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+.venv/
+.pytest_cache/
+htmlcov/
+coverage.xml
+
+docs/_build/
+.ruff_cache/

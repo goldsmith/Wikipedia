@@ -2,21 +2,46 @@ from __future__ import unicode_literals
 
 import requests
 import time
+import atexit
+import math
+from email.utils import parsedate_to_datetime
+from numbers import Real
+from urllib.parse import unquote, urlsplit
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from decimal import Decimal
 
 from .exceptions import (
   PageError, DisambiguationError, RedirectError, HTTPTimeoutError,
-  WikipediaException, ODD_ERROR_MESSAGE)
+  WikipediaException, RequestError, ODD_ERROR_MESSAGE)
 from .util import cache, stdout_encode, debug
 import re
 
-API_URL = 'http://en.wikipedia.org/w/api.php'
+API_URL = 'https://en.wikipedia.org/w/api.php'
 RATE_LIMIT = False
 RATE_LIMIT_MIN_WAIT = None
 RATE_LIMIT_LAST_CALL = None
 USER_AGENT = 'wikipedia (https://github.com/goldsmith/Wikipedia/)'
+TIMEOUT = (5, 15)
+_SESSION = requests.Session()
+atexit.register(_SESSION.close)
+
+
+def set_timeout(timeout):
+  """Set connect/read timeout seconds, a (connect, read) pair, or None.
+
+  The default is (5, 15). None explicitly disables timeouts. A read timeout
+  limits inactivity while reading, not the total wall time of an operation.
+  """
+  values = timeout if isinstance(timeout, tuple) else (timeout,)
+  if timeout is not None and (
+      len(values) not in (1, 2) or
+      (isinstance(timeout, tuple) and len(values) != 2) or
+      any(isinstance(v, bool) or not isinstance(v, Real) or
+          not math.isfinite(v) or v <= 0 for v in values)):
+    raise ValueError('timeout must be positive seconds, a positive pair, or None')
+  global TIMEOUT
+  TIMEOUT = timeout
 
 
 def set_lang(prefix):
@@ -24,14 +49,15 @@ def set_lang(prefix):
   Change the language of the API being requested.
   Set `prefix` to one of the two letter prefixes found on the `list of all Wikipedias <http://meta.wikimedia.org/wiki/List_of_Wikipedias>`_.
 
-  After setting the language, the cache for ``search``, ``suggest``, and ``summary`` will be cleared.
+  After setting the language, all module function caches will be cleared.
+  Existing page objects retain their original language.
 
   .. note:: Make sure you search for page titles in the language that you have set.
   '''
   global API_URL
-  API_URL = 'http://' + prefix.lower() + '.wikipedia.org/w/api.php'
+  API_URL = 'https://' + prefix.lower() + '.wikipedia.org/w/api.php'
 
-  for cached_func in (search, suggest, summary):
+  for cached_func in (search, suggest, summary, geosearch, languages):
     cached_func.clear_cache()
 
 
@@ -86,7 +112,7 @@ def search(query, results=10, suggestion=False):
 
   Keyword arguments:
 
-  * results - the maxmimum number of results returned
+  * results - the maximum number of results returned
   * suggestion - if True, return results and suggestion (if any) in a tuple
   '''
 
@@ -108,13 +134,11 @@ def search(query, results=10, suggestion=False):
     else:
       raise WikipediaException(raw_results['error']['info'])
 
-  search_results = (d['title'] for d in raw_results['query']['search'])
+  search_results = (_required(d, 'title', str) for d in
+                    _required(_required(raw_results, 'query', dict), 'search', list))
 
   if suggestion:
-    if raw_results['query'].get('searchinfo'):
-      return list(search_results), raw_results['query']['searchinfo']['suggestion']
-    else:
-      return list(search_results), None
+    return list(search_results), _search_suggestion(raw_results)
 
   return list(search_results)
 
@@ -154,11 +178,13 @@ def geosearch(latitude, longitude, title=None, results=10, radius=1000):
     else:
       raise WikipediaException(raw_results['error']['info'])
 
-  search_pages = raw_results['query'].get('pages', None)
+  query_data = _required(raw_results, 'query', dict)
+  search_pages = query_data.get('pages', None)
   if search_pages:
-    search_results = (v['title'] for k, v in search_pages.items() if k != '-1')
+    search_pages = _required(query_data, 'pages', dict)
+    search_results = (_required(v, 'title', str) for k, v in search_pages.items() if k != '-1')
   else:
-    search_results = (d['title'] for d in raw_results['query']['geosearch'])
+    search_results = (_required(d, 'title', str) for d in _required(query_data, 'geosearch', list))
 
   return list(search_results)
 
@@ -179,10 +205,7 @@ def suggest(query):
 
   raw_result = _wiki_request(search_params)
 
-  if raw_result['query'].get('searchinfo'):
-    return raw_result['query']['searchinfo']['suggestion']
-
-  return None
+  return _search_suggestion(raw_result)
 
 
 def random(pages=1):
@@ -203,7 +226,8 @@ def random(pages=1):
   }
 
   request = _wiki_request(query_params)
-  titles = [page['title'] for page in request['query']['random']]
+  titles = [_required(page, 'title', str) for page in
+            _required(_required(request, 'query', dict), 'random', list)]
 
   if len(titles) == 1:
     return titles[0]
@@ -222,7 +246,7 @@ def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
 
   * sentences - if set, return the first `sentences` sentences (can be no greater than 10).
   * chars - if set, return only the first `chars` characters (actual text returned may be slightly longer).
-  * auto_suggest - let Wikipedia find a valid page title for the query
+  * auto_suggest - try a search suggestion only if the exact title is missing
   * redirect - allow redirection without raising RedirectError
   '''
 
@@ -245,8 +269,8 @@ def summary(title, sentences=0, chars=0, auto_suggest=True, redirect=True):
   else:
     query_params['exintro'] = ''
 
-  request = _wiki_request(query_params)
-  summary = request['query']['pages'][pageid]['extract']
+  request = page_info._request(query_params)
+  summary = _required(_page_data(request, pageid), 'extract', str)
 
   return summary
 
@@ -260,22 +284,25 @@ def page(title=None, pageid=None, auto_suggest=True, redirect=True, preload=Fals
 
   * title - the title of the page to load
   * pageid - the numeric pageid of the page to load
-  * auto_suggest - let Wikipedia find a valid page title for the query
+  * auto_suggest - try a search suggestion only if the exact title is missing
   * redirect - allow redirection without raising RedirectError
   * preload - load content, summary, images, references, and links during initialization
   '''
 
   if title is not None:
-    if auto_suggest:
+    try:
+      return WikipediaPage(title, redirect=redirect, preload=preload)
+    except PageError:
+      if not auto_suggest:
+        raise
       results, suggestion = search(title, results=1, suggestion=True)
-      try:
-        title = suggestion or results[0]
-      except IndexError:
-        # if there is no suggestion or search results, the page doesn't exist
-        raise PageError(title)
-    return WikipediaPage(title, redirect=redirect, preload=preload)
+      candidate = suggestion or (results[0] if results else None)
+      if not candidate or candidate == title:
+        raise PageError(None, title) from None
+      return WikipediaPage(candidate, redirect=redirect, preload=preload,
+                           original_title=title)
   elif pageid is not None:
-    return WikipediaPage(pageid=pageid, preload=preload)
+    return WikipediaPage(pageid=pageid, redirect=redirect, preload=preload)
   else:
     raise ValueError("Either a title or a pageid must be specified")
 
@@ -288,6 +315,7 @@ class WikipediaPage(object):
   '''
 
   def __init__(self, title=None, pageid=None, redirect=True, preload=False, original_title=''):
+    self._api_url = API_URL
     if title is not None:
       self.title = title
       self.original_title = original_title or title
@@ -305,6 +333,9 @@ class WikipediaPage(object):
   def __repr__(self):
     return stdout_encode(u'<WikipediaPage \'{}\'>'.format(self.title))
 
+  def _request(self, params):
+    return _wiki_request(params, api_url=self._api_url)
+
   def __eq__(self, other):
     try:
       return (
@@ -312,7 +343,7 @@ class WikipediaPage(object):
         and self.title == other.title
         and self.url == other.url
       )
-    except:
+    except Exception:
       return False
 
   def __load(self, redirect=True, preload=False):
@@ -328,105 +359,86 @@ class WikipediaPage(object):
       'ppprop': 'disambiguation',
       'redirects': '',
     }
-    if not getattr(self, 'pageid', None):
+    if not hasattr(self, 'pageid'):
       query_params['titles'] = self.title
     else:
       query_params['pageids'] = self.pageid
 
-    request = _wiki_request(query_params)
+    request = self._request(query_params)
 
     query = request['query']
-    pageid = list(query['pages'].keys())[0]
-    page = query['pages'][pageid]
-
-    # missing is present if the page is missing
-    if 'missing' in page:
+    data = _page_data(request)
+    if 'missing' in data or 'invalid' in data:
       if hasattr(self, 'title'):
-        raise PageError(self.title)
-      else:
-        raise PageError(pageid=self.pageid)
-
-    # same thing for redirect, except it shows up in query instead of page for
-    # whatever silly reason
-    elif 'redirects' in query:
-      if redirect:
-        redirects = query['redirects'][0]
-
-        if 'normalized' in query:
-          normalized = query['normalized'][0]
-          assert normalized['from'] == self.title, ODD_ERROR_MESSAGE
-
-          from_title = normalized['to']
-
-        else:
-          from_title = self.title
-
-        assert redirects['from'] == from_title, ODD_ERROR_MESSAGE
-
-        # change the title and reload the whole object
-        self.__init__(redirects['to'], redirect=redirect, preload=preload)
-
-      else:
-        raise RedirectError(getattr(self, 'title', page['title']))
-
-    # since we only asked for disambiguation in ppprop,
-    # if a pageprop is returned,
-    # then the page must be a disambiguation page
-    elif 'pageprops' in page:
-      query_params = {
-        'prop': 'revisions',
-        'rvprop': 'content',
-        'rvparse': '',
-        'rvlimit': 1
-      }
-      if hasattr(self, 'pageid'):
-        query_params['pageids'] = self.pageid
-      else:
-        query_params['titles'] = self.title
-      request = _wiki_request(query_params)
-      html = request['query']['pages'][pageid]['revisions'][0]['*']
-
-      lis = BeautifulSoup(html, 'html.parser').find_all('li')
-      filtered_lis = [li for li in lis if not 'tocsection' in ''.join(li.get('class', []))]
-      may_refer_to = [li.a.get_text() for li in filtered_lis if li.a]
-
-      raise DisambiguationError(getattr(self, 'title', page['title']), may_refer_to)
-
-    else:
-      self.pageid = pageid
-      self.title = page['title']
-      self.url = page['fullurl']
+        raise PageError(None, self.title)
+      raise PageError(pageid=self.pageid)
+    if query.get('redirects') and not redirect:
+      raise RedirectError(getattr(self, 'title', data.get('title', '')))
+    self.pageid = str(_required(data, 'pageid', int))
+    self.title = _required(data, 'title', str)
+    self.url = _required(data, 'fullurl', str)
+    pageprops = data.get('pageprops', {})
+    if not isinstance(pageprops, dict):
+      raise RequestError('Wikipedia returned malformed pageprops')
+    if 'disambiguation' in pageprops:
+      parsed = _required(self._request({'action': 'parse', 'prop': 'text|links',
+                                       'page': self.title}), 'parse', dict)
+      self._html = _required(_required(parsed, 'text', dict), '*', str)
+      allowed = {_required(link, '*', str) for link in _required(parsed, 'links', list)
+                 if _required(link, 'ns', int) == 0 and 'exists' in link}
+      soup = BeautifulSoup(self._html, 'html.parser')
+      options = []
+      for li in soup.find_all('li'):
+        if any('tocsection' in name for name in li.get('class', [])):
+          continue
+        for link in li.find_all('a', href=True):
+          target = urlsplit(link['href'])
+          if target.netloc and target.netloc != urlsplit(self._api_url).netloc:
+            continue
+          if not target.path.startswith('/wiki/') or 'new' in link.get('class', []):
+            continue
+          title = unquote(target.path[len('/wiki/'):]).replace('_', ' ')
+          if title not in allowed:
+            continue
+          if title not in options:
+            options.append(title)
+          break
+      raise DisambiguationError(self.title, options)
 
   def __continued_query(self, query_params):
     '''
     Based on https://www.mediawiki.org/wiki/API:Query#Continuing_queries
     '''
-    query_params.update(self.__title_query_param)
-
+    query_params = dict(query_params, **self.__title_query_param)
     last_continue = {}
-    prop = query_params.get('prop', None)
-
+    seen = set()
+    prop = query_params.get('prop')
     while True:
-      params = query_params.copy()
-      params.update(last_continue)
-
-      request = _wiki_request(params)
-
-      if 'query' not in request:
-        break
-
-      pages = request['query']['pages']
+      request = self._request(dict(query_params, **last_continue))
       if 'generator' in query_params:
-        for datum in pages.values():  # in python 3.3+: "yield from pages.values()"
+        if 'query' not in request and 'batchcomplete' in request:
+          pages = {}
+        else:
+          pages = _required(_required(request, 'query', dict), 'pages', dict)
+        for datum in pages.values():
+          if not isinstance(datum, dict):
+            raise RequestError('Wikipedia returned a malformed generated page')
           yield datum
       else:
-        for datum in pages[self.pageid][prop]:
-          yield datum
-
+        data = _page_data(request, self.pageid)
+        if 'missing' in data:
+          raise PageError(pageid=self.pageid)
+        values = data.get(prop, [])
+        if not isinstance(values, list) or any(not isinstance(v, dict) for v in values):
+          raise RequestError('Wikipedia returned a malformed {} property'.format(prop))
+        yield from values
       if 'continue' not in request:
         break
-
-      last_continue = request['continue']
+      last_continue = _required(request, 'continue', dict)
+      token = repr(sorted(last_continue.items()))
+      if not last_continue or token in seen:
+        raise RequestError('Wikipedia repeated or omitted a continuation token')
+      seen.add(token)
 
   @property
   def __title_query_param(self):
@@ -442,17 +454,10 @@ class WikipediaPage(object):
     .. warning:: This can get pretty slow on long pages.
     '''
 
-    if not getattr(self, '_html', False):
-      query_params = {
-        'prop': 'revisions',
-        'rvprop': 'content',
-        'rvlimit': 1,
-        'rvparse': '',
-        'titles': self.title
-      }
-
-      request = _wiki_request(query_params)
-      self._html = request['query']['pages'][self.pageid]['revisions'][0]['*']
+    if not hasattr(self, '_html'):
+      request = self._request({'action': 'parse', 'prop': 'text', 'page': self.title})
+      text = _required(_required(request, 'parse', dict), 'text', dict)
+      self._html = _required(text, '*', str)
 
     return self._html
 
@@ -462,7 +467,7 @@ class WikipediaPage(object):
     Plain text content of the page, excluding images, tables, and other data.
     '''
 
-    if not getattr(self, '_content', False):
+    if not hasattr(self, '_content'):
       query_params = {
         'prop': 'extracts|revisions',
         'explaintext': '',
@@ -472,10 +477,17 @@ class WikipediaPage(object):
          query_params['titles'] = self.title
       else:
          query_params['pageids'] = self.pageid
-      request = _wiki_request(query_params)
-      self._content     = request['query']['pages'][self.pageid]['extract']
-      self._revision_id = request['query']['pages'][self.pageid]['revisions'][0]['revid']
-      self._parent_id   = request['query']['pages'][self.pageid]['revisions'][0]['parentid']
+      request = self._request(query_params)
+      data = _page_data(request, self.pageid)
+      content = _required(data, 'extract', str)
+      revisions = _required(data, 'revisions', list)
+      if not revisions or not isinstance(revisions[0], dict):
+        raise RequestError('Wikipedia returned no revision metadata')
+      revision_id = _required(revisions[0], 'revid', int)
+      parent_id = _required(revisions[0], 'parentid', int)
+      self._content = content
+      self._revision_id = revision_id
+      self._parent_id = parent_id
 
     return self._content
 
@@ -491,7 +503,7 @@ class WikipediaPage(object):
     information.
     '''
 
-    if not getattr(self, '_revid', False):
+    if not hasattr(self, '_revision_id'):
       # fetch the content (side effect is loading the revid)
       self.content
 
@@ -504,7 +516,7 @@ class WikipediaPage(object):
     page. See ``revision_id`` for more information.
     '''
 
-    if not getattr(self, '_parentid', False):
+    if not hasattr(self, '_parent_id'):
       # fetch the content (side effect is loading the revid)
       self.content
 
@@ -516,7 +528,7 @@ class WikipediaPage(object):
     Plain text summary of the page.
     '''
 
-    if not getattr(self, '_summary', False):
+    if not hasattr(self, '_summary'):
       query_params = {
         'prop': 'extracts',
         'explaintext': '',
@@ -527,8 +539,8 @@ class WikipediaPage(object):
       else:
          query_params['pageids'] = self.pageid
 
-      request = _wiki_request(query_params)
-      self._summary = request['query']['pages'][self.pageid]['extract']
+      request = self._request(query_params)
+      self._summary = _required(_page_data(request, self.pageid), 'extract', str)
 
     return self._summary
 
@@ -538,37 +550,49 @@ class WikipediaPage(object):
     List of URLs of images on the page.
     '''
 
-    if not getattr(self, '_images', False):
-      self._images = [
-        page['imageinfo'][0]['url']
-        for page in self.__continued_query({
+    if not hasattr(self, '_images'):
+      images = []
+      for page in self.__continued_query({
           'generator': 'images',
           'gimlimit': 'max',
           'prop': 'imageinfo',
           'iiprop': 'url',
-        })
-        if 'imageinfo' in page
-      ]
+        }):
+        info = page.get('imageinfo', [])
+        if not isinstance(info, list):
+          raise RequestError('Wikipedia returned malformed image metadata')
+        if not info:
+          continue
+        if not isinstance(info[0], dict):
+          raise RequestError('Wikipedia returned malformed image metadata')
+        if 'url' in info[0]:
+          images.append(_required(info[0], 'url', str))
+      self._images = images
 
-    return self._images
+    return list(self._images)
 
   @property
   def coordinates(self):
     '''
     Tuple of Decimals in the form of (lat, lon) or None
     '''
-    if not getattr(self, '_coordinates', False):
+    if not hasattr(self, '_coordinates'):
       query_params = {
         'prop': 'coordinates',
         'colimit': 'max',
         'titles': self.title,
       }
 
-      request = _wiki_request(query_params)
+      request = self._request(query_params)
 
-      if 'query' in request:
-        coordinates = request['query']['pages'][self.pageid]['coordinates']
-        self._coordinates = (Decimal(coordinates[0]['lat']), Decimal(coordinates[0]['lon']))
+      coordinates = _page_data(request, self.pageid).get('coordinates', [])
+      if not isinstance(coordinates, list):
+        raise RequestError('Wikipedia returned malformed coordinates')
+      if coordinates:
+        try:
+          self._coordinates = (Decimal(str(coordinates[0]['lat'])), Decimal(str(coordinates[0]['lon'])))
+        except (KeyError, TypeError, ArithmeticError) as exc:
+          raise RequestError('Wikipedia returned malformed coordinates') from exc
       else:
         self._coordinates = None
 
@@ -581,19 +605,19 @@ class WikipediaPage(object):
     May include external links within page that aren't technically cited anywhere.
     '''
 
-    if not getattr(self, '_references', False):
+    if not hasattr(self, '_references'):
       def add_protocol(url):
-        return url if url.startswith('http') else 'http:' + url
+        return 'https:' + url if url.startswith('//') else url
 
       self._references = [
-        add_protocol(link['*'])
+        add_protocol(_required(link, '*', str))
         for link in self.__continued_query({
           'prop': 'extlinks',
           'ellimit': 'max'
         })
       ]
 
-    return self._references
+    return list(self._references)
 
   @property
   def links(self):
@@ -603,9 +627,9 @@ class WikipediaPage(object):
     .. note:: Only includes articles from namespace 0, meaning no Category, User talk, or other meta-Wikipedia pages.
     '''
 
-    if not getattr(self, '_links', False):
+    if not hasattr(self, '_links'):
       self._links = [
-        link['title']
+        _required(link, 'title', str)
         for link in self.__continued_query({
           'prop': 'links',
           'plnamespace': 0,
@@ -613,7 +637,7 @@ class WikipediaPage(object):
         })
       ]
 
-    return self._links
+    return list(self._links)
 
   @property
   def categories(self):
@@ -621,16 +645,16 @@ class WikipediaPage(object):
     List of categories of a page.
     '''
 
-    if not getattr(self, '_categories', False):
-      self._categories = [re.sub(r'^Category:', '', x) for x in
-        [link['title']
+    if not hasattr(self, '_categories'):
+      self._categories = [x.split(':', 1)[-1] for x in
+        [_required(link, 'title', str)
         for link in self.__continued_query({
           'prop': 'categories',
           'cllimit': 'max'
         })
       ]]
 
-    return self._categories
+    return list(self._categories)
 
   @property
   def sections(self):
@@ -638,18 +662,18 @@ class WikipediaPage(object):
     List of section titles from the table of contents on the page.
     '''
 
-    if not getattr(self, '_sections', False):
-      query_params = {
-        'action': 'parse',
-        'prop': 'sections',
-      }
-      if not getattr(self, 'title', None) is None:
-          query_params["page"] = self.title
+    if not hasattr(self, '_sections'):
+      request = self._request({'action': 'parse', 'prop': 'tocdata', 'page': self.title})
+      parsed = _required(request, 'parse', dict)
+      # MediaWiki returns explicit null for a page without a table of contents.
+      if 'tocdata' in parsed and parsed['tocdata'] is None:
+        sections = []
+      else:
+        sections = _required(_required(parsed, 'tocdata', dict), 'sections', list)
+      self._sections = [BeautifulSoup(_required(section, 'line', str), 'html.parser').get_text()
+                        for section in sections]
 
-      request = _wiki_request(query_params)
-      self._sections = [section['line'] for section in request['parse']['sections']]
-
-    return self._sections
+    return list(self._sections)
 
   def section(self, section_title):
     '''
@@ -663,18 +687,12 @@ class WikipediaPage(object):
            `section_title` and the next subheading, which is often empty.
     '''
 
-    section = u"== {} ==".format(section_title)
-    try:
-      index = self.content.index(section) + len(section)
-    except ValueError:
-      return None
-
-    try:
-      next_index = self.content.index("==", index)
-    except ValueError:
-      next_index = len(self.content)
-
-    return self.content[index:next_index].lstrip("=").strip()
+    headings = list(re.finditer(r'^(={2,6})[ \t]*(.*?)[ \t]*\1[ \t]*$', self.content, re.MULTILINE))
+    for index, heading in enumerate(headings):
+      if heading.group(2).strip() == section_title:
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(self.content)
+        return self.content[heading.end():end].strip()
+    return None
 
 
 @cache
@@ -693,10 +711,10 @@ def languages():
     'siprop': 'languages'
   })
 
-  languages = response['query']['languages']
+  languages = _required(_required(response, 'query', dict), 'languages', list)
 
   return {
-    lang['code']: lang['*']
+    _required(lang, 'code', str): _required(lang, '*', str)
     for lang in languages
   }
 
@@ -710,34 +728,125 @@ def donate():
   webbrowser.open('https://donate.wikimedia.org/w/index.php?title=Special:FundraiserLandingPage', new=2)
 
 
-def _wiki_request(params):
+def _search_suggestion(response):
+  info = _required(response, 'query', dict).get('searchinfo', {})
+  if not isinstance(info, dict):
+    raise RequestError('Wikipedia returned malformed search information')
+  suggestion = info.get('suggestion')
+  if suggestion is not None and not isinstance(suggestion, str):
+    raise RequestError('Wikipedia returned a malformed suggestion')
+  return suggestion
+
+
+def _required(mapping, key, expected_type):
+  if not isinstance(mapping, dict) or not isinstance(mapping.get(key), expected_type):
+    raise RequestError('Wikipedia returned a missing or malformed {}'.format(key))
+  return mapping[key]
+
+
+def _page_data(response, pageid=None):
+  pages = _required(_required(response, 'query', dict), 'pages', dict)
+  if not pages:
+    raise RequestError('Wikipedia returned no page records')
+  if pageid is None:
+    if len(pages) != 1:
+      raise RequestError('Wikipedia returned ambiguous page records')
+    data = next(iter(pages.values()))
+  else:
+    data = pages.get(str(pageid))
+  if not isinstance(data, dict):
+    raise RequestError('Wikipedia returned a missing or malformed page record')
+  return data
+
+
+def _retry_after(value):
+  """Parse HTTP delta-seconds or a date; ignore invalid header values."""
+  if value is None:
+    return None
+  try:
+    seconds = float(value)
+  except (TypeError, ValueError):
+    try:
+      seconds = parsedate_to_datetime(value).timestamp() - time.time()
+    except (TypeError, ValueError, OverflowError):
+      return None
+  else:
+    if seconds < 0:
+      return None
+  return max(0.0, seconds) if math.isfinite(seconds) else None
+
+
+def _wiki_request(params, api_url=None):
   '''
   Make a request to the Wikipedia API using the given search parameters.
   Returns a parsed dict of the JSON response.
   '''
   global RATE_LIMIT_LAST_CALL
-  global USER_AGENT
+  params = dict(params, format='json')
+  params.setdefault('action', 'query')
+  query = next((params[k] for k in ('titles', 'pageids', 'srsearch', 'gscoord')
+                if k in params), params)
+  slept = 0.0
+  for attempt in range(3):
+    if RATE_LIMIT and RATE_LIMIT_LAST_CALL is not None:
+      wait = RATE_LIMIT_MIN_WAIT.total_seconds() - (time.monotonic() - RATE_LIMIT_LAST_CALL)
+      if wait > 0:
+        time.sleep(wait)
+    retry_after = None
+    throttled = False
+    try:
+      response = _SESSION.get(api_url or API_URL, params=params,
+                              headers={'User-Agent': USER_AGENT}, timeout=TIMEOUT)
+    except requests.Timeout as exc:
+      failure = HTTPTimeoutError(query)
+      failure.__cause__ = exc
+      retryable = True
+    except requests.ConnectionError as exc:
+      failure = RequestError('Connection to Wikipedia failed: {}'.format(exc))
+      failure.__cause__ = exc
+      retryable = True
+    except requests.RequestException as exc:
+      raise RequestError('Wikipedia request failed: {}'.format(exc)) from exc
+    else:
+      status = response.status_code
+      retry_after = _retry_after(response.headers.get('Retry-After'))
+      try:
+        data = response.json()
+      except ValueError as exc:
+        if 200 <= status < 300:
+          raise RequestError('Wikipedia returned invalid JSON', status_code=status) from exc
+        data = {}
+      error = data.get('error', {}) if isinstance(data, dict) else {}
+      if not isinstance(error, dict):
+        raise RequestError('Wikipedia returned a malformed API error', status_code=status)
+      code = error.get('code')
+      message = error.get('info', code or 'HTTP {}'.format(status))
+      if not 200 <= status < 300 or error:
+        retryable = status in (429, 502, 503, 504) or code in ('maxlag', 'ratelimited')
+        throttled = status == 429 or code in ('maxlag', 'ratelimited')
+        if message in ('HTTP request timed out.', 'Pool queue is full'):
+          failure = HTTPTimeoutError(query)
+          retryable = True
+        else:
+          failure = RequestError(message, status_code=status, api_code=code,
+                                 retry_after=retry_after)
+      else:
+        action = params['action']
+        if not isinstance(data, dict) or not isinstance(data.get(action), dict):
+          # Empty image generators legitimately omit query while returning batchcomplete.
+          if not (action == 'query' and 'generator' in params and
+                  isinstance(data, dict) and 'batchcomplete' in data):
+            raise RequestError('Wikipedia returned a malformed {} response'.format(action),
+                               status_code=status)
+        return data
+    finally:
+      if RATE_LIMIT:
+        RATE_LIMIT_LAST_CALL = time.monotonic()
 
-  params['format'] = 'json'
-  if not 'action' in params:
-    params['action'] = 'query'
-
-  headers = {
-    'User-Agent': USER_AGENT
-  }
-
-  if RATE_LIMIT and RATE_LIMIT_LAST_CALL and \
-    RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT > datetime.now():
-
-    # it hasn't been long enough since the last API call
-    # so wait until we're in the clear to make the request
-
-    wait_time = (RATE_LIMIT_LAST_CALL + RATE_LIMIT_MIN_WAIT) - datetime.now()
-    time.sleep(int(wait_time.total_seconds()))
-
-  r = requests.get(API_URL, params=params, headers=headers)
-
-  if RATE_LIMIT:
-    RATE_LIMIT_LAST_CALL = datetime.now()
-
-  return r.json()
+    if not retryable or attempt == 2:
+      raise failure
+    delay = retry_after if retry_after is not None else (5 if throttled else 1) * 2 ** attempt
+    if slept + delay > 30:
+      raise failure
+    time.sleep(delay)
+    slept += delay

@@ -1,6 +1,35 @@
-# Changelog
+# Changes
 
-## Current
+## 1.5.0 — unreleased stabilization candidate
+
+- Require Python 3.10 or newer; test through 3.14. Modern build metadata, wheels,
+  offline pytest coverage and GitHub Actions replace the obsolete Travis setup.
+- Resolve exact titles before a single suggestion fallback, preserving the
+  `auto_suggest=True` default and public positional signatures. Exact disambiguation
+  pages raise rather than silently resolving to an unrelated article.
+- Use HTTPS, connection reuse and configurable timeouts (default connect 5s/read
+  15s). Add `set_timeout` and `RequestError`. Retry transient failures at most twice,
+  honor Retry-After within a 30-second retry-sleep budget, and fix fractional rate limits.
+  Timeouts are inactivity limits, not a total deadline for a multi-request operation.
+- Preserve page objects' originating language; invalidate geosearch on language changes.
+  Module caches expire after five minutes and hold at most 256 entries each. Cached
+  mutable outputs and list page properties are returned defensively.
+- Fix page-ID redirects and missing-title exception attributes. Empty PageError
+  construction no longer crashes. Existing exception class names remain available.
+- Return empty lists for absent list properties and None for absent coordinates;
+  cache empty results. Reject malformed response structures and repeated continuation
+  tokens; raise on mid-pagination failures instead of returning partial results.
+- Use supported parse requests for HTML and table-of-contents data; a null TOC
+  correctly returns an empty sections list. Disambiguation
+  options are unique existing article targets rather than potentially misleading labels.
+- Match section headings as complete lines, retaining the existing exclusion of
+  subsection content. Decode section heading markup. Strip localized category namespaces.
+- Make Unicode page representations independent of terminal encoding.
+- Keep absolute external-link schemes intact; protocol-relative references become HTTPS.
+- Retain tuple `__version__`, Decimal coordinates, random return shapes, and the
+  existing meanings of links, images, references, text extracts and lazy properties.
+- Incorporate PR #351 with original authorship: object equality no longer swallows
+  KeyboardInterrupt or SystemExit. See CONTRIBUTIONS.md for contributor acknowledgments.
 
 ## Version 1.4
 
